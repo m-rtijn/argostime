@@ -73,6 +73,8 @@ class ParseProduct():
 
         if shops_info["ah"]["hostname"] in hostname:
             self._parse_ah()
+        elif shops_info["jumbo"]["hostname"] in hostname:
+            self._parse_jumbo()
         else:
             raise WebsiteNotImplementedException(url)
 
