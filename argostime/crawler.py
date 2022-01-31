@@ -222,13 +222,13 @@ class ParseProduct():
 
         soup = BeautifulSoup(request.text, "html.parser")
 
-        product_title = soup.find("span", attrs={ "itemprop": "name"})
+        product_title = soup.find("meta", attrs={ "name": "title"})
         product_price = soup.find("meta", attrs={ "property": "product:price:amount"})
 
         try:
             self.url = self.url
-            self.name = product_title.text
+            self.name = product_title['content']
             self.normal_price = product_price['content']
-            self.product_code = product_title.text.replace(" ", "")
+            self.product_code = product_title['content'].replace(" ", "-")
         except Exception as e:
             logging.error("%s, raising Exception %s" % e)
