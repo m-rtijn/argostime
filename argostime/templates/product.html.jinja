@@ -1,0 +1,31 @@
+{% extends "base.html.jinja" %}
+{% block title %}{{ p.name }} | Argostimè {% endblock %}
+{% block content %}
+<h1>{{ p.name }}</h1>
+
+{% for offer in offers %}
+<h3>Verkoper: {{ offer.get_shop().name }} (<a target="_blank" href="{{ offer.url }}">Bezoek website 🡥</a>)</h3>
+<table>
+<tr>
+    <th>Huidige prijs</th>
+    <th>Gemiddelde prijs</th>
+    <th>Laagste prijs</th>
+    <th>Hoogste prijs</th>
+    <th>Bijgehouden sinds</th>
+</tr>
+<tr>
+{% if offer.get_current_price().on_sale %}
+    <td class="sale">Korting! {{ "€%.2f" | format(offer.get_current_price().discount_price)  }} ({{ offer.get_current_price().datetime.strftime("%Y-%m-%d") }})</td>
+{% else %}
+    <td>{{ "€%.2f" | format(offer.get_current_price().normal_price) }} ({{ offer.get_current_price().datetime.strftime("%Y-%m-%d") }})</td>
+{% endif %}
+    <td>{{ "€%.2f" | format(offer.get_average_price()) }}</td>
+    <td>{{ "€%.2f" | format(offer.get_lowest_price()) }}</td>
+    <td>{{ "€%.2f" | format(offer.get_highest_price()) }}</td>
+    <td>{{ offer.time_added.strftime("%Y-%m-%d") }}</td>
+</tr>
+</table>
+
+<a href="/productoffer/{{ offer.id }}/price_step_graph.png"><img src="/productoffer/{{ offer.id }}/price_step_graph.png"></a>
+{% endfor %}
+{% endblock %}

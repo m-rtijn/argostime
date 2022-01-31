@@ -1,0 +1,25 @@
+[Unit]
+Description=Keep an eye on prices
+After=network.target
+After=mariadb.service
+
+[Service]
+User=nobody
+WorkingDirectory=/opt/argostime/src
+Environment="PATH=/opt/argostime/.venv/bin"
+ExecStart=/opt/argostime/.venv/bin/gunicorn --workers 1 --bind 127.0.0.1:20738 wsgi:app
+ExecReload=/bin/kill -s HUP $MAINPID
+ExecStop=/bin/kill -s TERM $MAINPID
+
+# Security hardening
+PrivateDevices=true
+ProtectClock=true
+ProtectControlGroups=true
+ProtectHome=true
+ProtectKernelLogs=yes
+ProtectKernelModules=yes
+ProtectKernelTunables=true
+ProtectSystem=full
+RestrictSUIDSGID=true
+NoNewPrivileges=true
+PrivateTmp=true

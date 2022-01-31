@@ -1,0 +1,27 @@
+[MESSAGES CONTROL]
+disable=R0903
+
+[TYPECHECK]
+generated-members=flask_sqlalchemy.SQLAlchemy.DateTime,
+                    flask_sqlalchemy.SQLAlchemy.relationship,
+                    flask_sqlalchemy.SQLAlchemy.Integer,
+                    flask_sqlalchemy.SQLAlchemy.Column,
+                    flask_sqlalchemy.SQLAlchemy.ForeignKey,
+                    flask_sqlalchemy.SQLAlchemy.String,
+                    flask_sqlalchemy.SQLAlchemy.Float,
+                    flask_sqlalchemy.SQLAlchemy.Boolean,
+                    flask_sqlalchemy.SQLAlchemy.Unicode,
+                    db.session.add,
+                    db.session.commit,
+                    ax.set_ylabel,
+                    ax.set_xlabel,
+                    ax.set_title,
+                    ax.bar_label,
+                    ax.step,
+                    ax.grid,
+                    ax.set_xticks,
+                    ax.annotate,
+                    ax.bar
+
+[BASIC]
+good-names=i,j,k,x,ax

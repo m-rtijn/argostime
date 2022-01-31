@@ -1,0 +1,32 @@
+{% extends "base.html.jinja" %}
+{% block title %}{{ s.name }} | Argostimè {% endblock %}
+{% block content %}
+<h1>{{ s.name }}</h1>
+
+<table>
+<tr>
+    <th>Product</th>
+    <th>Huidige prijs</th>
+    <th>Gemiddelde prijs</th>
+    <th>Laagste prijs</th>
+    <th>Hoogste prijs</th>
+    <th>Bijgehouden sinds</th>
+    <th>Website verkoper</th>
+</tr>
+{% for offer in offers %}
+<tr>
+    <td><a href="/product/{{ offer.get_product().product_code }}">{{ offer.get_product().name }}</a></td>
+{% if offer.get_current_price().on_sale %}
+    <td class="sale">Korting! {{ "€%.2f" | format(offer.get_current_price().discount_price)  }} ({{ offer.get_current_price().datetime.strftime("%Y-%m-%d") }})</td>
+{% else %}
+    <td>{{ "€%.2f" | format(offer.get_current_price().normal_price) }} ({{ offer.get_current_price().datetime.strftime("%Y-%m-%d") }})</td>
+{% endif %}
+    <td>{{ "€%.2f" | format(offer.get_average_price()) }}</td>
+    <td>{{ "€%.2f" | format(offer.get_lowest_price()) }}</td>
+    <td>{{ "€%.2f" | format(offer.get_highest_price()) }}</td>
+    <td>{{ offer.time_added.strftime("%Y-%m-%d") }}</td>
+    <td><a target="_blank" href="{{ offer.url }}">{{ offer.get_shop().hostname }} 🡥</a></td>
+</tr>
+{% endfor %}
+</table>
+{% endblock %}

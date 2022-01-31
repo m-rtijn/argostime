@@ -1,0 +1,25 @@
+{% extends "base.html.jinja" %}
+{% block title %}Argostimè{% endblock %}
+{% block content %}
+<p>Argostimè houdt voor jou prijzen van winkels bij, zodat je weet of iets echt korting heeft, of dat het slechts schijn is.</p>
+
+<p>Vul de URL in om een product toe te voegen aan de website:</p>
+<form action="" method="post">
+    <input type="text" name="url" size="50"></input>
+    <input type="submit" name="submit" value="Toevoegen"></input>
+</form>
+
+<p>Beschikbare webwinkels:</p>
+<nav>
+{% for shop in shops %}
+<a href="/shop/{{ shop.id }}">{{ shop.name }}</a>
+{% endfor %}
+</nav>
+
+<p>De laatst toegevoegde producten zijn:</p>
+<ul>
+{% for product in products %}
+<li><a href="product/{{ product.product_code }}">{{ product.name }}</a></li>
+{% endfor %}
+</ul>
+{% endblock %}
