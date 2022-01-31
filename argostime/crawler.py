@@ -229,6 +229,6 @@ class ParseProduct():
             self.url = self.url
             self.name = product_title.text
             self.normal_price = product_price['content']
-            self.product_code = False     
+            self.product_code = product_title.text.replace(" ", "")
         except Exception as e:
             logging.error("%s, raising Exception %s" % e)
