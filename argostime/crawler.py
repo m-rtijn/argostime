@@ -81,6 +81,8 @@ class ParseProduct():
             self._parse_ah()
         elif shops_info["jumbo"]["hostname"] in hostname:
             self._parse_jumbo()
+        elif shops_info["brandzaak"]["hostname"] in hostname:
+            self._parse_brandzaak()            
         else:
             raise WebsiteNotImplementedException(url)
 
@@ -224,6 +226,7 @@ class ParseProduct():
         product_price = soup.find("meta", attrs={ "property": "product:price:amount"})
 
         try:
+            self.url = self.url
             self.name = product_title.text
             self.normal_price = product_price['content']
             self.product_code = False     
