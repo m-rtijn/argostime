@@ -36,13 +36,19 @@ shops_info = {
     "ah": {
         "name": "Albert Heijn",
         "hostname": "ah.nl"
-        }
+    },
+    "jumbo": {
+        "name": "Jumbo",
+        "hostname": "jumbo.com"
     }
+}
 
 enabled_shops = {
     "ah.nl": "ah",
-    "www.ah.nl": "ah"
-    }
+    "www.ah.nl": "ah",
+    "jumbo.com": "jumbo",
+    "www.jumbo.com": "jumbo"
+}
 
 class ParseProduct():
     """The results of parsing a product from a URL"""
@@ -67,6 +73,8 @@ class ParseProduct():
 
         if shops_info["ah"]["hostname"] in hostname:
             self._parse_ah()
+        elif shops_info["jumbo"]["hostname"] in hostname:
+            self._parse_jumbo()
         else:
             raise WebsiteNotImplementedException(url)
 
@@ -144,3 +152,53 @@ class ParseProduct():
             except KeyError:
                 logging.error("Couldn't even find a normal price in %s", product_dict)
                 raise CrawlerException from KeyError
+
+    def _parse_jumbo(self):
+        headers = {
+            "Referer": "https://www.jumbo.com",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+            "Accept-Encoding": "gzip, deflate, br",
+            "Accept-Language": "nl,en-US;q=0.7,en;q=0.3",
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "DNT": "1",
+            "Pragma": "no-cache",
+            "Sec-Fetch-Dest": "document",
+            "Sec-Fetch-Mode": "navigate",
+            "Sec-Fetch-Site": "none",
+            "Sec-Fetch-User": "?1",
+            "Upgrade-Insecure-Requests": "1",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:96.0) Gecko/20100101 Firefox/96.0"
+        }
+
+        request = requests.get(self.url, timeout=10, headers=headers)
+
+        if request.status_code == 404:
+            raise PageNotFoundException(self.url)
+
+        soup = BeautifulSoup(request.text, "html.parser")
+        product_json = soup.find("script", attrs={"type": "application/ld+json", "data-n-head": "ssr"})
+        raw_json = product_json.string
+
+        try:
+            product = json.loads(raw_json)
+        except json.decoder.JSONDecodeError:
+            logging.error("Could not decode JSON %s, raising CrawlerException", raw_json)
+            raise CrawlerException from json.decoder.JSONDecodeError
+
+        if product["offers"]["@type"] == "AggregateOffer":
+            offer = product["offers"]
+        else:
+            logging.error("No price info available, raising CrawlerException", raw_json)
+            raise CrawlerException()
+
+        try:
+            self.url = product["url"]
+            self.name = product["name"]
+            self.ean = product["gtin13"]
+            self.product_code = product["sku"]
+            self.discount_price = offer["lowPrice"]
+            self.normal_price = offer["highPrice"]
+        except KeyError as e:
+            logging.error("%s, raising CrawlerException" % e, raw_json)
+            raise CrawlerException from KeyError
