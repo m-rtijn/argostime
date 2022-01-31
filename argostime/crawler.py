@@ -40,14 +40,20 @@ shops_info = {
     "jumbo": {
         "name": "Jumbo",
         "hostname": "jumbo.com"
-    }
+    },
+    "brandzaak": {
+        "name": "Brandzaak",
+        "hostname": "brandzaak.nl"
+    }    
 }
 
 enabled_shops = {
     "ah.nl": "ah",
     "www.ah.nl": "ah",
     "jumbo.com": "jumbo",
-    "www.jumbo.com": "jumbo"
+    "www.jumbo.com": "jumbo",
+    "brandzaak.nl": "brandzaak",
+    "www.brandzaak.nl": "brandzaak"
 }
 
 class ParseProduct():
@@ -202,3 +208,24 @@ class ParseProduct():
         except KeyError as e:
             logging.error("%s, raising CrawlerException" % e, raw_json)
             raise CrawlerException from KeyError
+
+
+    def _parse_brandzaak(self):
+        """Parse a product from brandzaak.nl"""
+
+        request = requests.get(self.url)
+
+        if request.status_code == 404:
+            raise PageNotFoundException(url)
+
+        soup = BeautifulSoup(request.text, "html.parser")
+
+        product_title = soup.find("span", attrs={ "itemprop": "name"})
+        product_price = soup.find("meta", attrs={ "property": "product:price:amount"})
+
+        try:
+            self.name = product_title.text
+            self.normal_price = product_price['content']
+            self.product_code = False     
+        except Exception as e:
+            logging.error("%s, raising Exception %s" % e)
