@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """
     crawler.py
 
@@ -125,15 +125,24 @@ class ParseProduct():
             raise CrawlerException from KeyError
 
         try:
-            bonus_from: datetime = datetime.strptime(product_dict["offers"]["validFrom"], ah_date_format)
-            bonus_until: datetime = datetime.strptime(product_dict["offers"]["priceValidUntil"], ah_date_format)
-            if datetime.now() >= bonus_from and datetime.now() <= bonus_until:
+            if product_dict["offers"]["validFrom"] == "undefined":
+                # Sometimes the "validFrom" is just undefined, just assume that there is a discount then
                 self.discount_price = float(product_dict["offers"]["price"])
                 self.normal_price = -1.0
             else:
-                # Ahh, the nice moments when there is just no valid price available. That sucks!
-                logging.error("No valid price available for %s", self.url)
-                self.normal_price = -1.0
+                bonus_from: datetime = datetime.strptime(product_dict["offers"]["validFrom"], ah_date_format)
+                try:
+                    bonus_until: datetime = datetime.strptime(product_dict["offers"]["priceValidUntil"], ah_date_format)
+                except ValueError:
+                    # If there is no bonus_until, just use this instead
+                    bonus_until: datetime = datetime(year=5000, month=12, day=31)
+                if datetime.now() >= bonus_from and datetime.now() <= bonus_until:
+                    self.discount_price = float(product_dict["offers"]["price"])
+                    self.normal_price = -1.0
+                else:
+                    # Ahh, the nice moments when there is just no valid price available. That sucks!
+                    logging.error("No valid price available for %s", self.url)
+                    self.normal_price = -1.0
         except KeyError:
             # No details on if there is bonus data or not, so assume no bonus
             try:

@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """
     __init__.py
 
@@ -35,6 +35,7 @@ def create_app():
         level=logging.DEBUG,
         format="%(asctime)s - %(levelname)s - %(module)s - %(funcName)s - %(message)s"
         )
+    logging.getLogger("matplotlib.font_manager").disabled = True
 
     config = configparser.ConfigParser()
     config.read("argostime.conf")
