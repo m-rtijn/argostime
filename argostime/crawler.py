@@ -118,7 +118,8 @@ class ParseProduct():
             self.ean = product_dict["gtin13"]
         except KeyError:
             logging.error("No key gtin13 found in json %s", product_dict)
-            raise CrawlerException from KeyError
+            # Don't crash because the ean is not strictly necessarry
+            pass
 
         try:
             self.product_code = product_dict["sku"]
