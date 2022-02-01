@@ -24,6 +24,7 @@
 
 from datetime import datetime
 import logging
+import statistics
 from sys import maxsize
 from typing import List
 
@@ -106,17 +107,15 @@ class ProductOffer(db.Model):
     def get_average_price(self) -> float:
         """Calculate the average price of this offer."""
         effective_price_values: List[float] = []
-        price_sum: float = 0
         for price in Price.query.filter_by(product_offer_id=self.id).all():
             try:
-                price_sum = price_sum + price.get_effective_price()
-                effective_price_values.append(price)
+                effective_price_values.append(price.get_effective_price())
             except NoEffectivePriceAvailableException:
                 # Ignore price entries without a valid price in calculating the price.
                 pass
         try:
-            return price_sum / len(effective_price_values)
-        except ZeroDivisionError:
+            return statistics.mean(effective_price_values)
+        except statistics.StatisticsError:
             logging.info("Called get_average_price but no prices were found...")
             return -1
 
