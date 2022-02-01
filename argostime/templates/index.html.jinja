@@ -12,14 +12,14 @@
 <p>Beschikbare webwinkels:</p>
 <nav>
 {% for shop in shops %}
-<a href="/shop/{{ shop.id }}">{{ shop.name }}</a>
+<a href="/shop/{{ shop.id }}">{{ shop.name|e }}</a>
 {% endfor %}
 </nav>
 
 <p>De laatst toegevoegde producten zijn:</p>
 <ul>
 {% for product in products %}
-<li><a href="product/{{ product.product_code }}">{{ product.name }}</a></li>
+<li><a href="product/{{ product.product_code|e }}">{{ product.name|e }}</a></li>
 {% endfor %}
 </ul>
 {% endblock %}

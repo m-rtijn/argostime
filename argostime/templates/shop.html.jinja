@@ -1,7 +1,7 @@
 {% extends "base.html.jinja" %}
-{% block title %}{{ s.name }} | Argostimè {% endblock %}
+{% block title %}{{ s.name|e }} | Argostimè {% endblock %}
 {% block content %}
-<h1>{{ s.name }}</h1>
+<h1>{{ s.name|e }}</h1>
 
 <table>
 <tr>
@@ -15,7 +15,7 @@
 </tr>
 {% for offer in offers %}
 <tr>
-    <td><a href="/product/{{ offer.product.product_code }}">{{ offer.product.name }}</a></td>
+    <td><a href="/product/{{ offer.product.product_code|e }}">{{ offer.product.name|e }}</a></td>
 {% if offer.get_current_price().on_sale %}
     <td class="sale">Korting! {{ "€%.2f" | format(offer.get_current_price().discount_price)  }} ({{ offer.get_current_price().datetime.strftime("%Y-%m-%d") }})</td>
 {% else %}
