@@ -123,7 +123,7 @@ def generate_price_step_graph(offer: ProductOffer) -> Figure:
 
     # Add data labels in the plot
     for x, effective_price in zip(x_locations, effective_prices):
-        label = "{:.2f}".format(effective_price)
+        label = "€ {:.2f}".format(effective_price)
 
         ax.annotate(
             label,
