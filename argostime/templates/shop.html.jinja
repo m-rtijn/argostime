@@ -1,5 +1,5 @@
 {% extends "base.html.jinja" %}
-{% block title %}{{ s.name|e }} | Argostimè {% endblock %}
+{% block title %}{{ s.name|e }} | {{ super() }}{% endblock %}
 {% block content %}
 <h1>{{ s.name|e }}</h1>
 
