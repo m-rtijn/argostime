@@ -88,7 +88,7 @@ def product_page(product_code):
 @app.route("/productoffer/<offer_id>/price_bar_graph.png")
 def offer_price_bar_graph(offer_id):
     """Generate the price graph of a specific offer"""
-    offer: ProductOffer = ProductOffer.query.filter_by(id=offer_id).first()
+    offer: ProductOffer = ProductOffer.query.get(offer_id)
 
     if offer is None:
         abort(404)
@@ -102,7 +102,7 @@ def offer_price_bar_graph(offer_id):
 @app.route("/productoffer/<offer_id>/price_step_graph.png")
 def offer_price_step_graph(offer_id):
     """Generate the price step graph of a specific offer"""
-    offer: ProductOffer = ProductOffer.query.filter_by(id=offer_id).first()
+    offer: ProductOffer = ProductOffer.query.get(offer_id)
 
     if offer is None:
         abort(404)
@@ -116,7 +116,7 @@ def offer_price_step_graph(offer_id):
 @app.route("/shop/<shop_id>")
 def webshop_page(shop_id):
     """Show a page with all the product offers of a specific webshop"""
-    shop: Webshop = Webshop.query.filter_by(id=shop_id).first()
+    shop: Webshop = Webshop.query.get(shop_id)
 
     if shop is None:
         abort(404)
