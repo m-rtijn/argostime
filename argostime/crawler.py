@@ -24,6 +24,7 @@
 
 from datetime import datetime
 import json
+import re
 import logging
 import urllib.parse
 import requests
@@ -40,6 +41,10 @@ shops_info = {
     "jumbo": {
         "name": "Jumbo",
         "hostname": "jumbo.com"
+    },
+    "pipa-shop": {
+        "name": "Pipa Shop",
+        "hostname": "pipa-shop.nl"
     }
 }
 
@@ -47,7 +52,9 @@ enabled_shops = {
     "ah.nl": "ah",
     "www.ah.nl": "ah",
     "jumbo.com": "jumbo",
-    "www.jumbo.com": "jumbo"
+    "www.jumbo.com": "jumbo",
+    "pipa-shop.nl": "pipa-shop",
+    "www.pipa-shop.nl": "pipa-shop"
 }
 
 class ParseProduct():
@@ -75,6 +82,8 @@ class ParseProduct():
             self._parse_ah()
         elif shops_info["jumbo"]["hostname"] in hostname:
             self._parse_jumbo()
+        elif shops_info["pipa-shop"]["hostname"] in hostname:
+            self._parse_pipa_shop()
         else:
             raise WebsiteNotImplementedException(url)
 
@@ -202,4 +211,24 @@ class ParseProduct():
             self.normal_price = offer["highPrice"]
         except KeyError as e:
             logging.error("%s, raising CrawlerException" % e, raw_json)
+            raise CrawlerException from KeyError
+
+    def _parse_pipa_shop(self):
+        request = requests.get(self.url, timeout=10)
+
+        if request.status_code == 404:
+            raise PageNotFoundException(self.url)
+
+        soup = BeautifulSoup(request.text, "html.parser")
+
+        try:
+            price = re.sub(r"[^0-9.]", "" , soup.select_one("div.product-price").text)
+            self.name = soup.select_one("div.product-title a").text
+            self.ean = -1.0
+            self.product_code = self.url.split("/product/").pop().split("/")[0]
+            self.discount_price = float(price)
+            self.normal_price = float(price)
+            self.on_sale = False
+        except (AttributeError, IndexError, ValueError) as e:
+            logging.error("%s, raising CrawlerException" % e)
             raise CrawlerException from KeyError
