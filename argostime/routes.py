@@ -61,14 +61,13 @@ def index():
 
         return render_template("add_product.html.jinja", result=str(res))
     else:
-        products = Product.query.order_by(Product.id.desc()).all()
+        products = Product.query.order_by(Product.id.desc()).limit(10).all()
         shops = Webshop.query.order_by(Webshop.name).all()
 
         return render_template(
             "index.html.jinja",
-            products=products[:10],
-            shops=shops
-            )
+            products=products,
+            shops=shops)
 
 @app.route("/product/<product_code>")
 def product_page(product_code):
