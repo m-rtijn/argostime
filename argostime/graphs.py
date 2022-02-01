@@ -22,7 +22,7 @@
     along with Argostimè. If not, see <https://www.gnu.org/licenses/>.
 """
 
-from datetime import datetime
+import datetime
 import logging
 from typing import List
 
