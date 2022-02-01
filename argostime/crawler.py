@@ -226,9 +226,17 @@ class ParseProduct():
         product_price = soup.find("meta", attrs={ "property": "product:price:amount"})
 
         try:
-            self.url = self.url
             self.name = product_title['content']
-            self.normal_price = product_price['content']
+        except Exception as e:
+            logging.error ("Could not find product name %s", e)
+            raise CrawlerException from e
+        try:
+            self.normal_price = float(product_price['content'])
+        except Exception as e:
+            logging.error("Could not find price %s", e)
+            raise CrawlerException from e
+        try:
             self.product_code = product_title['content'].replace(" ", "-")
         except Exception as e:
-            logging.error("%s, raising Exception %s" % e)
+            logging.error("Could not find product code %s", e)
+            raise CrawlerException from e
