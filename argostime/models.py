@@ -109,9 +109,7 @@ class ProductOffer(db.Model):
 
     def get_current_price(self) -> Price:
         """Get the latest Price object related to this offer."""
-        prices: List[Price] = Price.query.filter_by(product_offer_id=self.id).all()
-        prices.sort(key=lambda price: price.datetime)
-        return prices[-1]
+        return Price.query.filter_by(product_offer_id=self.id).order_by(Price.datetime.desc()).first()
 
     def get_average_price(self) -> float:
         """Calculate the average price of this offer."""

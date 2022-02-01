@@ -61,11 +61,8 @@ def index():
 
         return render_template("add_product.html.jinja", result=str(res))
     else:
-        products = Product.query.all()
-        shops = Webshop.query.all()
-
-        products.sort(key=lambda product: product.id, reverse=True)
-        shops.sort(key=lambda shop: shop.name)
+        products = Product.query.order_by(Product.id.desc()).all()
+        shops = Webshop.query.order_by(Webshop.name).all()
 
         return render_template(
             "index.html.jinja",

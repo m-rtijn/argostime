@@ -37,8 +37,7 @@ from argostime.models import ProductOffer, Price
 def generate_price_bar_graph(offer: ProductOffer) -> Figure:
     """Generate a bar graph with the price over time of a specific ProductOffer"""
 
-    prices: List[Price] = Price.query.filter_by(product_offer_id=offer.id).all()
-    prices.sort(key=lambda price: price.datetime)
+    prices: List[Price] = Price.query.filter_by(product_offer_id=offer.id).order_by(Price.datetime).all()
 
     fig: Figure = Figure()
     ax: Axes = fig.subplots()
@@ -75,8 +74,7 @@ def generate_price_bar_graph(offer: ProductOffer) -> Figure:
 def generate_price_step_graph(offer: ProductOffer) -> Figure:
     """Generate a step graph with the price over time of a specific ProductOffer"""
 
-    prices: List[Price] = Price.query.filter_by(product_offer_id=offer.id).all()
-    prices.sort(key=lambda price: price.datetime)
+    prices: List[Price] = Price.query.filter_by(product_offer_id=offer.id).order_by(Price.datetime).all()
 
     fig: Figure = Figure()
     ax: Axes = fig.subplots()
