@@ -61,7 +61,7 @@ def generate_price_bar_graph(offer: ProductOffer) -> Figure:
     bar = ax.bar(x_locations, effective_prices)
     ax.set_ylabel("prijs in €")
     ax.set_xlabel("datum")
-    ax.set_title("Prijsontwikkeling van {product} bij {shop}".format(product=offer.get_product().name, shop=offer.get_shop().name))
+    ax.set_title("Prijsontwikkeling van {product} bij {shop}".format(product=offer.product.name, shop=offer.webshop.name))
     ax.set_xticks(x_locations, labels=date_strings)
     ax.bar_label(bar, fmt="€ %0.2f", label_type="edge")
 
@@ -97,7 +97,7 @@ def generate_price_step_graph(offer: ProductOffer) -> Figure:
     ax.grid(True)
     ax.set_ylabel("prijs in €")
     ax.set_xlabel("datum")
-    ax.set_title("Prijsontwikkeling van {product} bij {shop}".format(product=offer.get_product().name, shop=offer.get_shop().name))
+    ax.set_title("Prijsontwikkeling van {product} bij {shop}".format(product=offer.product.name, shop=offer.webshop.name))
     ax.set_xticks(x_locations, labels=date_strings)
     #ax.xaxis.set_major_locator(mdates.DayLocator())
     #ax.xaxis.set_major_formatter(mdates.ConciseDateFormatter(ax.xaxis.get_major_locator()))

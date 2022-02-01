@@ -122,7 +122,7 @@ def webshop_page(shop_id):
         abort(404)
 
     offers: List[ProductOffer] = ProductOffer.query.filter_by(shop_id=shop_id).all()
-    offers.sort(key=lambda offer: offer.get_product().name)
+    offers.sort(key=lambda offer: offer.product.name)
 
     return render_template(
         "shop.html.jinja",

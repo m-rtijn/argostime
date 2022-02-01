@@ -4,7 +4,7 @@
 <h1>{{ p.name }}</h1>
 
 {% for offer in offers %}
-<h3>Verkoper: <a href="/shop/{{ offer.get_shop().id }}">{{ offer.get_shop().name }}</a> (<a target="_blank" href="{{ offer.url }}">Bezoek website 🡥</a>)</h3>
+<h3>Verkoper: <a href="/shop/{{ offer.webshop.id }}">{{ offer.webshop.name }}</a> (<a target="_blank" href="{{ offer.url }}">Bezoek website 🡥</a>)</h3>
 <table>
 <tr>
     <th>Huidige prijs</th>

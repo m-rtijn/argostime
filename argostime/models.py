@@ -43,7 +43,7 @@ class Webshop(db.Model):
     name = db.Column(db.Unicode(512), unique=True, nullable=False)
     hostname = db.Column(db.Unicode(512), unique=True, nullable=False)
     products = db.relationship("ProductOffer",
-                                backref="Webshop",
+                                backref="webshop",
                                 lazy=True, cascade="all, delete", passive_deletes=True)
 
 
@@ -55,7 +55,7 @@ class Product(db.Model):
     ean = db.Column(db.Integer)
     product_code = db.Column(db.Unicode(512), unique=True)
     product_offers = db.relationship("ProductOffer",
-                                        backref="Product", lazy=True,
+                                        backref="product", lazy=True,
                                         cascade="all, delete", passive_deletes=True)
 
 
@@ -92,20 +92,12 @@ class ProductOffer(db.Model):
                             db.ForeignKey("Webshop.id", ondelete="CASCADE"), nullable=False)
     url = db.Column(db.Unicode(1024), unique=True, nullable=False)
     time_added = db.Column(db.DateTime)
-    prices = db.relationship("Price", backref="ProductOffer", lazy=True,
+    prices = db.relationship("Price", backref="product_offer", lazy=True,
                                 cascade="all, delete", passive_deletes=True)
 
     def __str__(self):
         return f"ProductOffer(id={self.id}, product_id={self.product_id},"\
             f"shop_id={self.shop_id}, url={self.url}, time_added={self.time_added})"
-
-    def get_product(self) -> Product:
-        """Get the associated Product"""
-        return Product.query.filter_by(id=self.product_id).first()
-
-    def get_shop(self) -> Webshop:
-        """Get the associated Webshop"""
-        return Webshop.query.filter_by(id=self.shop_id).first()
 
     def get_current_price(self) -> Price:
         """Get the latest Price object related to this offer."""
