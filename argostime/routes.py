@@ -121,8 +121,7 @@ def webshop_page(shop_id):
     if shop is None:
         abort(404)
 
-    offers: List[ProductOffer] = ProductOffer.query.filter_by(shop_id=shop_id).all()
-    offers.sort(key=lambda offer: offer.product.name)
+    offers: List[ProductOffer] = ProductOffer.query.filter_by(shop_id=shop_id).join(Product).order_by(Product.name).all()
 
     return render_template(
         "shop.html.jinja",
