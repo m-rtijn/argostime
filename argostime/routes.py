@@ -57,7 +57,7 @@ def index():
                 result="De pagina {url} kon niet worden gevonden.".format(url=form["url"])), 404
 
         if res == ProductOfferAddResult.ADDED or res == ProductOfferAddResult.ALREADY_EXISTS and offer is not None:
-            return redirect(f"/product/{offer.get_product().product_code}")
+            return redirect(f"/product/{offer.product.product_code}")
 
         return render_template("add_product.html.jinja", result=str(res))
     else:
