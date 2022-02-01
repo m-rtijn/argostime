@@ -28,6 +28,7 @@ from typing import List
 
 from matplotlib.figure import Figure
 import matplotlib.dates as mdates
+import matplotlib.ticker as mticker
 from matplotlib.axes import Axes
 import numpy as np
 
@@ -65,9 +66,19 @@ def generate_price_bar_graph(offer: ProductOffer) -> Figure:
     ax.set_xticks(x_locations, labels=date_strings)
     ax.bar_label(bar, fmt="€ %0.2f", label_type="edge")
 
+    # Format y-axis ticks
+    tick = mticker.StrMethodFormatter("€ {x:.2f}")
+    ax.yaxis.set_major_formatter(tick)
+
     # Rotate x-axis labels
     for label in ax.get_xticklabels(which='major'):
         label.set(rotation=30, horizontalalignment='right')
+
+    # Set margin to avoid annotations overlapping with top border
+    ax.margins(0.1)
+
+    # Add more space to bottom of plot to fit x-axis ticks and label
+    fig.subplots_adjust(left=0.15, bottom=0.2)
 
     return fig
 
@@ -102,6 +113,10 @@ def generate_price_step_graph(offer: ProductOffer) -> Figure:
     #ax.xaxis.set_major_locator(mdates.DayLocator())
     #ax.xaxis.set_major_formatter(mdates.ConciseDateFormatter(ax.xaxis.get_major_locator()))
 
+    # Format y-axis ticks
+    tick = mticker.StrMethodFormatter("€ {x:.2f}")
+    ax.yaxis.set_major_formatter(tick)
+
     # Rotate x-axis labels
     for label in ax.get_xticklabels(which='major'):
         label.set(rotation=30, horizontalalignment='right')
@@ -117,5 +132,11 @@ def generate_price_step_graph(offer: ProductOffer) -> Figure:
             xytext=(0,5),
             ha="center"
             )
+
+    # Set margin to avoid annotations overlapping with top border
+    ax.margins(0.1)
+
+    # Add more space to bottom of plot to fit x-axis ticks and label
+    fig.subplots_adjust(left=0.15, bottom=0.2)
 
     return fig
