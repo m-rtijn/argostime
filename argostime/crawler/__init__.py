@@ -25,3 +25,4 @@
 
 from argostime.crawler.crawlresult import CrawlResult, CrawlResultStatus
 from argostime.crawler.crawl_url import crawl_url
+from argostime.crawler.shop_info import shops_info, enabled_shops

@@ -30,8 +30,8 @@ from typing import List
 
 from flask_sqlalchemy import SQLAlchemy
 
-from argostime.crawler import ParseProduct
-from argostime.exceptions import CrawlerException
+from argostime.crawler import crawl_url, CrawlResult
+from argostime.exceptions import CrawlerException, WebsiteNotImplementedException
 from argostime.exceptions import PageNotFoundException
 from argostime.exceptions import NoEffectivePriceAvailableException
 
@@ -168,12 +168,15 @@ class ProductOffer(db.Model):
             return
 
         try:
-            parse_result: ParseProduct = ParseProduct(self.url)
+            parse_result: CrawlResult = crawl_url(self.url)
         except PageNotFoundException:
             logging.error("Received a PageNotFoundexception in %s", str(self))
         except CrawlerException:
             logging.error("Received CrawlerException in %s", str(self))
             return
+        except WebsiteNotImplementedException:
+            logging.error("Disabled website for existing product %s", self)
+            raise WebsiteNotImplementedException(self.url) from WebsiteNotImplementedException
 
         on_sale: bool = False
         if parse_result.discount_price > 0:

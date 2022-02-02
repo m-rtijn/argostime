@@ -28,9 +28,9 @@ from datetime import datetime
 from typing import Tuple
 import urllib.parse
 
-from .exceptions import WebsiteNotImplementedException
-from .models import Webshop, Price, Product, ProductOffer, db
-from .crawler import ParseProduct, enabled_shops, shops_info
+from argostime.exceptions import WebsiteNotImplementedException
+from argostime.models import Webshop, Price, Product, ProductOffer, db
+from argostime.crawler import crawl_url, CrawlResult, CrawlResultStatus, shops_info, enabled_shops
 
 class ProductOfferAddResult(Enum):
     """Enum to indicate the result of add_product_offer"""
@@ -64,12 +64,12 @@ def add_product_offer_from_url(url: str) -> Tuple[ProductOfferAddResult, Product
     if product_offer is not None:
         return (ProductOfferAddResult.ALREADY_EXISTS, product_offer)
 
-    parse_results: ParseProduct = ParseProduct(url)
+    parse_results: CrawlResult = crawl_url(url)
 
     # Check if this Product already exists, otherwise add it to the database
     product: Product = Product.query.filter_by(product_code=parse_results.product_code).first()
     if product is None:
-        product = Product(name=parse_results.name, product_code=parse_results.product_code)
+        product = Product(name=parse_results.product_name, product_code=parse_results.product_code)
         db.session.add(product)
         db.session.commit()
 
