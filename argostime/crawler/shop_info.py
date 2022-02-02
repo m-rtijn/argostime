@@ -30,6 +30,10 @@ shops_info = {
     "jumbo": {
         "name": "Jumbo",
         "hostname": "jumbo.com"
+    },
+    "brandzaak": {
+        "name": "Brandzaak",
+        "hostname": "brandzaak.nl"
     }
 }
 
@@ -37,5 +41,7 @@ enabled_shops = {
     "ah.nl": "ah",
     "www.ah.nl": "ah",
     "jumbo.com": "jumbo",
-    "www.jumbo.com": "jumbo"
+    "www.jumbo.com": "jumbo",
+    "brandzaak.nl": "brandzaak",
+    "www.brandzaak.nl": "brandzaak"
 }
