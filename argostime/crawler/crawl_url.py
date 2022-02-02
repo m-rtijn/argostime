@@ -2,8 +2,8 @@
 """
     crawler/crawl_url.py
 
-    Abstraction layer between the crawler & database on one hand, and the actual web interface
-    on the other.
+    Crawler function exposed to the rest of the system to get pricing and product
+    information from a given URL.
 
     Copyright (c) 2022 Martijn <martijn [at] mrtijn.nl>
 

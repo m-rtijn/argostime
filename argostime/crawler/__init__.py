@@ -2,8 +2,7 @@
 """
     crawler/__init__.py
 
-    Abstraction layer between the crawler & database on one hand, and the actual web interface
-    on the other.
+    Submodule for crawling websites to get pricing information.
 
     Copyright (c) 2022 Martijn <martijn [at] mrtijn.nl>
 
