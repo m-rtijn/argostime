@@ -33,7 +33,7 @@ from bs4 import BeautifulSoup
 from argostime.exceptions import CrawlerException
 from argostime.exceptions import PageNotFoundException
 
-from argostime.crawler.crawlresult import CrawlResult
+from argostime.crawler.crawl_utils import CrawlResult
 
 ah_date_format: str = "%Y-%m-%d"
 

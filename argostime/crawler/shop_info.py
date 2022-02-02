@@ -34,6 +34,10 @@ shops_info = {
     "brandzaak": {
         "name": "Brandzaak",
         "hostname": "brandzaak.nl"
+    },
+    "etos" : {
+        "name": "Etos",
+        "hostname": "etos.nl"
     }
 }
 
@@ -43,5 +47,7 @@ enabled_shops = {
     "jumbo.com": "jumbo",
     "www.jumbo.com": "jumbo",
     "brandzaak.nl": "brandzaak",
-    "www.brandzaak.nl": "brandzaak"
+    "www.brandzaak.nl": "brandzaak",
+    "etos.nl": "etos",
+    "www.etos.nl": "etos"
 }
