@@ -26,16 +26,25 @@ from datetime import datetime
 import json
 import logging
 
-from requests import Response
+
+import requests
 from bs4 import BeautifulSoup
 
 from argostime.exceptions import CrawlerException
+from argostime.exceptions import PageNotFoundException
 
 from argostime.crawler.crawlresult import CrawlResult, CrawlResultStatus
 
 ah_date_format: str = "%Y-%m-%d"
 
-def crawl_ah(url: str, response: Response) -> CrawlResult:
+def crawl_ah(url: str) -> CrawlResult:
+    """Crawler for ah.nl"""
+    response: requests.Response = requests.get(url)
+
+    if response.status_code != 200:
+        logging.debug("Got status code %d while getting url %s", response.status_code, url)
+        raise PageNotFoundException(url)
+
     soup = BeautifulSoup(response.text, "html.parser")
 
     product_json = soup.find("script", attrs={ "type": "application/ld+json", "data-react-helmet": "true"})

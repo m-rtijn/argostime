@@ -26,9 +26,7 @@
 import logging
 import urllib.parse
 
-import requests
-
-from argostime.exceptions import PageNotFoundException, WebsiteNotImplementedException
+from argostime.exceptions import WebsiteNotImplementedException
 
 from argostime.crawler.crawlresult import *
 from argostime.crawler.shop_info import shops_info, enabled_shops
@@ -36,17 +34,18 @@ from argostime.crawler.shop_info import shops_info, enabled_shops
 from argostime.crawler.ah import crawl_ah
 
 def crawl_url(url: str) -> CrawlResult:
+    """Crawl a product at the given URL
+
+    Returns a CrawlResult object.
+    May raise any of the following exceptions:
+        PageNotFoundException
+        WebsiteNotImplementedException
+    """
     logging.debug("%s", url)
     hostname: str = urllib.parse.urlparse(url).netloc
 
     if hostname not in enabled_shops:
         raise WebsiteNotImplementedException(url)
-
-    response: requests.Response = requests.get(url)
-
-    if response.status_code != 200:
-        logging.debug("Got status code %d while getting url %s", response.status_code, url)
-        raise PageNotFoundException(url)
 
     if shops_info["ah"]["hostname"] in hostname:
         return crawl_ah(url, response)
