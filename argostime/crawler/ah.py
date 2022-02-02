@@ -33,7 +33,7 @@ from bs4 import BeautifulSoup
 from argostime.exceptions import CrawlerException
 from argostime.exceptions import PageNotFoundException
 
-from argostime.crawler.crawlresult import CrawlResult, CrawlResultStatus
+from argostime.crawler.crawlresult import CrawlResult
 
 ah_date_format: str = "%Y-%m-%d"
 
@@ -102,12 +102,5 @@ def crawl_ah(url: str) -> CrawlResult:
         except KeyError:
             logging.error("Couldn't even find a normal price in %s", product_dict)
             raise CrawlerException from KeyError
-    
-    if result.discount_price > 0:
-        result.on_sale = True
-    else:
-        result.on_sale = False
-
-    result.status = CrawlResultStatus.SUCCESS
 
     return result

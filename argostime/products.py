@@ -30,7 +30,7 @@ import urllib.parse
 
 from argostime.exceptions import WebsiteNotImplementedException
 from argostime.models import Webshop, Price, Product, ProductOffer, db
-from argostime.crawler import crawl_url, CrawlResult, CrawlResultStatus, shops_info, enabled_shops
+from argostime.crawler import crawl_url, CrawlResult, shops_info, enabled_shops
 
 class ProductOfferAddResult(Enum):
     """Enum to indicate the result of add_product_offer"""

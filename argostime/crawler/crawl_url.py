@@ -28,7 +28,7 @@ import urllib.parse
 
 from argostime.exceptions import WebsiteNotImplementedException
 
-from argostime.crawler.crawlresult import *
+from argostime.crawler.crawlresult import CrawlResult
 from argostime.crawler.shop_info import shops_info, enabled_shops
 
 from argostime.crawler.ah import crawl_ah
@@ -48,9 +48,17 @@ def crawl_url(url: str) -> CrawlResult:
     if hostname not in enabled_shops:
         raise WebsiteNotImplementedException(url)
 
+    result: CrawlResult
     if shops_info["ah"]["hostname"] in hostname:
-        return crawl_ah(url)
+        result = crawl_ah(url)
     elif shops_info["jumbo"]["hostname"] in hostname:
-        return crawl_jumbo(url)
+        result = crawl_jumbo(url)
     else:
         raise WebsiteNotImplementedException(url)
+
+    if result.discount_price > 0:
+        result.on_sale = True
+    else:
+        result.on_sale = False
+
+    return result

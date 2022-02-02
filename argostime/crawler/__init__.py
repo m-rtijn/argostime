@@ -23,6 +23,6 @@
     along with Argostimè. If not, see <https://www.gnu.org/licenses/>.
 """
 
-from argostime.crawler.crawlresult import CrawlResult, CrawlResultStatus
+from argostime.crawler.crawlresult import CrawlResult
 from argostime.crawler.crawl_url import crawl_url
 from argostime.crawler.shop_info import shops_info, enabled_shops
