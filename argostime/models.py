@@ -24,13 +24,14 @@
 
 from datetime import datetime
 import logging
+import statistics
 from sys import maxsize
 from typing import List
 
 from flask_sqlalchemy import SQLAlchemy
 
-from argostime.crawler import ParseProduct
-from argostime.exceptions import CrawlerException
+from argostime.crawler import crawl_url, CrawlResult
+from argostime.exceptions import CrawlerException, WebsiteNotImplementedException
 from argostime.exceptions import PageNotFoundException
 from argostime.exceptions import NoEffectivePriceAvailableException
 
@@ -43,7 +44,7 @@ class Webshop(db.Model):
     name = db.Column(db.Unicode(512), unique=True, nullable=False)
     hostname = db.Column(db.Unicode(512), unique=True, nullable=False)
     products = db.relationship("ProductOffer",
-                                backref="Webshop",
+                                backref="webshop",
                                 lazy=True, cascade="all, delete", passive_deletes=True)
 
 
@@ -55,7 +56,7 @@ class Product(db.Model):
     ean = db.Column(db.Integer)
     product_code = db.Column(db.Unicode(512), unique=True)
     product_offers = db.relationship("ProductOffer",
-                                        backref="Product", lazy=True,
+                                        backref="product", lazy=True,
                                         cascade="all, delete", passive_deletes=True)
 
 
@@ -92,41 +93,29 @@ class ProductOffer(db.Model):
                             db.ForeignKey("Webshop.id", ondelete="CASCADE"), nullable=False)
     url = db.Column(db.Unicode(1024), unique=True, nullable=False)
     time_added = db.Column(db.DateTime)
-    prices = db.relationship("Price", backref="ProductOffer", lazy=True,
+    prices = db.relationship("Price", backref="product_offer", lazy=True,
                                 cascade="all, delete", passive_deletes=True)
 
     def __str__(self):
         return f"ProductOffer(id={self.id}, product_id={self.product_id},"\
             f"shop_id={self.shop_id}, url={self.url}, time_added={self.time_added})"
 
-    def get_product(self) -> Product:
-        """Get the associated Product"""
-        return Product.query.filter_by(id=self.product_id).first()
-
-    def get_shop(self) -> Webshop:
-        """Get the associated Webshop"""
-        return Webshop.query.filter_by(id=self.shop_id).first()
-
     def get_current_price(self) -> Price:
         """Get the latest Price object related to this offer."""
-        prices: List[Price] = Price.query.filter_by(product_offer_id=self.id).all()
-        prices.sort(key=lambda price: price.datetime)
-        return prices[-1]
+        return Price.query.filter_by(product_offer_id=self.id).order_by(Price.datetime.desc()).first()
 
     def get_average_price(self) -> float:
         """Calculate the average price of this offer."""
         effective_price_values: List[float] = []
-        price_sum: float = 0
         for price in Price.query.filter_by(product_offer_id=self.id).all():
             try:
-                price_sum = price_sum + price.get_effective_price()
-                effective_price_values.append(price)
+                effective_price_values.append(price.get_effective_price())
             except NoEffectivePriceAvailableException:
                 # Ignore price entries without a valid price in calculating the price.
                 pass
         try:
-            return price_sum / len(effective_price_values)
-        except ZeroDivisionError:
+            return statistics.mean(effective_price_values)
+        except statistics.StatisticsError:
             logging.info("Called get_average_price but no prices were found...")
             return -1
 
@@ -179,12 +168,21 @@ class ProductOffer(db.Model):
             return
 
         try:
-            parse_result: ParseProduct = ParseProduct(self.url)
+            parse_result: CrawlResult = crawl_url(self.url)
         except PageNotFoundException:
-            logging.error("Received a PageNotFoundexception in %s", str(self))
-        except CrawlerException:
-            logging.error("Received CrawlerException in %s", str(self))
+            logging.error(
+                "Received a PageNotFoundException in %s, is"
+                "seems that the product is no longer available?", str(self))
+        except CrawlerException as exception:
+            logging.error(
+                "Received CrawlerException in %s, couldn't update price %s",
+                str(self),
+                exception
+                )
             return
+        except WebsiteNotImplementedException:
+            logging.error("Disabled website for existing product %s", self)
+            raise WebsiteNotImplementedException(self.url) from WebsiteNotImplementedException
 
         on_sale: bool = False
         if parse_result.discount_price > 0:

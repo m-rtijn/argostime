@@ -57,22 +57,17 @@ def index():
                 result="De pagina {url} kon niet worden gevonden.".format(url=form["url"])), 404
 
         if res == ProductOfferAddResult.ADDED or res == ProductOfferAddResult.ALREADY_EXISTS and offer is not None:
-            product: Product = Product.query.filter_by(id=offer.id).first()
-            return redirect(f"/product/{product.product_code}")
+            return redirect(f"/product/{offer.product.product_code}")
 
         return render_template("add_product.html.jinja", result=str(res))
     else:
-        products = Product.query.all()
-        shops = Webshop.query.all()
-
-        products.sort(key=lambda product: product.id, reverse=True)
-        shops.sort(key=lambda shop: shop.name)
+        products = Product.query.order_by(Product.id.desc()).limit(10).all()
+        shops = Webshop.query.order_by(Webshop.name).all()
 
         return render_template(
             "index.html.jinja",
-            products=products[:10],
-            shops=shops
-            )
+            products=products,
+            shops=shops)
 
 @app.route("/product/<product_code>")
 def product_page(product_code):
@@ -92,7 +87,7 @@ def product_page(product_code):
 @app.route("/productoffer/<offer_id>/price_bar_graph.png")
 def offer_price_bar_graph(offer_id):
     """Generate the price graph of a specific offer"""
-    offer: ProductOffer = ProductOffer.query.filter_by(id=offer_id).first()
+    offer: ProductOffer = ProductOffer.query.get(offer_id)
 
     if offer is None:
         abort(404)
@@ -106,7 +101,7 @@ def offer_price_bar_graph(offer_id):
 @app.route("/productoffer/<offer_id>/price_step_graph.png")
 def offer_price_step_graph(offer_id):
     """Generate the price step graph of a specific offer"""
-    offer: ProductOffer = ProductOffer.query.filter_by(id=offer_id).first()
+    offer: ProductOffer = ProductOffer.query.get(offer_id)
 
     if offer is None:
         abort(404)
@@ -120,12 +115,12 @@ def offer_price_step_graph(offer_id):
 @app.route("/shop/<shop_id>")
 def webshop_page(shop_id):
     """Show a page with all the product offers of a specific webshop"""
-    shop: Webshop = Webshop.query.filter_by(id=shop_id).first()
+    shop: Webshop = Webshop.query.get(shop_id)
 
     if shop is None:
         abort(404)
 
-    offers: List[ProductOffer] = ProductOffer.query.filter_by(shop_id=shop_id).all()
+    offers: List[ProductOffer] = ProductOffer.query.filter_by(shop_id=shop_id).join(Product).order_by(Product.name).all()
 
     return render_template(
         "shop.html.jinja",
