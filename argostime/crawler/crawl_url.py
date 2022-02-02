@@ -34,6 +34,7 @@ from argostime.crawler.shop_info import shops_info, enabled_shops
 from argostime.crawler.ah import crawl_ah
 from argostime.crawler.jumbo import crawl_jumbo
 from argostime.crawler.brandzaak import crawl_brandzaak
+from argostime.crawler.etos import crawl_etos
 
 def crawl_url(url: str) -> CrawlResult:
     """Crawl a product at the given URL
@@ -56,6 +57,8 @@ def crawl_url(url: str) -> CrawlResult:
         result = crawl_jumbo(url)
     elif shops_info["brandzaak"]["hostname"] in hostname:
         result = crawl_brandzaak(url)
+    elif shops_info["etos"]["hostname"] in hostname:
+        result = crawl_etos(url)
     else:
         raise WebsiteNotImplementedException(url)
 
