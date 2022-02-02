@@ -170,9 +170,15 @@ class ProductOffer(db.Model):
         try:
             parse_result: CrawlResult = crawl_url(self.url)
         except PageNotFoundException:
-            logging.error("Received a PageNotFoundexception in %s", str(self))
-        except CrawlerException:
-            logging.error("Received CrawlerException in %s", str(self))
+            logging.error(
+                "Received a PageNotFoundException in %s, is"
+                "seems that the product is no longer available?", str(self))
+        except CrawlerException as exception:
+            logging.error(
+                "Received CrawlerException in %s, couldn't update price %s",
+                str(self),
+                exception
+                )
             return
         except WebsiteNotImplementedException:
             logging.error("Disabled website for existing product %s", self)

@@ -85,9 +85,15 @@ def crawl_ah(url: str) -> CrawlResult:
             result.discount_price = float(product_dict["offers"]["price"])
             result.normal_price = -1.0
         else:
-            bonus_from: datetime = datetime.strptime(product_dict["offers"]["validFrom"], ah_date_format)
+            bonus_from: datetime = datetime.strptime(
+                product_dict["offers"]["validFrom"],
+                ah_date_format
+                )
             try:
-                bonus_until: datetime = datetime.strptime(product_dict["offers"]["priceValidUntil"], ah_date_format)
+                bonus_until: datetime = datetime.strptime(
+                    product_dict["offers"]["priceValidUntil"],
+                    ah_date_format
+                    )
             except ValueError:
                 # If there is no bonus_until, just use this instead
                 bonus_until: datetime = datetime(year=5000, month=12, day=31)
