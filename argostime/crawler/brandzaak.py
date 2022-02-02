@@ -23,10 +23,8 @@
     along with Argostimè. If not, see <https://www.gnu.org/licenses/>.
 """
 
-from datetime import datetime
-import json
-import logging
 
+import logging
 
 import requests
 from bs4 import BeautifulSoup
@@ -53,18 +51,18 @@ def crawl_brandzaak(url: str) -> CrawlResult:
 
     try:
         result.product_name = product_title['content']
-    except Exception as e:
-        logging.error ("Could not find product name %s", e)
-        raise CrawlerException from e
+    except KeyError:
+        logging.error("Could not find product name in %s", product_title)
+        raise CrawlerException from KeyError
     try:
         result.normal_price = float(product_price['content'])
-    except Exception as e:
-        logging.error("Could not find price %s", e)
-        raise CrawlerException from e
+    except KeyError:
+        logging.error("Could not find price in %s", product_price)
+        raise CrawlerException from KeyError
     try:
         result.product_code = product_title['content'].replace(" ", "-")
-    except Exception as e:
-        logging.error("Could not find product code %s", e)
-        raise CrawlerException from e
-    
+    except KeyError:
+        logging.error("Could not find product code in %s", product_title)
+        raise CrawlerException from KeyError
+
     return result
