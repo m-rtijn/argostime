@@ -22,7 +22,6 @@
     along with Argostimè. If not, see <https://www.gnu.org/licenses/>.
 """
 
-from datetime import datetime
 import json
 import logging
 
@@ -35,6 +34,10 @@ from argostime.exceptions import PageNotFoundException
 from argostime.crawler.crawlresult import CrawlResult
 
 def crawl_jumbo(url: str) -> CrawlResult:
+    """Crawler for jumbo.com
+
+    May raise CrawlerException or PageNotFoundException.
+    """
     headers = {
         "Referer": "https://www.jumbo.com",
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
@@ -77,11 +80,36 @@ def crawl_jumbo(url: str) -> CrawlResult:
 
     try:
         result.url = str(product["url"])
+    except KeyError:
+        logging.info("No url found in product data, using the given url")
+        result.url = url
+
+    try:
         result.product_name = str(product["name"])
-        result.ean = int(product["gtin13"])
-        result.product_code = str(product["sku"])
-        result.discount_price = float(offer["lowPrice"])
-        result.normal_price = float(offer["highPrice"])
-    except KeyError as e:
-        logging.error("%s, raising CrawlerException" % e, raw_json)
+    except KeyError:
+        logging.error("No product name found in %s", raw_json)
         raise CrawlerException from KeyError
+
+    try:
+        result.ean = int(product["gtin13"])
+    except KeyError:
+        logging.info("No EAN found")
+
+    try:
+        result.product_code = str(product["sku"])
+    except KeyError:
+        logging.error("No product code found in %s", raw_json)
+        raise CrawlerException from KeyError
+
+    try:
+        result.discount_price = float(offer["lowPrice"])
+    except KeyError:
+        logging.info("No discount / low price found in %s", raw_json)
+
+    try:
+        result.normal_price = float(offer["highPrice"])
+    except KeyError:
+        logging.error("No normal price found in %s", raw_json)
+        raise CrawlerException from KeyError
+
+    return result
