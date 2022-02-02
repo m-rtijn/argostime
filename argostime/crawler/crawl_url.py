@@ -32,6 +32,7 @@ from argostime.crawler.crawlresult import *
 from argostime.crawler.shop_info import shops_info, enabled_shops
 
 from argostime.crawler.ah import crawl_ah
+from argostime.crawler.jumbo import crawl_jumbo
 
 def crawl_url(url: str) -> CrawlResult:
     """Crawl a product at the given URL
@@ -48,6 +49,8 @@ def crawl_url(url: str) -> CrawlResult:
         raise WebsiteNotImplementedException(url)
 
     if shops_info["ah"]["hostname"] in hostname:
-        return crawl_ah(url, response)
+        return crawl_ah(url)
+    elif shops_info["jumbo"]["hostname"] in hostname:
+        return crawl_jumbo(url)
     else:
         raise WebsiteNotImplementedException(url)
