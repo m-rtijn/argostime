@@ -47,7 +47,10 @@ def crawl_ah(url: str) -> CrawlResult:
 
     soup = BeautifulSoup(response.text, "html.parser")
 
-    product_json = soup.find("script", attrs={ "type": "application/ld+json", "data-react-helmet": "true"})
+    product_json = soup.find(
+        "script",
+        attrs={ "type": "application/ld+json", "data-react-helmet": "true"}
+        )
 
     result: CrawlResult = CrawlResult(url=url)
 
@@ -66,9 +69,8 @@ def crawl_ah(url: str) -> CrawlResult:
     try:
         result.ean = product_dict["gtin13"]
     except KeyError:
-        logging.error("No key gtin13 found in json %s", product_dict)
         # Don't crash because the ean is not strictly necessarry
-        pass
+        logging.info("No key gtin13 found in json %s", product_dict)
 
     try:
         result.product_code = product_dict["sku"]
@@ -78,7 +80,8 @@ def crawl_ah(url: str) -> CrawlResult:
 
     try:
         if product_dict["offers"]["validFrom"] == "undefined":
-            # Sometimes the "validFrom" is just undefined, just assume that there is a discount then
+            # Sometimes the "validFrom" is just undefined,
+            # just assume that there is a discount then
             result.discount_price = float(product_dict["offers"]["price"])
             result.normal_price = -1.0
         else:
