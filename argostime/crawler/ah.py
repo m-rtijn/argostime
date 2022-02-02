@@ -56,15 +56,15 @@ def crawl_ah(url: str) -> CrawlResult:
 
     try:
         product_dict = json.loads(product_json.text)
-    except json.decoder.JSONDecodeError:
+    except json.decoder.JSONDecodeError as exception:
         logging.error("Could not decode JSON %s, raising CrawlerException", product_json)
-        raise CrawlerException from json.decoder.JSONDecodeError
+        raise CrawlerException from exception
 
     try:
         result.product_name = product_dict["name"]
-    except KeyError:
+    except KeyError as exception:
         logging.error("No key name found in json %s", product_dict)
-        raise CrawlerException from KeyError
+        raise CrawlerException from exception
 
     try:
         result.ean = product_dict["gtin13"]
@@ -74,9 +74,9 @@ def crawl_ah(url: str) -> CrawlResult:
 
     try:
         result.product_code = product_dict["sku"]
-    except KeyError:
+    except KeyError as exception:
         logging.error("No key sku found in json %s", product_dict)
-        raise CrawlerException from KeyError
+        raise CrawlerException from exception
 
     try:
         if product_dict["offers"]["validFrom"] == "undefined":
@@ -104,12 +104,12 @@ def crawl_ah(url: str) -> CrawlResult:
                 # Ahh, the nice moments when there is just no valid price available. That sucks!
                 logging.error("No valid price available for %s", url)
                 result.normal_price = -1.0
-    except KeyError:
+    except KeyError as exception:
         # No details on if there is bonus data or not, so assume no bonus
         try:
             result.normal_price = float(product_dict["offers"]["price"])
-        except KeyError:
+        except KeyError as inner_exception:
             logging.error("Couldn't even find a normal price in %s", product_dict)
-            raise CrawlerException from KeyError
+            raise CrawlerException from inner_exception
 
     return result

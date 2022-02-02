@@ -68,9 +68,9 @@ def crawl_jumbo(url: str) -> CrawlResult:
 
     try:
         product = json.loads(raw_json)
-    except json.decoder.JSONDecodeError:
+    except json.decoder.JSONDecodeError as exception:
         logging.error("Could not decode JSON %s, raising CrawlerException", raw_json)
-        raise CrawlerException from json.decoder.JSONDecodeError
+        raise CrawlerException from exception
 
     if product["offers"]["@type"] == "AggregateOffer":
         offer = product["offers"]
@@ -86,9 +86,9 @@ def crawl_jumbo(url: str) -> CrawlResult:
 
     try:
         result.product_name = str(product["name"])
-    except KeyError:
+    except KeyError as exception:
         logging.error("No product name found in %s", raw_json)
-        raise CrawlerException from KeyError
+        raise CrawlerException from exception
 
     try:
         result.ean = int(product["gtin13"])
@@ -97,9 +97,9 @@ def crawl_jumbo(url: str) -> CrawlResult:
 
     try:
         result.product_code = str(product["sku"])
-    except KeyError:
+    except KeyError as exception:
         logging.error("No product code found in %s", raw_json)
-        raise CrawlerException from KeyError
+        raise CrawlerException from exception
 
     try:
         result.discount_price = float(offer["lowPrice"])
@@ -108,8 +108,8 @@ def crawl_jumbo(url: str) -> CrawlResult:
 
     try:
         result.normal_price = float(offer["highPrice"])
-    except KeyError:
+    except KeyError as exception:
         logging.error("No normal price found in %s", raw_json)
-        raise CrawlerException from KeyError
+        raise CrawlerException from exception
 
     return result

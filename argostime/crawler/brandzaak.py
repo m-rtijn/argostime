@@ -51,18 +51,18 @@ def crawl_brandzaak(url: str) -> CrawlResult:
 
     try:
         result.product_name = product_title['content']
-    except KeyError:
+    except KeyError as exception:
         logging.error("Could not find product name in %s", product_title)
-        raise CrawlerException from KeyError
+        raise CrawlerException from exception
     try:
         result.normal_price = float(product_price['content'])
-    except KeyError:
+    except KeyError as exception:
         logging.error("Could not find price in %s", product_price)
-        raise CrawlerException from KeyError
+        raise CrawlerException from exception
     try:
         result.product_code = product_title['content'].replace(" ", "-")
-    except KeyError:
+    except KeyError as exception:
         logging.error("Could not find product code in %s", product_title)
-        raise CrawlerException from KeyError
+        raise CrawlerException from exception
 
     return result

@@ -180,9 +180,9 @@ class ProductOffer(db.Model):
                 exception
                 )
             return
-        except WebsiteNotImplementedException:
+        except WebsiteNotImplementedException as exception:
             logging.error("Disabled website for existing product %s", self)
-            raise WebsiteNotImplementedException(self.url) from WebsiteNotImplementedException
+            raise WebsiteNotImplementedException(self.url) from exception
 
         on_sale: bool = False
         if parse_result.discount_price > 0:

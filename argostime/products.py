@@ -48,8 +48,8 @@ def add_product_offer_from_url(url: str) -> Tuple[ProductOfferAddResult, Product
 
     try:
         shop_info = shops_info[enabled_shops[hostname]]
-    except KeyError:
-        raise WebsiteNotImplementedException(url) from KeyError
+    except KeyError as exception:
+        raise WebsiteNotImplementedException(url) from exception
 
     shop: Webshop = Webshop.query.filter(Webshop.hostname.contains(shop_info["hostname"])).first()
 
