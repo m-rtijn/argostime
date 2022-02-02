@@ -28,7 +28,7 @@ import urllib.parse
 
 from argostime.exceptions import WebsiteNotImplementedException
 
-from argostime.crawler.crawlresult import CrawlResult
+from argostime.crawler.crawl_utils import CrawlResult
 from argostime.crawler.shop_info import shops_info, enabled_shops
 
 from argostime.crawler.ah import crawl_ah

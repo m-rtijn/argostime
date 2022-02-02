@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-    crawler/crawlresult.py
+    crawler/crawl_utils.py
 
-    Data structure for returning the results of a crawler in a uniform way.
+    Utilities for the crawler submodule
 
     Copyright (c) 2022 Martijn <martijn [at] mrtijn.nl>
 
@@ -23,7 +23,7 @@
 """
 
 class CrawlResult():
-    """Data structure which contains the result of crawling a page."""
+    """Data structure for returning the results of a crawler in a uniform way."""
 
     url: str
     product_name: str
@@ -51,3 +51,30 @@ class CrawlResult():
         self.discount_price = discount_price
         self.on_sale = on_sale
         self.ean = ean
+
+def parse_promotional_message(message: str) -> float:
+    """Parse a given promotional message, and return a percentage effective discount.
+    
+    For example "1+1 GRATIS" will be parsed to meaning a 50% discount.
+    
+    Returns -1 if it couldn't find a match"""
+
+    # Remove all whitespace from the message
+    message_no_whitespace = "".join(message.split())
+
+    message_no_whitespace.lower()
+
+    if message_no_whitespace == "1+1gratis":
+        return 1/2
+    elif message_no_whitespace == "2+1gratis":
+        return 1/3
+    elif message_no_whitespace == "3+1gratis":
+        return 1/4
+    elif message_no_whitespace == "5+1gratis":
+        return 1/6
+    elif message_no_whitespace == "2ehalveprijs":
+        return 1/4
+    elif message_no_whitespace == "50%korting":
+        return 1/2
+    else:
+        return -1

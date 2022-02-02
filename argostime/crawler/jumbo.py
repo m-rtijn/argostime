@@ -31,7 +31,7 @@ from bs4 import BeautifulSoup
 from argostime.exceptions import CrawlerException
 from argostime.exceptions import PageNotFoundException
 
-from argostime.crawler.crawlresult import CrawlResult
+from argostime.crawler.crawl_utils import CrawlResult
 
 def crawl_jumbo(url: str) -> CrawlResult:
     """Crawler for jumbo.com
