@@ -76,5 +76,11 @@ def parse_promotional_message(message: str) -> float:
         return 1/4
     elif message_no_whitespace == "50%korting":
         return 1/2
+    elif message_no_whitespace == "2eartikel70%":
+        return 0.15
+    elif message_no_whitespace == "15%korting":
+        return 0.15
+    elif message_no_whitespace == "1+1":
+        return 1/2
     else:
         return -1

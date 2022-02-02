@@ -33,7 +33,7 @@ from bs4 import BeautifulSoup
 from argostime.exceptions import CrawlerException
 from argostime.exceptions import PageNotFoundException
 
-from argostime.crawler.crawl_utils import CrawlResult
+from argostime.crawler.crawl_utils import CrawlResult, parse_promotional_message
 
 ah_date_format: str = "%Y-%m-%d"
 
@@ -79,32 +79,73 @@ def crawl_ah(url: str) -> CrawlResult:
         raise CrawlerException from exception
 
     try:
-        if product_dict["offers"]["validFrom"] == "undefined":
-            # Sometimes the "validFrom" is just undefined,
-            # just assume that there is a discount then
-            result.discount_price = float(product_dict["offers"]["price"])
-            result.normal_price = -1.0
-        else:
+        offer = product_dict["offers"]
+    except KeyError as exception:
+        logging.error("Could not find a valid offer in the json %s", product_dict)
+
+    if "validFrom" in offer.keys():
+        try:
             bonus_from: datetime = datetime.strptime(
-                product_dict["offers"]["validFrom"],
+                offer["validFrom"],
                 ah_date_format
                 )
-            try:
-                bonus_until: datetime = datetime.strptime(
-                    product_dict["offers"]["priceValidUntil"],
-                    ah_date_format
-                    )
-            except ValueError:
-                # If there is no bonus_until, just use this instead
-                bonus_until: datetime = datetime(year=5000, month=12, day=31)
-            if datetime.now() >= bonus_from and datetime.now() <= bonus_until:
-                result.discount_price = float(product_dict["offers"]["price"])
-                result.normal_price = -1.0
+        except ValueError:
+            logging.error(
+                "Failed to parse validFrom %s, assuming bonus is valid",
+                offer["validFrom"]
+                )
+            bonus_from: datetime = datetime(year=2000, month=1, day=1)
+        try:
+            bonus_until: datetime = datetime.strptime(
+                offer["priceValidUntil"],
+                ah_date_format
+                )
+        except ValueError:
+            logging.error(
+                "Failed to parse priceValidUntil %s, using fallback",
+                offer["priceValidUntil"]
+                )
+            bonus_until: datetime = datetime(year=5000, month=12, day=31)
+
+        if datetime.now() >= bonus_from and datetime.now() <= bonus_until:
+            # Try to find a promotional message
+            promo_text_matches = soup.find_all(
+                "p",
+                attrs={ "class" :lambda x: x and x.startswith("promo-sticker-text") }
+                )
+
+            logging.debug(promo_text_matches)
+
+            promotion_message: str = ""
+            for match in promo_text_matches:
+                promotion_message = promotion_message + match.text
+
+            # Remove all whitespace from the message
+            message_no_whitespace = "".join(promotion_message.split())
+            message_no_whitespace.lower()
+
+            # If there is a mark with for example "25% Korting", this is already calculated into
+            # the price we got from the json.
+            if "korting" not in message_no_whitespace:
+                promotion = parse_promotional_message(promotion_message)
             else:
-                # Ahh, the nice moments when there is just no valid price available. That sucks!
-                logging.error("No valid price available for %s", url)
-                result.normal_price = -1.0
-    except KeyError as exception:
+                promotion = -1
+
+            logging.debug(
+                "Found promotional message %s with result %f",
+                promotion_message,
+                promotion
+                )
+
+            if promotion != -1:
+                result.discount_price = float(offer["price"]) * promotion
+            else:
+                result.discount_price = float(offer["price"])
+        else:
+            # No valid bonus, so there's no valid price available.
+            logging.info("No valid price found for %s", url)
+            result.normal_price = -1
+    else:
         # No details on if there is bonus data or not, so assume no bonus
         try:
             result.normal_price = float(product_dict["offers"]["price"])
