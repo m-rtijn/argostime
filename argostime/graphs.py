@@ -27,7 +27,6 @@ import logging
 from typing import List
 
 from matplotlib.figure import Figure
-import matplotlib.dates as mdates
 import matplotlib.ticker as mticker
 from matplotlib.axes import Axes
 import numpy as np
@@ -38,7 +37,8 @@ from argostime.models import ProductOffer, Price
 def generate_price_bar_graph(offer: ProductOffer) -> Figure:
     """Generate a bar graph with the price over time of a specific ProductOffer"""
 
-    prices: List[Price] = Price.query.filter_by(product_offer_id=offer.id).order_by(Price.datetime).all()
+    prices: List[Price] = Price.query.filter_by(
+        product_offer_id=offer.id).order_by(Price.datetime).all()
 
     fig: Figure = Figure()
     ax: Axes = fig.subplots()
@@ -59,12 +59,12 @@ def generate_price_bar_graph(offer: ProductOffer) -> Figure:
     logging.debug("%s", effective_prices)
 
     x_locations: List[float] = np.arange(len(dates))
-    bar = ax.bar(x_locations, effective_prices)
+    bar_container = ax.bar(x_locations, effective_prices)
     ax.set_ylabel("prijs in €")
     ax.set_xlabel("datum")
-    ax.set_title("Prijsontwikkeling van {product} bij {shop}".format(product=offer.product.name, shop=offer.webshop.name))
+    ax.set_title(f"Prijsontwikkeling van {offer.product.name} bij {offer.webshop.name}")
     ax.set_xticks(x_locations, labels=date_strings)
-    ax.bar_label(bar, fmt="€ %0.2f", label_type="edge")
+    ax.bar_label(bar_container, fmt="€ %0.2f", label_type="edge")
 
     # Format y-axis ticks
     tick = mticker.StrMethodFormatter("€ {x:.2f}")
@@ -85,7 +85,8 @@ def generate_price_bar_graph(offer: ProductOffer) -> Figure:
 def generate_price_step_graph(offer: ProductOffer) -> Figure:
     """Generate a step graph with the price over time of a specific ProductOffer"""
 
-    prices: List[Price] = Price.query.filter_by(product_offer_id=offer.id).order_by(Price.datetime).all()
+    prices: List[Price] = Price.query.filter_by(
+        product_offer_id=offer.id).order_by(Price.datetime).all()
 
     fig: Figure = Figure()
     ax: Axes = fig.subplots()
@@ -108,10 +109,8 @@ def generate_price_step_graph(offer: ProductOffer) -> Figure:
     ax.grid(True)
     ax.set_ylabel("prijs in €")
     ax.set_xlabel("datum")
-    ax.set_title("Prijsontwikkeling van {product} bij {shop}".format(product=offer.product.name, shop=offer.webshop.name))
+    ax.set_title(f"Prijsontwikkeling van {offer.product.name} bij {offer.webshop.name}")
     ax.set_xticks(x_locations, labels=date_strings)
-    #ax.xaxis.set_major_locator(mdates.DayLocator())
-    #ax.xaxis.set_major_formatter(mdates.ConciseDateFormatter(ax.xaxis.get_major_locator()))
 
     # Format y-axis ticks
     tick = mticker.StrMethodFormatter("€ {x:.2f}")

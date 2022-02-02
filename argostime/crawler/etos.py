@@ -22,7 +22,6 @@
     along with Argostimè. If not, see <https://www.gnu.org/licenses/>.
 """
 
-from asyncio import exceptions
 import json
 import logging
 

@@ -54,10 +54,10 @@ class CrawlResult():
 
 def parse_promotional_message(message: str) -> float:
     """Parse a given promotional message, and return a modifier to calculate the effectife price.
-    
+
     For example "1+1 GRATIS" will be parsed to meaning a 50% discount.
     "2+1 GRATIS" will be parsed to mean a 33% discount, and will return 2/3.
-    
+
     Returns -1 if it couldn't find a match"""
 
     # Remove all whitespace from the message

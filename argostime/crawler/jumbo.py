@@ -75,7 +75,7 @@ def crawl_jumbo(url: str) -> CrawlResult:
     if product["offers"]["@type"] == "AggregateOffer":
         offer = product["offers"]
     else:
-        logging.error("No price info available, raising CrawlerException", raw_json)
+        logging.error("No price info available in %s, raising CrawlerException", raw_json)
         raise CrawlerException()
 
     try:
