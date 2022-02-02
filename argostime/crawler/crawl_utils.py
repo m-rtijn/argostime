@@ -65,6 +65,8 @@ def parse_promotional_message(message: str) -> float:
 
     message_no_whitespace.lower()
 
+    # TODO: Add a general solution for "x voor €y" promotions
+
     if message_no_whitespace == "1+1gratis":
         return 1/2
     elif message_no_whitespace == "2+1gratis":
@@ -85,5 +87,9 @@ def parse_promotional_message(message: str) -> float:
         return 1/2
     elif message_no_whitespace == "6=5":
         return 5/6
+    elif message_no_whitespace == "2egratis":
+        return 1/2
+    elif message_no_whitespace == "2+3gratis":
+        return 0.4
     else:
         return -1
