@@ -53,9 +53,10 @@ class CrawlResult():
         self.ean = ean
 
 def parse_promotional_message(message: str) -> float:
-    """Parse a given promotional message, and return a percentage effective discount.
+    """Parse a given promotional message, and return a modifier to calculate the effectife price.
     
     For example "1+1 GRATIS" will be parsed to meaning a 50% discount.
+    "2+1 GRATIS" will be parsed to mean a 33% discount, and will return 2/3.
     
     Returns -1 if it couldn't find a match"""
 
@@ -67,20 +68,22 @@ def parse_promotional_message(message: str) -> float:
     if message_no_whitespace == "1+1gratis":
         return 1/2
     elif message_no_whitespace == "2+1gratis":
-        return 1/3
+        return 2/3
     elif message_no_whitespace == "3+1gratis":
-        return 1/4
+        return 3/4
     elif message_no_whitespace == "5+1gratis":
-        return 1/6
+        return 5/6
     elif message_no_whitespace == "2ehalveprijs":
-        return 1/4
+        return 3/4
     elif message_no_whitespace == "50%korting":
         return 1/2
     elif message_no_whitespace == "2eartikel70%":
-        return 0.15
+        return 0.85
     elif message_no_whitespace == "15%korting":
-        return 0.15
+        return 0.85
     elif message_no_whitespace == "1+1":
         return 1/2
+    elif message_no_whitespace == "6=5":
+        return 5/6
     else:
         return -1
