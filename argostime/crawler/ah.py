@@ -59,6 +59,12 @@ def crawl_ah(url: str) -> CrawlResult:
     except json.decoder.JSONDecodeError as exception:
         logging.error("Could not decode JSON %s, raising CrawlerException", product_json)
         raise CrawlerException from exception
+    except Exception as exception:
+        logging.error(
+            "Could not find a JSON to parse? Got Exception %s parsing %s",
+            exception,
+            product_json)
+        raise CrawlerException from exception
 
     try:
         result.product_name = product_dict["name"]
