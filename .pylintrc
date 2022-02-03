@@ -1,3 +1,6 @@
+[GENERAL]
+fail-under=9.0
+
 [MESSAGES CONTROL]
 disable=R0903
 
