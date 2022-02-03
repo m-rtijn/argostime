@@ -22,14 +22,25 @@
 
 import configparser
 import logging
+from os import getcwd
 
 from flask import Flask
 
-from .products import *
-from .exceptions import *
-from .models import *
+from git import Repo
+
+from argostime.products import *
+from argostime.exceptions import *
+from argostime.models import *
+
+def get_current_commit() -> str:
+    """Return the hexadecimal hash of the current running commit,
+    assuming we're on the HEAD of master.
+    """
+    repo = Repo(getcwd())
+    return repo.heads.master.commit.hexsha
 
 def create_app():
+    """Return a flask object for argostime, initialize logger and db."""
     logging.basicConfig(
         filename="argostime.log",
         level=logging.DEBUG,
@@ -54,6 +65,8 @@ def create_app():
     else:
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+    app.config["GIT_CURRENT_COMMIT"] = get_current_commit()
     db.init_app(app)
 
     with app.app_context():
