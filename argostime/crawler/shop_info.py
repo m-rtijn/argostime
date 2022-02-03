@@ -38,6 +38,10 @@ shops_info = {
     "etos" : {
         "name": "Etos",
         "hostname": "etos.nl"
+    },
+    "simonlevelt": {
+        "name": "Simon Lévelt",
+        "hostname": "simonlevelt.nl"
     }
 }
 
@@ -49,5 +53,7 @@ enabled_shops = {
     "brandzaak.nl": "brandzaak",
     "www.brandzaak.nl": "brandzaak",
     "etos.nl": "etos",
-    "www.etos.nl": "etos"
+    "www.etos.nl": "etos",
+    "simonlevelt.nl": "simonlevelt",
+    "www.simonlevelt.nl": "simonlevelt"
 }

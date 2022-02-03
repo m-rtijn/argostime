@@ -25,6 +25,7 @@
 
 import logging
 import urllib.parse
+from argostime.crawler.simonlevelt import crawl_simonlevelt
 
 from argostime.exceptions import WebsiteNotImplementedException
 
@@ -59,6 +60,8 @@ def crawl_url(url: str) -> CrawlResult:
         result = crawl_brandzaak(url)
     elif shops_info["etos"]["hostname"] in hostname:
         result = crawl_etos(url)
+    elif shops_info["simonlevelt"]["hostname"] in hostname:
+        result = crawl_simonlevelt(url)
     else:
         raise WebsiteNotImplementedException(url)
 
