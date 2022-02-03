@@ -23,6 +23,7 @@
 """
 
 import io
+import logging
 from typing import List
 import urllib.parse
 
@@ -33,7 +34,9 @@ from flask import Response
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 
-from argostime.exceptions import PageNotFoundException, WebsiteNotImplementedException
+from argostime.exceptions import CrawlerException
+from argostime.exceptions import PageNotFoundException
+from argostime.exceptions import WebsiteNotImplementedException
 from argostime.graphs import generate_price_bar_graph
 from argostime.graphs import generate_price_step_graph
 from argostime.models import Webshop, Product, ProductOffer
@@ -44,17 +47,27 @@ def index():
     """Render home page"""
     if request.method == "POST":
         form = request.form
+        url = request.form["url"]
         try:
-            res, offer = add_product_offer_from_url(form["url"])
+            res, offer = add_product_offer_from_url(url)
         except WebsiteNotImplementedException:
-            hostname: str = urllib.parse.urlparse(form["url"]).netloc
+            hostname: str = urllib.parse.urlparse(url).netloc
             if len(hostname) == 0:
-                hostname = form["url"]
+                hostname = url
             return render_template("add_product_result.html.jinja",
                 result=f"Helaas wordt de website {hostname} nog niet ondersteund."), 400
         except PageNotFoundException:
             return render_template("add_product_result.html.jinja",
-                result="De pagina {url} kon niet worden gevonden.".format(url=form["url"])), 404
+                result=f"De pagina {url} kon niet worden gevonden."), 404
+        except CrawlerException as exception:
+            logging.info(
+                "Failed to add product from url %s, got CrawlerException %s",
+                url,
+                exception)
+
+            return render_template("add_product_result.html.jinja",
+                result=f"Het is niet gelukt om een product te vinden op de gegeven URL {url}."
+                        " Verwijst de link wel naar een productpagina?")
 
         if res == ProductOfferAddResult.ADDED or res == ProductOfferAddResult.ALREADY_EXISTS and offer is not None:
             return redirect(f"/product/{offer.product.product_code}")
