@@ -7,6 +7,7 @@ After=mariadb.service
 User=argostime
 WorkingDirectory=/opt/argostime
 Environment="PATH=/opt/argostime/venv/bin"
+Environment="GIT_PYTHON_GIT_EXECUTABLE=/usr/bin/git"
 ExecStart=/opt/argostime/venv/bin/gunicorn --workers 1 --bind 127.0.0.1:20739 wsgi:app
 ExecReload=/bin/kill -s HUP $MAINPID
 ExecStop=/bin/kill -s TERM $MAINPID
@@ -16,10 +17,14 @@ PrivateDevices=true
 ProtectClock=true
 ProtectControlGroups=true
 ProtectHome=true
+ProtectHostname=true
 ProtectKernelLogs=yes
 ProtectKernelModules=yes
 ProtectKernelTunables=true
+ProtectControlGroups=true
 ProtectSystem=full
 RestrictSUIDSGID=true
 NoNewPrivileges=true
 PrivateTmp=true
+DevicePolicy=closed
+InaccessiblePaths=-/srv /home /mnt /var/www /backup
