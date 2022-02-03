@@ -94,7 +94,7 @@ def crawl_ah(url: str) -> CrawlResult:
                 "Failed to parse validFrom %s, assuming bonus is valid",
                 offer["validFrom"]
                 )
-            bonus_from: datetime = datetime(year=2000, month=1, day=1)
+            bonus_from = datetime(year=2000, month=1, day=1)
         try:
             bonus_until: datetime = datetime.strptime(
                 offer["priceValidUntil"],
@@ -105,7 +105,7 @@ def crawl_ah(url: str) -> CrawlResult:
                 "Failed to parse priceValidUntil %s, using fallback",
                 offer["priceValidUntil"]
                 )
-            bonus_until: datetime = datetime(year=5000, month=12, day=31)
+            bonus_until = datetime(year=5000, month=12, day=31)
 
         if datetime.now() >= bonus_from and datetime.now() <= bonus_until:
             # Try to find a promotional message

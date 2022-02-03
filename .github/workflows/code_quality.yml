@@ -32,7 +32,7 @@ jobs:
     - name: Check types with mypy
       if: always()
       run: |
-        mypy --install-types --non-interactive argostime
+        mypy --install-types --non-interactive --ignore-missing-imports argostime
 #    - name: Test with unittest
 #      run: |
 #        python3 -m unittest argostime

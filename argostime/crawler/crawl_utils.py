@@ -22,16 +22,18 @@
     along with Argostimè. If not, see <https://www.gnu.org/licenses/>.
 """
 
+from typing import Optional
+
 class CrawlResult():
     """Data structure for returning the results of a crawler in a uniform way."""
 
-    url: str
-    product_name: str
-    product_code: str
-    ean: int
+    url: Optional[str]
+    product_name: Optional[str]
+    product_code: Optional[str]
+    ean: Optional[int]
 
-    normal_price: float
-    discount_price: float = 0.0
+    normal_price: float = -1.0
+    discount_price: float = -1.0
     on_sale: bool = False
 
     def __init__(

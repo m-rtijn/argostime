@@ -58,7 +58,7 @@ def generate_price_bar_graph(offer: ProductOffer) -> Figure:
     logging.debug("%s", dates)
     logging.debug("%s", effective_prices)
 
-    x_locations: List[float] = np.arange(len(dates))
+    x_locations = np.arange(len(dates))
     bar_container = ax.bar(x_locations, effective_prices)
     ax.set_ylabel("prijs in €")
     ax.set_xlabel("datum")
@@ -103,7 +103,7 @@ def generate_price_step_graph(offer: ProductOffer) -> Figure:
         except NoEffectivePriceAvailableException:
             pass
 
-    x_locations: List[float] = np.arange(len(dates))
+    x_locations = np.arange(len(dates))
 
     ax.step(x_locations, effective_prices, "o-", where="mid")
     ax.grid(True)
