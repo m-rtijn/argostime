@@ -77,7 +77,7 @@ def index():
         products = Product.query.order_by(Product.id.desc()).limit(10).all()
         discounts = Price.query.filter(
             Price.datetime >= datetime.now().date(),
-            Price.on_sale is True
+            Price.on_sale == True # pylint: disable=C0121
             ).all()
         shops = Webshop.query.order_by(Webshop.name).all()
 
