@@ -22,6 +22,7 @@
     along with Argostimè. If not, see <https://www.gnu.org/licenses/>.
 """
 
+from datetime import datetime
 import io
 import logging
 from typing import List
@@ -39,14 +40,13 @@ from argostime.exceptions import PageNotFoundException
 from argostime.exceptions import WebsiteNotImplementedException
 from argostime.graphs import generate_price_bar_graph
 from argostime.graphs import generate_price_step_graph
-from argostime.models import Webshop, Product, ProductOffer
+from argostime.models import Webshop, Product, ProductOffer, Price
 from argostime.products import ProductOfferAddResult, add_product_offer_from_url
 
 @app.route("/", methods=["GET", "POST"])
 def index():
     """Render home page"""
     if request.method == "POST":
-        form = request.form
         url = request.form["url"]
         try:
             res, offer = add_product_offer_from_url(url)
@@ -75,11 +75,16 @@ def index():
         return render_template("add_product.html.jinja", result=str(res))
     else:
         products = Product.query.order_by(Product.id.desc()).limit(10).all()
+        discounts = Price.query.filter(
+            Price.datetime >= datetime.now().date(),
+            Price.on_sale is True
+            ).all()
         shops = Webshop.query.order_by(Webshop.name).all()
 
         return render_template(
             "index.html.jinja",
             products=products,
+            discounts=discounts,
             shops=shops)
 
 @app.route("/product/<product_code>")

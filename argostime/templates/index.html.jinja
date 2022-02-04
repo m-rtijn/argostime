@@ -15,7 +15,14 @@
 {% endfor %}
 </nav>
 
-<p>De laatst toegevoegde producten zijn:</p>
+<p>Vandaag in de aanbieding:</p>
+<ul>
+{% for price in discounts %}
+<li><a href="product/{{ price.product_offer.product.product_code |e }}">{{ price.product_offer.product.name|e }}</a></li>
+{% endfor %}
+</ul>
+
+<p>Laatst toegevoegd:</p>
 <ul>
 {% for product in products %}
 <li><a href="product/{{ product.product_code|e }}">{{ product.name|e }}</a></li>
