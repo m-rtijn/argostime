@@ -25,7 +25,6 @@
 
 import logging
 import urllib.parse
-from argostime.crawler.simonlevelt import crawl_simonlevelt
 
 from argostime.exceptions import WebsiteNotImplementedException
 
@@ -33,9 +32,10 @@ from argostime.crawler.crawl_utils import CrawlResult
 from argostime.crawler.shop_info import shops_info, enabled_shops
 
 from argostime.crawler.ah import crawl_ah
-from argostime.crawler.jumbo import crawl_jumbo
 from argostime.crawler.brandzaak import crawl_brandzaak
 from argostime.crawler.etos import crawl_etos
+from argostime.crawler.jumbo import crawl_jumbo
+from argostime.crawler.simonlevelt import crawl_simonlevelt
 
 def crawl_url(url: str) -> CrawlResult:
     """Crawl a product at the given URL
