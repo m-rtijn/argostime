@@ -54,7 +54,7 @@ class CrawlResult():
         self.on_sale = on_sale
         self.ean = ean
 
-    def __str__(self):
+    def __str__(self) -> str:
         string = f"CrawlResult(product_name={self.product_name},"\
             f"product_code={self.product_code},price={self.normal_price},"\
             f"discount={self.discount_price},sale={self.on_sale},ean={self.ean}"

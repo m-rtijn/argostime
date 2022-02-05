@@ -69,7 +69,11 @@ def index():
                 result=f"Het is niet gelukt om een product te vinden op de gegeven URL {url}."
                         " Verwijst de link wel naar een productpagina?")
 
-        if res == ProductOfferAddResult.ADDED or res == ProductOfferAddResult.ALREADY_EXISTS and offer is not None:
+        if (
+            res == ProductOfferAddResult.ADDED
+            or
+            res == ProductOfferAddResult.ALREADY_EXISTS and offer is not None
+            ):
             return redirect(f"/product/{offer.product.product_code}")
 
         return render_template("add_product.html.jinja", result=str(res))

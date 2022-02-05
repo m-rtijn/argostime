@@ -26,6 +26,7 @@ import codecs
 import json
 import logging
 import re
+from typing import Optional
 
 import requests
 from bs4 import BeautifulSoup
@@ -50,10 +51,8 @@ def crawl_hema(url: str) -> CrawlResult:
     matches = soup.find_all("script")
     pattern = re.compile(r"var gtmDataObj = JSON\.parse\(.+\);")
 
-    raw_json: str = ""
-
     for match in matches:
-        re_result: re.Match = pattern.search(match.text)
+        re_result: Optional[re.Match] = pattern.search(match.text)
 
         if re_result is not None:
             raw_json = re_result.group(0)

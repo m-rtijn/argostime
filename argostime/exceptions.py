@@ -24,7 +24,7 @@ import logging
 
 class PageNotFoundException(Exception):
     """Exception to throw when a request gets a 404 returned."""
-    def __init__(self, url):
+    def __init__(self, url: str):
         self.url = url
 
         logging.debug("PageNotFoundException for %s", url)
@@ -34,7 +34,7 @@ class PageNotFoundException(Exception):
 class WebsiteNotImplementedException(Exception):
     """Exception to throw if a certain website has no implemented scraper."""
 
-    def __init__(self, url):
+    def __init__(self, url: str):
         self.url = url
 
         logging.debug("WebsiteNotImplementedException for %s", url)
@@ -43,8 +43,6 @@ class WebsiteNotImplementedException(Exception):
 
 class NoEffectivePriceAvailableException(Exception):
     """Exception to throw if a Price object has no valid price."""
-    pass
 
 class CrawlerException(Exception):
     """Exception to throw if something goes wrong in the crawler."""
-    pass

@@ -42,7 +42,7 @@ def crawl_ah(url: str) -> CrawlResult:
     response: requests.Response = requests.get(url)
 
     if response.status_code != 200:
-        logging.debug("Got status code %d while getting url %s", response.status_code, url)
+        logging.error("Got status code %d while getting url %s", response.status_code, url)
         raise PageNotFoundException(url)
 
     soup = BeautifulSoup(response.text, "html.parser")
