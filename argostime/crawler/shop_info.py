@@ -42,6 +42,10 @@ shops_info = {
     "simonlevelt": {
         "name": "Simon Lévelt",
         "hostname": "simonlevelt.nl"
+    },
+    "hema": {
+        "name": "HEMA",
+        "hostname": "hema.nl"
     }
 }
 
@@ -55,5 +59,7 @@ enabled_shops = {
     "etos.nl": "etos",
     "www.etos.nl": "etos",
     "simonlevelt.nl": "simonlevelt",
-    "www.simonlevelt.nl": "simonlevelt"
+    "www.simonlevelt.nl": "simonlevelt",
+    "hema.nl": "hema",
+    "www.hema.nl": "hema"
 }
