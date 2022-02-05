@@ -95,7 +95,8 @@ def product_page(product_code):
     if product is None:
         abort(404)
 
-    offers: List[ProductOffer] = ProductOffer.query.filter_by(product_id=product.id).all()
+    offers: List[ProductOffer] = ProductOffer.query.filter_by(
+        product_id=product.id).join(Webshop).order_by(Webshop.name).all()
 
     return render_template(
         "product.html.jinja",
