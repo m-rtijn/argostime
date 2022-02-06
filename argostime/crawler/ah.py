@@ -22,7 +22,7 @@
     along with Argostimè. If not, see <https://www.gnu.org/licenses/>.
 """
 
-from datetime import datetime
+from datetime import date
 import json
 import logging
 
@@ -34,8 +34,6 @@ from argostime.exceptions import CrawlerException
 from argostime.exceptions import PageNotFoundException
 
 from argostime.crawler.crawl_utils import CrawlResult, parse_promotional_message
-
-ah_date_format: str = "%Y-%m-%d"
 
 def crawl_ah(url: str) -> CrawlResult:
     """Crawler for ah.nl"""
@@ -91,29 +89,23 @@ def crawl_ah(url: str) -> CrawlResult:
 
     if "validFrom" in offer.keys():
         try:
-            bonus_from: datetime = datetime.strptime(
-                offer["validFrom"],
-                ah_date_format
-                )
+            bonus_from: date = date.fromisoformat(offer["validFrom"])
         except ValueError:
             logging.error(
                 "Failed to parse validFrom %s, assuming bonus is valid",
                 offer["validFrom"]
                 )
-            bonus_from = datetime(year=2000, month=1, day=1)
+            bonus_from = date(year=2000, month=1, day=1)
         try:
-            bonus_until: datetime = datetime.strptime(
-                offer["priceValidUntil"],
-                ah_date_format
-                )
+            bonus_until: date = date.fromisoformat(offer["priceValidUntil"])
         except ValueError:
             logging.error(
                 "Failed to parse priceValidUntil %s, using fallback",
                 offer["priceValidUntil"]
                 )
-            bonus_until = datetime(year=5000, month=12, day=31)
+            bonus_until = date(year=5000, month=12, day=31)
 
-        if datetime.now().date() >= bonus_from and datetime.now().date() <= bonus_until:
+        if date.today() >= bonus_from and date.today() <= bonus_until:
             # Try to find a promotional message
             promo_text_matches = soup.find_all(
                 "p",
