@@ -113,7 +113,7 @@ def crawl_ah(url: str) -> CrawlResult:
                 )
             bonus_until = datetime(year=5000, month=12, day=31)
 
-        if datetime.now() >= bonus_from and datetime.now() <= bonus_until:
+        if datetime.now().date() >= bonus_from and datetime.now().date() <= bonus_until:
             # Try to find a promotional message
             promo_text_matches = soup.find_all(
                 "p",
