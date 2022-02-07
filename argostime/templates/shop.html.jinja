@@ -1,7 +1,7 @@
 {% extends "base.html.jinja" %}
 {% block title %}{{ s.name|e }} | {{ super() }}{% endblock %}
+{% block script %}<script src="/static/table-sort.js"></script>{% endblock %}
 {% block content %}
-<script src="/static/table-sort.js"></script>
 
 <h1>{{ s.name|e }}</h1>
 
