@@ -29,7 +29,7 @@
     <td>{{ "€%.2f" | format(offer.get_lowest_price()) }}</td>
     <td>{{ "€%.2f" | format(offer.get_highest_price()) }}</td>
     <td>{{ offer.time_added.strftime("%Y-%m-%d") }}</td>
-    <td><a target="_blank" href="{{ offer.url }}">{{ offer.webshop.hostname }} 🡥</a></td>
+    <td><a target="_blank" href="{{ offer.url }}">{{ offer.webshop.hostname }}</a></td>
 </tr>
 {% endfor %}
 </table>
