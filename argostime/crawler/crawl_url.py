@@ -46,7 +46,7 @@ def crawl_url(url: str) -> CrawlResult:
         PageNotFoundException
         WebsiteNotImplementedException
     """
-    logging.debug("%s", url)
+    logging.debug("Crawling %s", url)
     hostname: str = urllib.parse.urlparse(url).netloc
 
     if hostname not in enabled_shops:
@@ -72,5 +72,7 @@ def crawl_url(url: str) -> CrawlResult:
         result.on_sale = True
     else:
         result.on_sale = False
+
+    logging.debug("Crawl resulted in %s", result)
 
     return result

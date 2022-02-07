@@ -38,6 +38,7 @@ from argostime.crawler.crawl_utils import CrawlResult
 
 def crawl_hema(url: str) -> CrawlResult:
     """Crawler for hema.nl"""
+
     response: requests.Response = requests.get(url)
 
     if response.status_code != 200:
@@ -56,7 +57,7 @@ def crawl_hema(url: str) -> CrawlResult:
 
         if re_result is not None:
             raw_json = re_result.group(0)
-            logging.debug(raw_json)
+            logging.debug("Found raw product json %s", raw_json)
             break
 
     raw_json = raw_json.replace("var gtmDataObj = JSON.parse('", "")
@@ -89,7 +90,5 @@ def crawl_hema(url: str) -> CrawlResult:
     except KeyError as exception:
         logging.error("Could not find a valid price in %s via %s", raw_json, url)
         result.normal_price = -1
-
-    logging.debug(result)
 
     return result

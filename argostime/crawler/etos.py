@@ -24,6 +24,7 @@
 
 import json
 import logging
+from typing import Dict
 
 import requests
 from bs4 import BeautifulSoup
@@ -36,14 +37,11 @@ from argostime.crawler.crawl_utils import parse_promotional_message
 
 def crawl_etos(url: str) -> CrawlResult:
     """Crawler for etos.nl"""
-    response: requests.Response = requests.get(url)
+
+    response = requests.get(url)
 
     if response.status_code != 200:
-        logging.debug(
-            "Got status code %d while getting url %s",
-            response.status_code,
-            url
-            )
+        logging.error("Got status code %d while getting url %s", response.status_code, url)
         raise PageNotFoundException(url)
 
     soup = BeautifulSoup(response.text, "html.parser")
@@ -69,33 +67,36 @@ def crawl_etos(url: str) -> CrawlResult:
 
     logging.debug(product_dict)
 
+    offer: Dict[str, str] = product_dict["ecommerce"]["detail"]["products"][0]
+
     try:
-        result.product_name = product_dict["ecommerce"]["detail"]["products"][0]["name"]
+        result.product_name = offer["name"]
     except KeyError as exception:
         logging.error("No key name found in json %s parsed as %s", raw_product_json, product_dict)
         raise CrawlerException from exception
 
     try:
-        result.product_code = product_dict["ecommerce"]["detail"]["products"][0]["id"]
+        result.product_code = offer["id"]
     except KeyError as exception:
         logging.error("No key sku found in json %s", raw_product_json)
         raise CrawlerException from exception
 
     try:
-        promotion_message: str = product_dict["ecommerce"]["detail"]["products"][0]["dimension20"]
+        promotion_message: str = offer["dimension20"]
         promotion: float = parse_promotional_message(promotion_message)
-        logging.info("Found promotional message %s", promotion_message)
+        logging.debug("Found promotional message %s", promotion_message)
+
         # Try to parse this promotion
         if promotion != -1.0:
-            result.discount_price = product_dict["ecommerce"]["detail"]["products"][0]["price"] * promotion
+            result.discount_price = float(offer["price"]) * promotion
         else:
             # Couldn't parse the promotion!
-            logging.error("Couldn't parse promotion %s, assuming no discount", promotion_message)
-            result.normal_price = product_dict["ecommerce"]["detail"]["products"][0]["price"]
+            logging.info("Couldn't parse promotion %s, assuming no discount", promotion_message)
+            result.normal_price = float(offer["price"])
     except KeyError as exception:
-        logging.info("No promotion found, assuming no discount")
+        logging.debug("No promotion found, assuming no discount")
         try:
-            result.normal_price = product_dict["ecommerce"]["detail"]["products"][0]["price"]
+            result.normal_price = float(offer["price"])
         except KeyError as inner_exception:
             logging.error("No price found in json %s", raw_product_json)
             raise CrawlerException from inner_exception

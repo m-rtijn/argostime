@@ -22,6 +22,7 @@
     along with Argostimè. If not, see <https://www.gnu.org/licenses/>.
 """
 
+import logging
 from typing import Optional
 
 class CrawlResult():
@@ -67,7 +68,10 @@ def parse_promotional_message(message: str) -> float:
     For example "1+1 GRATIS" will be parsed to meaning a 50% discount.
     "2+1 GRATIS" will be parsed to mean a 33% discount, and will return 2/3.
 
-    Returns -1 if it couldn't find a match"""
+    Returns -1 if it couldn't find a match
+    """
+
+    logging.debug(message)
 
     # Remove all whitespace from the message
     message_no_whitespace = "".join(message.split())
@@ -101,4 +105,5 @@ def parse_promotional_message(message: str) -> float:
     elif message_no_whitespace == "2+3gratis":
         return 0.4
     else:
+        logging.error("Promotion text did not match any known promotion")
         return -1

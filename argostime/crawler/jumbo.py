@@ -55,12 +55,13 @@ def crawl_jumbo(url: str) -> CrawlResult:
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:96.0) Gecko/20100101 Firefox/96.0"
     }
 
-    request = requests.get(url, timeout=10, headers=headers)
+    response = requests.get(url, timeout=10, headers=headers)
 
-    if request.status_code == 404:
+    if response.status_code != 200:
+        logging.error("Got status code %d while getting url %s", response.status_code, url)
         raise PageNotFoundException(url)
 
-    soup = BeautifulSoup(request.text, "html.parser")
+    soup = BeautifulSoup(response.text, "html.parser")
     product_json = soup.find("script", attrs={"type": "application/ld+json", "data-n-head": "ssr"})
     raw_json = product_json.string
 

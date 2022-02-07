@@ -45,7 +45,7 @@ def crawl_ah(url: str) -> CrawlResult:
 
     soup = BeautifulSoup(response.text, "html.parser")
 
-    product_json = soup.find(
+    raw_json_match = soup.find(
         "script",
         attrs={ "type": "application/ld+json", "data-react-helmet": "true"}
         )
@@ -53,15 +53,15 @@ def crawl_ah(url: str) -> CrawlResult:
     result: CrawlResult = CrawlResult(url=url)
 
     try:
-        product_dict = json.loads(product_json.text)
+        product_dict = json.loads(raw_json_match.text)
     except json.decoder.JSONDecodeError as exception:
-        logging.error("Could not decode JSON %s, raising CrawlerException", product_json)
+        logging.error("Could not decode JSON %s, raising CrawlerException", raw_json_match)
         raise CrawlerException from exception
     except Exception as exception:
         logging.error(
             "Could not find a JSON to parse? Got Exception %s parsing %s",
             exception,
-            product_json)
+            raw_json_match)
         raise CrawlerException from exception
 
     try:
@@ -86,6 +86,7 @@ def crawl_ah(url: str) -> CrawlResult:
         offer = product_dict["offers"]
     except KeyError as exception:
         logging.error("Could not find a valid offer in the json %s", product_dict)
+        raise CrawlerException from exception
 
     if "validFrom" in offer.keys():
         try:
@@ -111,8 +112,6 @@ def crawl_ah(url: str) -> CrawlResult:
                 "p",
                 attrs={ "class" :lambda x: x and x.startswith("promo-sticker-text") }
                 )
-
-            logging.debug(promo_text_matches)
 
             promotion_message: str = ""
             for match in promo_text_matches:

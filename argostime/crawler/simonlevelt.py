@@ -35,6 +35,7 @@ from argostime.crawler.crawl_utils import CrawlResult
 
 def crawl_simonlevelt(url: str) -> CrawlResult:
     """Crawler for simonlevelt.nl"""
+
     response: requests.Response = requests.get(url)
 
     if response.status_code != 200:
@@ -62,7 +63,9 @@ def crawl_simonlevelt(url: str) -> CrawlResult:
     locale.setlocale(locale.LC_NUMERIC, "nl_NL.UTF-8")
 
     try:
-        result.normal_price = locale.atof(soup.find("meta", property="product:price").get("content"))
+        result.normal_price = locale.atof(
+            soup.find("meta", property="product:price").get("content")
+            )
     except Exception as exception:
         logging.error("Could not find a price %s", exception)
         raise CrawlerException from exception

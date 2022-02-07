@@ -116,7 +116,7 @@ class ProductOffer(db.Model):
         try:
             return statistics.mean(effective_price_values)
         except statistics.StatisticsError:
-            logging.info("Called get_average_price but no prices were found...")
+            logging.debug("Called get_average_price for %s but no prices were found...", str(self))
             return -1
 
     def get_lowest_price_since(self, since_time: datetime) -> float:

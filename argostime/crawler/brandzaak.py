@@ -37,12 +37,13 @@ from argostime.crawler.crawl_utils import CrawlResult
 def crawl_brandzaak(url: str) -> CrawlResult:
     """Parse a product from brandzaak.nl"""
 
-    request = requests.get(url)
+    response = requests.get(url)
 
-    if request.status_code == 404:
+    if response.status_code != 200:
+        logging.error("Got status code %d while getting url %s", response.status_code, url)
         raise PageNotFoundException(url)
 
-    soup = BeautifulSoup(request.text, "html.parser")
+    soup = BeautifulSoup(response.text, "html.parser")
 
     result: CrawlResult = CrawlResult(url=url)
 
