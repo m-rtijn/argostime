@@ -1,9 +1,11 @@
 {% extends "base.html.jinja" %}
 {% block title %}{{ s.name|e }} | {{ super() }}{% endblock %}
+{% block script %}<script src="/static/table-sort.js"></script>{% endblock %}
 {% block content %}
+
 <h1>{{ s.name|e }}</h1>
 
-<table>
+<table class="table-sort table-arrows">
 <tr>
     <th>Product</th>
     <th>Huidige prijs</th>
