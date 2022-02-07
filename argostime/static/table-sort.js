@@ -1,5 +1,5 @@
 /* 
-table-sort-js
+table-sort-js 1.6.8
 Author: Lee Wannacott
 Licence: MIT License Copyright (c) 2021 Lee Wannacott 
     
