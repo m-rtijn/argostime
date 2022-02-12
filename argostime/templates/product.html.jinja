@@ -1,5 +1,7 @@
 {% extends "base.html.jinja" %}
 {% block title %}{{ p.name|e }} | {{ super() }}{% endblock %}
+{% block og_title %}{{ p.name|e }} | {{ super() }}{% endblock %}
+{% block description %}Bekijk de prijsontwikkeling van {{ p.name|e }} op Argostimè{% endblock %}
 {% block content %}
 <h1>{{ p.name|e }}</h1>
 

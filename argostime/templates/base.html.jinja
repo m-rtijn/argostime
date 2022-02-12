@@ -7,6 +7,8 @@
     <title>{% block title %}Argostimè{% endblock %}</title>
     {% block script %}{% endblock %}
     {% endblock %}
+    <meta property="og:title" content="{% block og_title %}Argostimè{% endblock %}" />
+    <meta property="og:description" content="{% block description %}Hou prijzen in de gaten.{% endblock %}" />
 </head>
 <body>
     <a href="/"><h1 id="sitetitle">Argostimè</h1></a>
