@@ -121,16 +121,21 @@ def generate_price_step_graph(offer: ProductOffer) -> Figure:
         label.set(rotation=30, horizontalalignment='right')
 
     # Add data labels in the plot
+    last_effective_price: float = -1.0
     for x, effective_price in zip(x_locations, effective_prices):
-        label = "€ {:.2f}".format(effective_price)
 
-        ax.annotate(
-            label,
-            (x,effective_price),
-            textcoords="offset points",
-            xytext=(0,5),
-            ha="center"
-            )
+        if effective_price != last_effective_price:
+            label = "€ {:.2f}".format(effective_price)
+
+            ax.annotate(
+                label,
+                (x,effective_price),
+                textcoords="offset points",
+                xytext=(0,5),
+                ha="center"
+                )
+
+            last_effective_price = effective_price
 
     # Set margin to avoid annotations overlapping with top border
     ax.margins(0.1)
