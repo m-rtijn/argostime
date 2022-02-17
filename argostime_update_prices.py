@@ -14,12 +14,12 @@ import time
 from argostime.models import ProductOffer
 from argostime import create_app
 
-initial_sleep_time: float = random.uniform(0, 600)
-logging.debug("Sleeping for %f", initial_sleep_time)
-time.sleep(initial_sleep_time)
-
 app = create_app()
 app.app_context().push()
+
+initial_sleep_time: float = random.uniform(0, 600)
+logging.debug("Sleeping for %f seconds", initial_sleep_time)
+time.sleep(initial_sleep_time)
 
 offer: ProductOffer
 for offer in ProductOffer.query.all():
@@ -31,5 +31,5 @@ for offer in ProductOffer.query.all():
         logging.error("Received %s while updating price of %s, continuing...", exception, offer)
 
     next_sleep_time: float = random.uniform(1, 180)
-    logging.debug("Sleeping for %f", next_sleep_time)
+    logging.debug("Sleeping for %f seconds", next_sleep_time)
     time.sleep(next_sleep_time)
