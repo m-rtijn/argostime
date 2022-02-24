@@ -158,6 +158,29 @@ class ProductOffer(db.Model):
         """Return the highest effective price of this offer."""
         return self.get_highest_price_since(self.time_added)
 
+    def get_price_standard_deviation_since(self, since_time: datetime) -> float:
+        """Return the standard deviation of the effective price of this offer since a given date."""
+        effective_prices: List[float] = []
+        price: Price
+
+        for price in Price.query.filter(
+            Price.product_offer_id == self.id,
+            Price.datetime >= since_time).all():
+
+            try:
+                effective_prices.append(price.get_effective_price())
+            except NoEffectivePriceAvailableException:
+                pass
+
+        if len(effective_prices) > 1:
+            return statistics.stdev(effective_prices)
+        else:
+            return 0.0
+
+    def get_price_standard_deviation(self) -> float:
+        """Return the standard deviation of the effective price of this offer."""
+        return self.get_price_standard_deviation_since(self.time_added)
+
     def crawl_new_price(self) -> None:
         """Crawl the current price if we haven't already checked today."""
         latest_price: Price = self.get_current_price()

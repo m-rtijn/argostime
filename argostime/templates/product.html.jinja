@@ -13,6 +13,7 @@
     <th>Gemiddelde prijs</th>
     <th>Laagste prijs</th>
     <th>Hoogste prijs</th>
+    <th>Variatie</th>
     <th>Bijgehouden sinds</th>
 </tr>
 <tr>
@@ -24,6 +25,7 @@
     <td>{{ "€%.2f" | format(offer.get_average_price()) }}</td>
     <td>{{ "€%.2f" | format(offer.get_lowest_price()) }}</td>
     <td>{{ "€%.2f" | format(offer.get_highest_price()) }}</td>
+    <td>{{ "%.2f" | format(offer.get_price_standard_deviation()) }}</td>
     <td>{{ offer.time_added.strftime("%Y-%m-%d") }}</td>
 </tr>
 </table>
