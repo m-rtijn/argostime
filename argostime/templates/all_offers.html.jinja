@@ -1,0 +1,36 @@
+{% extends "base.html.jinja" %}
+{% block title %}Alle producten | {{ super() }}{% endblock %}
+{% block script %}<script src="/static/table-sort.js"></script>{% endblock %}
+{% block content %}
+
+<h1>Alle producten</h1>
+
+<table class="table-sort table-arrows">
+<tr>
+    <th>Product</th>
+    <th>Huidige prijs</th>
+    <th>Gemiddelde prijs</th>
+    <th>Laagste prijs</th>
+    <th>Hoogste prijs</th>
+    <th>Bijgehouden sinds</th>
+    <th>Website verkoper</th>
+</tr>
+{% for offer in offers %}
+<tr>
+    <td><a href="/product/{{ offer.product.product_code|e }}">{{ offer.product.name|e }}</a></td>
+{% if offer.get_current_price().on_sale %}
+    <td class="sale">{{ "€%.2f" | format(offer.get_current_price().discount_price)  }} ({{ offer.get_current_price().datetime.strftime("%Y-%m-%d") }}) Korting!</td>
+{% elif offer.get_current_price().normal_price == -1 %}
+    <td>Geen actuele prijs beschikbaar ({{ offer.get_current_price().datetime.strftime("%Y-%m-%d") }})</td>
+{% else %}
+    <td>{{ "€%.2f" | format(offer.get_current_price().normal_price) }} ({{ offer.get_current_price().datetime.strftime("%Y-%m-%d") }})</td>
+{% endif %}
+    <td>{{ "€%.2f" | format(offer.get_average_price()) }}</td>
+    <td>{{ "€%.2f" | format(offer.get_lowest_price()) }}</td>
+    <td>{{ "€%.2f" | format(offer.get_highest_price()) }}</td>
+    <td>{{ offer.time_added.strftime("%Y-%m-%d") }}</td>
+    <td><a target="_blank" href="{{ offer.url }}">{{ offer.webshop.hostname }}</a></td>
+</tr>
+{% endfor %}
+</table>
+{% endblock %}

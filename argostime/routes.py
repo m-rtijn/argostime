@@ -78,7 +78,7 @@ def index():
 
         return render_template("add_product.html.jinja", result=str(res))
     else:
-        products = Product.query.order_by(Product.id.desc()).limit(10).all()
+        products = Product.query.order_by(Product.id.desc()).limit(5).all()
         discounts = Price.query.filter(
             Price.datetime >= datetime.now().date(),
             Price.on_sale == True # pylint: disable=C0121
@@ -134,6 +134,14 @@ def offer_price_step_graph(offer_id):
     FigureCanvasAgg(fig).print_png(output)
 
     return Response(output.getvalue(), mimetype="image/png")
+
+@app.route("/all_offers")
+def all_offers():
+    """Generate an overview of all available offers"""
+
+    offers: List[ProductOffer] = ProductOffer.query.all()
+
+    return render_template("all_offers.html.jinja", offers=offers)
 
 @app.route("/shop/<shop_id>")
 def webshop_page(shop_id):

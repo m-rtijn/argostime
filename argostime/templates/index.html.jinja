@@ -10,6 +10,7 @@
 
 <p>Beschikbare webwinkels:</p>
 <nav>
+<b><a href="/all_offers">Alle producten</a></b>
 {% for shop in shops %}
 <a href="/shop/{{ shop.id }}">{{ shop.name|e }}</a>
 {% endfor %}
