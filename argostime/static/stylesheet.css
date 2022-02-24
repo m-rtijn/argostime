@@ -3,7 +3,7 @@ body {
     font: 1.2em/1.62 sans-serif;
     margin: auto;
     padding: 20px;
-    max-width: 40em;
+    max-width: 50em;
     text-align: left;
     background-color: #fff;
     word-wrap: break-word;
@@ -49,6 +49,10 @@ table, td, tr, th {
     width: 100%;
     border: 1px solid black;
     border-collapse: collapse;
+}
+
+tr:nth-child(even) {
+    background-color: #f2f2f2;
 }
 
 td {
