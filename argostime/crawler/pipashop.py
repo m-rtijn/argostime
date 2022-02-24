@@ -34,6 +34,7 @@ from argostime.exceptions import PageNotFoundException
 from argostime.crawler.crawl_utils import CrawlResult
 
 def crawl_pipashop(url: str) -> CrawlResult:
+    """Crawler for pipa-shop.nl meme website."""
     result: CrawlResult = CrawlResult(url=url)
     request = requests.get(url, timeout=10)
 
@@ -45,10 +46,10 @@ def crawl_pipashop(url: str) -> CrawlResult:
     try:
         price = re.sub(r"[^0-9.]", "", soup.select_one("div.product-price").text)
         result.product_name = soup.select_one("div.product-title a").text
-        result.product_code = result.url.split("/product/").pop().split("/")[0]
+        result.product_code = url.split("/product/").pop().split("/")[0]
         result.normal_price = float(price)
-    except (AttributeError, IndexError, ValueError) as e:
-        logging.error("%s, raising CrawlerException" % e)
+    except (AttributeError, IndexError, ValueError) as exception:
+        logging.error("%s, raising CrawlerException", exception)
         raise CrawlerException from KeyError
 
     return result
