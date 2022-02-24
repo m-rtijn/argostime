@@ -141,9 +141,13 @@ def offer_price_step_graph(offer_id):
 def all_offers():
     """Generate an overview of all available offers"""
 
+    show_variance: bool = False
+    if request.args.get("variance") != None:
+        show_variance = True
+
     offers: List[ProductOffer] = ProductOffer.query.all()
 
-    return render_template("all_offers.html.jinja", offers=offers)
+    return render_template("all_offers.html.jinja", offers=offers, show_variance=show_variance)
 
 @app.route("/shop/<shop_id>")
 def webshop_page(shop_id):
@@ -153,13 +157,18 @@ def webshop_page(shop_id):
     if shop is None:
         abort(404)
 
+    show_variance: bool = False
+    if request.args.get("variance") != None:
+        show_variance = True
+
     offers: List[ProductOffer] = ProductOffer.query.filter_by(
         shop_id=shop_id).join(Product).order_by(Product.name).all()
 
     return render_template(
         "shop.html.jinja",
         s=shop,
-        offers=offers
+        offers=offers,
+        show_variance=show_variance
         )
 
 @app.errorhandler(404)
