@@ -83,6 +83,8 @@ def index():
             Price.datetime >= datetime.now().date(),
             Price.on_sale == True # pylint: disable=C0121
             ).all()
+
+        discounts.sort(key=lambda x: x.product_offer.product.name)
         shops = Webshop.query.order_by(Webshop.name).all()
 
         return render_template(
