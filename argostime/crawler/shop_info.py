@@ -50,6 +50,10 @@ shops_info = {
     "steam": {
         "name": "Steam",
         "hostname": "store.steampowered.com"
+    },
+    "pipashop": {
+        "name": "Pipa Shop",
+        "hostname": "pipa-shop.nl"
     }
 }
 
@@ -66,5 +70,7 @@ enabled_shops = {
     "www.simonlevelt.nl": "simonlevelt",
     "hema.nl": "hema",
     "www.hema.nl": "hema",
-    "store.steampowered.com": "steam"
+    "store.steampowered.com": "steam",
+    "pipa-shop.nl": "pipashop",
+    "www.pipa-shop.nl": "pipashop"
 }
