@@ -79,17 +79,21 @@ def crawl_ikea(url: str) -> CrawlResult:
         logging.error("Could not find a product code in %s %s", info_wrapper, exception)
         raise CrawlerException from exception
 
-
     try:
+        price_tag_prev = info_wrapper.find(
+            "div",
+            "range-revamp-pip-price-package__previous-price-hasStrikeThrough"
+            )
+
         integers = float(
-            info_wrapper.find(
+            price_tag_prev.find(
                 "span",
                 "range-revamp-price__integer"
                 ).text)
 
         try:
             decimals = float(
-                info_wrapper.find(
+                price_tag_prev.find(
                     "span",
                     "range-revamp-price__decimals"
                     ).text)
@@ -98,7 +102,36 @@ def crawl_ikea(url: str) -> CrawlResult:
 
         result.normal_price = integers + decimals
     except Exception as exception:
-        logging.error("No normal price found in %s %s", info_wrapper, exception)
+        logging.info("No previous price found %s", exception)
+
+    try:
+        price_tag_curr = info_wrapper.find(
+            "div",
+            "range-revamp-pip-price-package__main-price"
+            )
+
+        integers = float(
+            price_tag_curr.find(
+                "span",
+                "range-revamp-price__integer"
+                ).text)
+
+        try:
+            decimals = float(
+                price_tag_curr.find(
+                    "span",
+                    "range-revamp-price__decimals"
+                    ).text)
+        except:
+            decimals = 0.0
+
+        if result.normal_price > 0:
+            result.discount_price = integers + decimals
+            result.on_sale = True
+        else:
+            result.normal_price = integers + decimals
+    except Exception as exception:
+        logging.error("No current price found in %s %s", info_wrapper, exception)
         raise CrawlerException from exception
 
     return result
