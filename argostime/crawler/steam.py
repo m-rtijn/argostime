@@ -35,8 +35,6 @@ from argostime.crawler.crawl_utils import CrawlResult
 def crawl_steam(url: str) -> CrawlResult:
     """Crawler for store.steampowered.com"""
 
-    print("Crawling {}".format(url))
-
     result: CrawlResult = CrawlResult(url=url)
 
     response: requests.Response = requests.get(url)
