@@ -24,6 +24,7 @@
 
 import datetime
 import logging
+import re
 from typing import List
 
 from matplotlib.figure import Figure
@@ -85,6 +86,8 @@ def generate_price_bar_graph(offer: ProductOffer) -> Figure:
 def generate_price_step_graph(offer: ProductOffer) -> Figure:
     """Generate a step graph with the price over time of a specific ProductOffer"""
 
+    short_product_name = re.sub("\(.*\)", "", offer.product.name).rstrip()
+
     prices: List[Price] = Price.query.filter_by(
         product_offer_id=offer.id).order_by(Price.datetime).all()
 
@@ -109,7 +112,7 @@ def generate_price_step_graph(offer: ProductOffer) -> Figure:
     ax.grid(True)
     ax.set_ylabel("prijs in €")
     ax.set_xlabel("datum")
-    ax.set_title(f"Prijsontwikkeling van {offer.product.name} bij {offer.webshop.name}")
+    ax.set_title(f"Prijsontwikkeling van {short_product_name} bij {offer.webshop.name}")
     ax.set_xticks(x_locations, labels=date_strings)
 
     # Format y-axis ticks
