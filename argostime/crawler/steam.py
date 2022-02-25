@@ -35,6 +35,8 @@ from argostime.crawler.crawl_utils import CrawlResult
 def crawl_steam(url: str) -> CrawlResult:
     """Crawler for store.steampowered.com"""
 
+    print("Crawling {}".format(url))
+
     result: CrawlResult = CrawlResult(url=url)
 
     response: requests.Response = requests.get(url)
@@ -45,10 +47,17 @@ def crawl_steam(url: str) -> CrawlResult:
 
     soup = BeautifulSoup(response.text, "html.parser")
 
-    game_info = soup.find(
+    # Find all the divs with class 'game_area_purchase_game'
+    game_infos = soup.find_all(
         "div",
         "game_area_purchase_game"
         )
+
+    # Select first div with only one class attribute, or select last div
+    for game_info in game_infos:
+        if len(game_info['class']) > 1:
+            continue
+        break
 
     try:
         result.url = soup.find("meta", property="og:url").get("content")
