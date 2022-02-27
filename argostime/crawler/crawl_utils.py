@@ -113,6 +113,8 @@ def parse_promotional_message(message: str, price: float) -> float:
             return float(msg_split[1]) / float(msg_split[0])
         except ArithmeticError as exception:
             logging.error("Calculation error parsing %s %s", message_no_whitespace, exception)
+        except IndexError as exception:
+            logging.error("IndexError in message %s", message_no_whitespace)
 
     logging.error("Promotion text did not match any known promotion")
     return -1
