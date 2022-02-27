@@ -25,7 +25,7 @@
 from datetime import datetime
 import io
 import logging
-from typing import List
+from typing import List, Dict
 import urllib.parse
 
 from flask import current_app as app
@@ -147,7 +147,16 @@ def all_offers():
 
     offers: List[ProductOffer] = ProductOffer.query.all()
 
-    return render_template("all_offers.html.jinja", offers=offers, show_variance=show_variance)
+    current_prices: Dict[ProductOffer, Price] = {}
+    for offer in offers:
+        current_prices[offer] = offer.get_current_price()
+
+    return render_template(
+        "all_offers.html.jinja",
+        offers=offers,
+        current_prices=current_prices,
+        show_variance=show_variance
+        )
 
 @app.route("/shop/<shop_id>")
 def webshop_page(shop_id):
@@ -164,10 +173,15 @@ def webshop_page(shop_id):
     offers: List[ProductOffer] = ProductOffer.query.filter_by(
         shop_id=shop_id).join(Product).order_by(Product.name).all()
 
+    current_prices: Dict[ProductOffer, Price] = {}
+    for offer in offers:
+        current_prices[offer] = offer.get_current_price()
+
     return render_template(
         "shop.html.jinja",
         s=shop,
         offers=offers,
+        current_prices=current_prices,
         show_variance=show_variance
         )
 
