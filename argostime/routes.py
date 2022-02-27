@@ -145,7 +145,8 @@ def all_offers():
     if request.args.get("variance") != None:
         show_variance = True
 
-    offers: List[ProductOffer] = ProductOffer.query.all()
+    offers: List[ProductOffer] = ProductOffer.query.join(
+        Product).order_by(Product.name).all()
 
     current_prices: Dict[ProductOffer, Price] = {}
     for offer in offers:
