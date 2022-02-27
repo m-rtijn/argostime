@@ -83,20 +83,21 @@ def crawl_etos(url: str) -> CrawlResult:
 
     try:
         promotion_message: str = offer["dimension20"]
-        promotion: float = parse_promotional_message(promotion_message)
+        price: float = float(offer["price"])
+        promotion: float = parse_promotional_message(promotion_message, price)
         logging.debug("Found promotional message %s", promotion_message)
 
         # Try to parse this promotion
         if promotion != -1.0:
-            result.discount_price = float(offer["price"]) * promotion
+            result.discount_price = promotion
         else:
             # Couldn't parse the promotion!
             logging.info("Couldn't parse promotion %s, assuming no discount", promotion_message)
-            result.normal_price = float(offer["price"])
+            result.normal_price = price
     except KeyError as exception:
         logging.debug("No promotion found, assuming no discount")
         try:
-            result.normal_price = float(offer["price"])
+            result.normal_price = price
         except KeyError as inner_exception:
             logging.error("No price found in json %s", raw_product_json)
             raise CrawlerException from inner_exception

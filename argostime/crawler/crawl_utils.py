@@ -23,7 +23,10 @@
 """
 
 import logging
+import re
 from typing import Optional
+
+voor_regex = re.compile("voor")
 
 class CrawlResult():
     """Data structure for returning the results of a crawler in a uniform way."""
@@ -62,8 +65,8 @@ class CrawlResult():
 
         return string
 
-def parse_promotional_message(message: str) -> float:
-    """Parse a given promotional message, and return a modifier to calculate the effectife price.
+def parse_promotional_message(message: str, price: float) -> float:
+    """Parse a given promotional message, and returns the calculated effective price.
 
     For example "1+1 GRATIS" will be parsed to meaning a 50% discount.
     "2+1 GRATIS" will be parsed to mean a 33% discount, and will return 2/3.
@@ -71,39 +74,45 @@ def parse_promotional_message(message: str) -> float:
     Returns -1 if it couldn't find a match
     """
 
-    logging.debug(message)
+    logging.debug("Parsing promotion %s", message)
 
     # Remove all whitespace from the message
     message_no_whitespace = "".join(message.split())
 
-    message_no_whitespace.lower()
+    message_no_whitespace = message_no_whitespace.lower()
 
-    # TODO: Add a general solution for "x voor €y" promotions
+    logging.debug("Promotion yielded sanitized input %s", message_no_whitespace)
 
     if message_no_whitespace == "1+1gratis":
-        return 1/2
+        return 1/2 * price
     elif message_no_whitespace == "2+1gratis":
-        return 2/3
+        return 2/3 * price
     elif message_no_whitespace == "3+1gratis":
-        return 3/4
+        return 3/4 * price
     elif message_no_whitespace == "5+1gratis":
-        return 5/6
+        return 5/6 * price
     elif message_no_whitespace == "2ehalveprijs":
-        return 3/4
+        return 3/4 * price
     elif message_no_whitespace == "50%korting":
-        return 1/2
+        return 1/2 * price
     elif message_no_whitespace == "2eartikel70%":
-        return 0.85
+        return 0.85 * price
     elif message_no_whitespace == "15%korting":
-        return 0.85
+        return 0.85 * price
     elif message_no_whitespace == "1+1":
-        return 1/2
+        return 1/2 * price
     elif message_no_whitespace == "6=5":
-        return 5/6
+        return 5/6 * price
     elif message_no_whitespace == "2egratis":
-        return 1/2
+        return 1/2 * price
     elif message_no_whitespace == "2+3gratis":
-        return 0.4
-    else:
-        logging.error("Promotion text did not match any known promotion")
-        return -1
+        return 0.4 * price
+    elif "voor" in message_no_whitespace:
+        msg_split = voor_regex.split(message_no_whitespace)
+        try:
+            return float(msg_split[1]) / float(msg_split[0])
+        except ArithmeticError as exception:
+            logging.error("Calculation error parsing %s %s", message_no_whitespace, exception)
+
+    logging.error("Promotion text did not match any known promotion")
+    return -1

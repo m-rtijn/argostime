@@ -121,10 +121,12 @@ def crawl_ah(url: str) -> CrawlResult:
             message_no_whitespace = "".join(promotion_message.split())
             message_no_whitespace.lower()
 
+            price: float = float(offer["price"])
+
             # If there is a mark with for example "25% Korting", this is already calculated into
             # the price we got from the json.
             if "korting" not in message_no_whitespace:
-                promotion = parse_promotional_message(promotion_message)
+                promotion = parse_promotional_message(promotion_message, price)
             else:
                 promotion = -1
 
@@ -135,9 +137,9 @@ def crawl_ah(url: str) -> CrawlResult:
                 )
 
             if promotion != -1:
-                result.discount_price = float(offer["price"]) * promotion
+                result.discount_price = promotion
             else:
-                result.discount_price = float(offer["price"])
+                result.discount_price = price
         else:
             # No valid bonus, so there's no valid price available.
             logging.info("No valid price found for %s", url)
