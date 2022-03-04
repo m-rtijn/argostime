@@ -19,14 +19,24 @@
 <p>Vandaag in de aanbieding:</p>
 <ul>
 {% for price in discounts %}
-<li><a href="product/{{ price.product_offer.product.product_code |e }}">{{ price.product_offer.product.name|e }}</a></li>
+<li><a href="product/{{ price.product_offer.product.product_code |e }}">
+    {{ price.product_offer.product.name|e }}
+    {% if price.product_offer.product.description %}
+        <span class="description">{{ price.product_offer.product.description }}</span>
+    {% endif %}
+</a></li>
 {% endfor %}
 </ul>
 
 <p>Laatst toegevoegd:</p>
 <ul>
 {% for product in products %}
-<li><a href="product/{{ product.product_code|e }}">{{ product.name|e }}</a></li>
+<li><a href="product/{{ product.product_code|e }}">
+    {{ product.name|e }}
+    {% if product.description %}
+        <span class="description">{{ product.description }}</span>
+    {% endif %}
+</a></li>
 {% endfor %}
 </ul>
 {% endblock %}

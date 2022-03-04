@@ -69,7 +69,11 @@ def add_product_offer_from_url(url: str) -> Tuple[ProductOfferAddResult, Product
     # Check if this Product already exists, otherwise add it to the database
     product: Product = Product.query.filter_by(product_code=parse_results.product_code).first()
     if product is None:
-        product = Product(name=parse_results.product_name, product_code=parse_results.product_code)
+        product: Product = Product(
+            name=parse_results.product_name,
+            description=parse_results.product_description,
+            product_code=parse_results.product_code
+        )
         db.session.add(product)
         db.session.commit()
 

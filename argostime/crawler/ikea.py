@@ -56,19 +56,22 @@ def crawl_ikea(url: str) -> CrawlResult:
         logging.info("Couldn't find Open Graph canonical URL %s", exception)
 
     try:
-        title = info_wrapper.find(
+        result.product_name = info_wrapper.find(
             "div",
             "range-revamp-header-section__title--big"
             ).text
-        description = info_wrapper.find(
+    except Exception as exception:
+        logging.error("Could not find a name in %s %s", info_wrapper, exception)
+        raise CrawlerException from exception
+
+    try:
+        result.product_description = info_wrapper.find(
             "span",
             "range-revamp-header-section__description-text"
             ).text
-
-        result.product_name = f"{title} ({description})"
     except Exception as exception:
-        logging.error("Could not find a name in %s", info_wrapper)
-        raise CrawlerException from exception
+        logging.error("Could not find a description in %s", info_wrapper)
+
 
     try:
         result.product_code = soup.find(

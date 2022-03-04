@@ -30,6 +30,7 @@ class CrawlResult():
 
     url: Optional[str]
     product_name: Optional[str]
+    product_description: Optional[str]
     product_code: Optional[str]
     ean: Optional[int]
 
@@ -41,6 +42,7 @@ class CrawlResult():
         self,
         url: str=None,
         product_name: str=None,
+        product_description: str=None,
         product_code: str=None,
         normal_price: float=-1.0,
         discount_price: float=-1.0,
@@ -49,6 +51,7 @@ class CrawlResult():
         ):
         self.url = url
         self.product_name = product_name
+        self.product_description = product_description
         self.product_code = product_code
         self.normal_price = normal_price
         self.discount_price = discount_price
@@ -57,6 +60,7 @@ class CrawlResult():
 
     def __str__(self) -> str:
         string = f"CrawlResult(product_name={self.product_name},"\
+            f"product_description={self.product_description},"\
             f"product_code={self.product_code},price={self.normal_price},"\
             f"discount={self.discount_price},sale={self.on_sale},ean={self.ean}"
 

@@ -3,7 +3,12 @@
 {% block og_title %}{{ p.name|e }} | {{ super() }}{% endblock %}
 {% block description %}Bekijk de prijsontwikkeling van {{ p.name|e }} op Argostimè{% endblock %}
 {% block content %}
-<h1>{{ p.name|e }}</h1>
+<h1>
+    {{ p.name|e }}
+    {% if p.description %}
+        <span class="description">{{ p.description }}</span>
+    {% endif %}
+</h1>
 
 {% for offer in offers %}
 <h3>Verkoper: <a href="/shop/{{ offer.webshop.id }}">{{ offer.webshop.name|e }}</a> (<a target="_blank" href="{{ offer.url|e }}">Bezoek website</a>)</h3>

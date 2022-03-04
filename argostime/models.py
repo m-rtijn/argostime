@@ -53,6 +53,7 @@ class Product(db.Model):
     __tablename__ = "Product"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Unicode(512), nullable=False)
+    description = db.Column(db.Text)
     ean = db.Column(db.Integer)
     product_code = db.Column(db.Unicode(512), unique=True)
     product_offers = db.relationship("ProductOffer",
