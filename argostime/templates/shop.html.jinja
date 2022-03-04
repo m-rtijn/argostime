@@ -26,12 +26,12 @@
             <span class="description">{{ offer.product.description }}</span>
         {% endif %}
     </a></td>
-{% if offer.get_current_price().on_sale %}
-    <td class="sale">{{ "€%.2f" | format(offer.get_current_price().discount_price)  }} ({{ offer.get_current_price().datetime.strftime("%Y-%m-%d") }}) Korting!</td>
-{% elif offer.get_current_price().normal_price == -1 %}
-    <td>Geen actuele prijs beschikbaar ({{ offer.get_current_price().datetime.strftime("%Y-%m-%d") }})</td>
+{% if current_prices[offer].on_sale %}
+    <td class="sale">{{ "€%.2f" | format(current_prices[offer].discount_price)  }} ({{ current_prices[offer].datetime.strftime("%Y-%m-%d") }}) Korting!</td>
+{% elif current_prices[offer].normal_price == -1 %}
+    <td>Geen actuele prijs beschikbaar ({{ current_prices[offer].datetime.strftime("%Y-%m-%d") }})</td>
 {% else %}
-    <td>{{ "€%.2f" | format(offer.get_current_price().normal_price) }} ({{ offer.get_current_price().datetime.strftime("%Y-%m-%d") }})</td>
+    <td>{{ "€%.2f" | format(current_prices[offer].normal_price) }} ({{ current_prices[offer].datetime.strftime("%Y-%m-%d") }})</td>
 {% endif %}
     <td>{{ "€%.2f" | format(offer.get_average_price()) }}</td>
     <td>{{ "€%.2f" | format(offer.get_lowest_price()) }}</td>

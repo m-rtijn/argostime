@@ -45,10 +45,23 @@ def crawl_steam(url: str) -> CrawlResult:
 
     soup = BeautifulSoup(response.text, "html.parser")
 
-    game_info = soup.find(
+    # Find all the divs with class 'game_area_purchase_game'
+    game_infos = soup.find_all(
         "div",
         "game_area_purchase_game"
         )
+
+    game_info = None
+
+    # Select first div with only one class attribute, or select last div
+    for game_info in game_infos:
+        if len(game_info['class']) > 1:
+            continue
+        break
+
+    if game_info is None:
+        logging.error("Couldn't find a valid game_info div crawling %s", url)
+        raise CrawlerException()
 
     try:
         result.url = soup.find("meta", property="og:url").get("content")
