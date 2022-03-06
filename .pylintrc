@@ -28,6 +28,7 @@ generated-members=flask_sqlalchemy.SQLAlchemy.DateTime,
                     ax.yaxis,
                     ax.get_xticklabels,
                     ax.margins,
+                    ax.scatter
 
 [BASIC]
 good-names=i,j,k,x,ax

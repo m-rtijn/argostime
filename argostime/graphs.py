@@ -94,18 +94,25 @@ def generate_price_step_graph(offer: ProductOffer) -> Figure:
     effective_prices: List[float] = []
     dates: List[datetime.date] = []
     date_strings: List[str] = []
+    price_is_sale: List[bool] = []
 
     for price in prices:
         try:
             effective_prices.append(price.get_effective_price())
             dates.append(price.datetime.date())
             date_strings.append(str(price.datetime.date()))
+            price_is_sale.append(price.on_sale)
         except NoEffectivePriceAvailableException:
             pass
 
     x_locations = np.arange(len(dates))
 
+    for x, effective_price, sale in zip(x_locations, effective_prices, price_is_sale):
+        if sale:
+            ax.scatter(x, effective_price, color="orange", zorder=10)
+
     ax.step(x_locations, effective_prices, "o-", where="mid")
+
     ax.grid(True)
     ax.set_ylabel("prijs in €")
     ax.set_xlabel("datum")
