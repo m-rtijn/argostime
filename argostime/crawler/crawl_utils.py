@@ -85,6 +85,8 @@ def parse_promotional_message(message: str, price: float) -> float:
 
     if message_no_whitespace == "1+1gratis":
         return 1/2 * price
+    elif message_no_whitespace == "2+2gratis":
+        return 1/2 * price
     elif message_no_whitespace == "2+1gratis":
         return 2/3 * price
     elif message_no_whitespace == "3+1gratis":
