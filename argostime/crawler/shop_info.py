@@ -54,7 +54,11 @@ shops_info = {
     "pipashop": {
         "name": "Pipa Shop",
         "hostname": "pipa-shop.nl"
-    }
+    },
+    "ikea": {
+        "name": "IKEA",
+        "hostname": "ikea.com"
+    },
 }
 
 enabled_shops = {
@@ -72,5 +76,6 @@ enabled_shops = {
     "www.hema.nl": "hema",
     "store.steampowered.com": "steam",
     "pipa-shop.nl": "pipashop",
-    "www.pipa-shop.nl": "pipashop"
+    "www.pipa-shop.nl": "pipashop",
+    "www.ikea.com": "ikea",
 }

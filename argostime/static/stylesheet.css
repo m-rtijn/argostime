@@ -90,3 +90,11 @@ blockquote {
     color: #eba613;
     font-size: small;
 }
+
+h1 .description {
+    font-size: x-large;
+}
+
+td .description, li .description {
+    font-size: small;
+}
