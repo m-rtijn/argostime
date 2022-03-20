@@ -32,7 +32,7 @@ from argostime.exceptions import PageNotFoundException
 
 from argostime.crawler.crawl_utils import CrawlResult
 
-def crawl_ikea(url: str) -> CrawlResult:
+def crawl_ikea(url: str) -> CrawlResult: # pylint: disable=R0915
     """Crawler for ikea.com"""
 
     result: CrawlResult = CrawlResult(url=url)
@@ -47,7 +47,7 @@ def crawl_ikea(url: str) -> CrawlResult:
 
     info_wrapper = soup.find(
         "div",
-        "range-revamp-pip-price-package__wrapper"
+        "pip-pip-price-package__wrapper"
         )
 
     try:
@@ -58,7 +58,7 @@ def crawl_ikea(url: str) -> CrawlResult:
     try:
         result.product_name = info_wrapper.find(
             "div",
-            "range-revamp-header-section__title--big"
+            "pip-header-section__title--big"
             ).text
     except Exception as exception:
         logging.error("Could not find a name in %s %s", info_wrapper, exception)
@@ -67,7 +67,7 @@ def crawl_ikea(url: str) -> CrawlResult:
     try:
         result.product_description = info_wrapper.find(
             "span",
-            "range-revamp-header-section__description-text"
+            "pip-header-section__description-text"
             ).text
     except Exception as exception:
         logging.error("Could not find a description in %s", info_wrapper)
@@ -76,7 +76,7 @@ def crawl_ikea(url: str) -> CrawlResult:
     try:
         result.product_code = soup.find(
             "span",
-            "range-revamp-product-identifier__value"
+            "pip-product-identifier__value"
             ).text
     except Exception as exception:
         logging.error("Could not find a product code in %s %s", info_wrapper, exception)
@@ -85,22 +85,23 @@ def crawl_ikea(url: str) -> CrawlResult:
     try:
         price_tag_prev = info_wrapper.find(
             "div",
-            "range-revamp-pip-price-package__previous-price-hasStrikeThrough"
+            "pip-pip-price-package__previous-price-hasStrikeThrough"
             )
 
         integers = float(
             price_tag_prev.find(
                 "span",
-                "range-revamp-price__integer"
+                "pip-price__integer"
                 ).text)
 
         try:
             decimals = float(
                 price_tag_prev.find(
                     "span",
-                    "range-revamp-price__decimals"
+                    "pip-price__decimals"
                     ).text)
-        except:
+        except Exception as exception:
+            logging.debug("No decimals found, assuming 0 %s", exception)
             decimals = 0.0
 
         result.normal_price = integers + decimals
@@ -110,22 +111,23 @@ def crawl_ikea(url: str) -> CrawlResult:
     try:
         price_tag_curr = info_wrapper.find(
             "div",
-            "range-revamp-pip-price-package__main-price"
+            "pip-pip-price-package__main-price"
             )
 
         integers = float(
             price_tag_curr.find(
                 "span",
-                "range-revamp-price__integer"
+                "pip-price__integer"
                 ).text)
 
         try:
             decimals = float(
                 price_tag_curr.find(
                     "span",
-                    "range-revamp-price__decimals"
+                    "pip-price__decimals"
                     ).text)
-        except:
+        except Exception as exception:
+            logging.debug("No decimals found, assuming 0 %s", exception)
             decimals = 0.0
 
         if result.normal_price > 0:

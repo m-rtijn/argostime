@@ -21,11 +21,7 @@
 {% for offer in offers %}
 <tr>
     <td><a href="/product/{{ offer.product.product_code|e }}">
-        {{ offer.product.name|e }}
-        {% if offer.product.description %}
-            <span class="description">{{ offer.product.description }}</span>
-        {% endif %}
-    </a></td>
+        {{ offer.product.name|e }}{% if offer.product.description %} <span class="description">{{ offer.product.description }}</span>{% endif %}</a></td>
 {% if current_prices[offer].on_sale %}
     <td class="sale">{{ "€%.2f" | format(current_prices[offer].discount_price)  }} ({{ current_prices[offer].datetime.strftime("%Y-%m-%d") }}) Korting!</td>
 {% elif current_prices[offer].normal_price == -1 %}

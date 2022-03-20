@@ -20,11 +20,7 @@
 <ul>
 {% for price in discounts %}
 <li><a href="product/{{ price.product_offer.product.product_code |e }}">
-    {{ price.product_offer.product.name|e }}
-    {% if price.product_offer.product.description %}
-        <span class="description">{{ price.product_offer.product.description }}</span>
-    {% endif %}
-</a></li>
+    {{ price.product_offer.product.name|e }}{% if price.product_offer.product.description %} <span class="description">{{ price.product_offer.product.description }}</span>{% endif %}</a></li>
 {% endfor %}
 </ul>
 
@@ -32,11 +28,7 @@
 <ul>
 {% for product in products %}
 <li><a href="product/{{ product.product_code|e }}">
-    {{ product.name|e }}
-    {% if product.description %}
-        <span class="description">{{ product.description }}</span>
-    {% endif %}
-</a></li>
+    {{ product.name|e }}{% if product.description %} <span class="description">{{ product.description }}</span>{% endif %}</a></li>
 {% endfor %}
 </ul>
 {% endblock %}
