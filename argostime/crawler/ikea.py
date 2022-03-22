@@ -23,6 +23,7 @@
 """
 
 import logging
+import re
 
 import requests
 from bs4 import BeautifulSoup
@@ -47,7 +48,7 @@ def crawl_ikea(url: str) -> CrawlResult: # pylint: disable=R0915
 
     info_wrapper = soup.find(
         "div",
-        "pip-pip-price-package__wrapper"
+        class_= re.compile("price-package__wrapper")
         )
 
     try:
@@ -57,8 +58,8 @@ def crawl_ikea(url: str) -> CrawlResult: # pylint: disable=R0915
 
     try:
         result.product_name = info_wrapper.find(
-            "div",
-            "pip-header-section__title--big"
+            ["span", "div"],
+            class_= re.compile("header-section__title--big")
             ).text
     except Exception as exception:
         logging.error("Could not find a name in %s %s", info_wrapper, exception)
@@ -67,7 +68,7 @@ def crawl_ikea(url: str) -> CrawlResult: # pylint: disable=R0915
     try:
         result.product_description = info_wrapper.find(
             "span",
-            "pip-header-section__description-text"
+            class_= re.compile("header-section__description-text")
             ).text
     except Exception as exception:
         logging.error("Could not find a description in %s", info_wrapper)
@@ -76,7 +77,7 @@ def crawl_ikea(url: str) -> CrawlResult: # pylint: disable=R0915
     try:
         result.product_code = soup.find(
             "span",
-            "pip-product-identifier__value"
+            class_= re.compile("product-identifier__value")
             ).text
     except Exception as exception:
         logging.error("Could not find a product code in %s %s", info_wrapper, exception)
@@ -85,20 +86,20 @@ def crawl_ikea(url: str) -> CrawlResult: # pylint: disable=R0915
     try:
         price_tag_prev = info_wrapper.find(
             "div",
-            "pip-pip-price-package__previous-price-hasStrikeThrough"
+            class_= re.compile("price-package__previous-price-hasStrikeThrough")
             )
 
         integers = float(
             price_tag_prev.find(
                 "span",
-                "pip-price__integer"
+                class_= re.compile("price__integer")
                 ).text)
 
         try:
             decimals = float(
                 price_tag_prev.find(
                     "span",
-                    "pip-price__decimals"
+                    class_= re.compile("price__decimals")
                     ).text)
         except Exception as exception:
             logging.debug("No decimals found, assuming 0 %s", exception)
@@ -111,20 +112,20 @@ def crawl_ikea(url: str) -> CrawlResult: # pylint: disable=R0915
     try:
         price_tag_curr = info_wrapper.find(
             "div",
-            "pip-pip-price-package__main-price"
+            class_= re.compile("price-package__main-price")
             )
 
         integers = float(
             price_tag_curr.find(
                 "span",
-                "pip-price__integer"
+                class_= re.compile("price__integer")
                 ).text)
 
         try:
             decimals = float(
                 price_tag_curr.find(
                     "span",
-                    "pip-price__decimals"
+                    class_= re.compile("price__decimals")
                     ).text)
         except Exception as exception:
             logging.debug("No decimals found, assuming 0 %s", exception)
