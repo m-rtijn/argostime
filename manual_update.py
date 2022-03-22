@@ -17,7 +17,6 @@ from argostime import create_app
 app = create_app()
 app.app_context().push()
 
-offer: ProductOffer
 
 try:
     product_offer_id: int = int(sys.argv[1])
@@ -25,8 +24,9 @@ except:
     print("No number given")
     sys.exit(-1)
 
-offer = ProductOffer.query.filter_by(id=product_offer_id)
+offer: ProductOffer = ProductOffer.query.get(product_offer_id)
 
+logging.debug("Found offer %s", product_offer_id)
 logging.debug("Manually updating ProductOffer %s", offer)
 
 try:
