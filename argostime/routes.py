@@ -23,7 +23,6 @@
 """
 
 from datetime import datetime
-import io
 import logging
 from typing import List, Dict
 import urllib.parse

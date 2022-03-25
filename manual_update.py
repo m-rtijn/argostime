@@ -9,7 +9,6 @@
 
 import sys
 import logging
-import time
 
 from argostime.models import ProductOffer
 from argostime import create_app
