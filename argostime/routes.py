@@ -32,14 +32,9 @@ from flask import current_app as app
 from flask import render_template, abort, request, redirect
 from flask import Response
 
-from matplotlib.figure import Figure
-from matplotlib.backends.backend_agg import FigureCanvasAgg
-
 from argostime.exceptions import CrawlerException
 from argostime.exceptions import PageNotFoundException
 from argostime.exceptions import WebsiteNotImplementedException
-from argostime.graphs import generate_price_bar_graph
-from argostime.graphs import generate_price_step_graph
 from argostime.graphs import generate_price_graph_data
 from argostime.models import Webshop, Product, ProductOffer, Price
 from argostime.products import ProductOfferAddResult, add_product_offer_from_url
@@ -109,34 +104,6 @@ def product_page(product_code):
         "product.html.jinja",
         p=product,
         offers=offers)
-
-@app.route("/productoffer/<offer_id>/price_bar_graph.png")
-def offer_price_bar_graph(offer_id):
-    """Generate the price graph of a specific offer"""
-    offer: ProductOffer = ProductOffer.query.get(offer_id)
-
-    if offer is None:
-        abort(404)
-
-    fig: Figure = generate_price_bar_graph(offer)
-    output = io.BytesIO()
-    FigureCanvasAgg(fig).print_png(output)
-
-    return Response(output.getvalue(), mimetype="image/png")
-
-@app.route("/productoffer/<offer_id>/price_step_graph.png")
-def offer_price_step_graph(offer_id):
-    """Generate the price step graph of a specific offer"""
-    offer: ProductOffer = ProductOffer.query.get(offer_id)
-
-    if offer is None:
-        abort(404)
-
-    fig: Figure = generate_price_step_graph(offer)
-    output = io.BytesIO()
-    FigureCanvasAgg(fig).print_png(output)
-
-    return Response(output.getvalue(), mimetype="image/png")
 
 @app.route("/productoffer/<offer_id>/price_step_graph_data.json")
 def offer_price_json(offer_id):
