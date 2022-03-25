@@ -81,6 +81,10 @@ blockquote {
     font-style: italic;
 }
 
+.graph {
+    margin: 25px 0;
+}
+
 .helptext {
     color: #777;
     font-size: small;

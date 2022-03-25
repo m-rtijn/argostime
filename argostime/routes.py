@@ -40,6 +40,7 @@ from argostime.exceptions import PageNotFoundException
 from argostime.exceptions import WebsiteNotImplementedException
 from argostime.graphs import generate_price_bar_graph
 from argostime.graphs import generate_price_step_graph
+from argostime.graphs import generate_price_graph_data
 from argostime.models import Webshop, Product, ProductOffer, Price
 from argostime.products import ProductOfferAddResult, add_product_offer_from_url
 
@@ -136,6 +137,17 @@ def offer_price_step_graph(offer_id):
     FigureCanvasAgg(fig).print_png(output)
 
     return Response(output.getvalue(), mimetype="image/png")
+
+@app.route("/productoffer/<offer_id>/price_step_graph_data.json")
+def offer_price_json(offer_id):
+    """Generate the price step graph data of a specific offer"""
+    offer: ProductOffer = ProductOffer.query.get(offer_id)
+
+    if offer is None:
+        abort(404)
+
+    data: str = generate_price_graph_data(offer)
+    return Response(data, mimetype="application/json")
 
 @app.route("/all_offers")
 def all_offers():

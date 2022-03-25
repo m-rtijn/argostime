@@ -30,6 +30,7 @@ from matplotlib.figure import Figure
 import matplotlib.ticker as mticker
 from matplotlib.axes import Axes
 import numpy as np
+import json
 
 from argostime.exceptions import NoEffectivePriceAvailableException
 from argostime.models import ProductOffer, Price
@@ -151,3 +152,71 @@ def generate_price_step_graph(offer: ProductOffer) -> Figure:
     fig.subplots_adjust(left=0.15, bottom=0.2)
 
     return fig
+
+def generate_price_graph_data(offer: ProductOffer) -> str:
+    """
+        Generate the data needed to render a step graph with the price over
+        time of a specific ProductOffer
+    """
+    
+    prices: List[Price] = Price.query.filter_by(
+        product_offer_id=offer.id).order_by(Price.datetime).all()
+
+    effective_prices: List[float] = []
+    date_strings: List[str] = []
+
+    for price in prices:
+        try:
+            effective_prices.append(price.get_effective_price())
+            date_strings.append(str(price.datetime.date()))
+        except NoEffectivePriceAvailableException:
+            pass
+
+    data = {
+        "title": {
+            "text": f"Prijsontwikkeling van {offer.product.name} bij {offer.webshop.name}",
+            "left": "center",
+        },
+        "tooltip": {
+            "trigger": "axis",
+            "formatter": "<center>{b}<br>€ {c}</center>",
+        },
+        "toolbox": {
+            "feature": {
+                "dataZoom": {
+                    "yAxisIndex": "none",
+                },
+            },
+        },
+        "dataZoom": [
+            {
+                "type": "inside",
+                "start": 0,
+                "end": 100,
+            },
+            {
+                "start": 0,
+                "end": 100,
+            },
+        ],
+        "xAxis": {
+            "type": "category",
+            "data": date_strings,
+        },
+        "yAxis": {
+            "type": "value",
+            "min": "dataMin",
+            "max": "dataMax",
+            "axisLabel": {
+                "formatter": "€ {value}",
+            },
+        },
+        "series": {
+            "type": "line",
+            "symbolSize": 10,
+            "step": "middle",
+            "data": effective_prices,
+        },
+    }
+
+    return json.dumps(data)
