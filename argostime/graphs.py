@@ -23,7 +23,8 @@
     along with Argostimè. If not, see <https://www.gnu.org/licenses/>.
 """
 
-from typing import List
+from typing import List, Tuple
+from datetime import datetime, timedelta
 import json
 
 from argostime.exceptions import NoEffectivePriceAvailableException
@@ -38,15 +39,25 @@ def generate_price_graph_data(offer: ProductOffer) -> str:
     prices: List[Price] = Price.query.filter_by(
         product_offer_id=offer.id).order_by(Price.datetime).all()
 
-    effective_prices: List[float] = []
-    date_strings: List[str] = []
+    price_data: List[Tuple[str, float]] = []
+    sales_data: List[List[datetime]] = [[]]
 
     for price in prices:
         try:
-            effective_prices.append(price.get_effective_price())
-            date_strings.append(str(price.datetime.date()))
+            price_data.append((
+                str(price.datetime.replace(hour=0, minute=0, second=0, microsecond=0)),
+                price.get_effective_price(),
+            ))
+
+            if price.on_sale:
+                sales_data[-1].append(price.datetime.replace(hour=0, minute=0, second=0, microsecond=0))
+            elif sales_data[-1] != []:
+                sales_data.append([])
         except NoEffectivePriceAvailableException:
             pass
+    
+    if sales_data[-1] == []:
+        sales_data = sales_data[:-1]
 
     data = {
         "title": {
@@ -55,7 +66,6 @@ def generate_price_graph_data(offer: ProductOffer) -> str:
         },
         "tooltip": {
             "trigger": "axis",
-            "formatter": "<center>{b}<br>€ {c}</center>",
         },
         "toolbox": {
             "feature": {
@@ -67,6 +77,7 @@ def generate_price_graph_data(offer: ProductOffer) -> str:
         "dataZoom": [
             {
                 "type": "inside",
+                "filterMode": "none",
                 "start": 0,
                 "end": 100,
             },
@@ -76,8 +87,10 @@ def generate_price_graph_data(offer: ProductOffer) -> str:
             },
         ],
         "xAxis": {
-            "type": "category",
-            "data": date_strings,
+            "type": "time",
+            "axisLabel": {
+                "formatter": "{yyyy}-{MM}-{dd}",
+            },
         },
         "yAxis": {
             "type": "value",
@@ -88,10 +101,29 @@ def generate_price_graph_data(offer: ProductOffer) -> str:
             },
         },
         "series": {
+            "name": offer.product.name,
             "type": "line",
             "symbolSize": 10,
             "step": "middle",
-            "data": effective_prices,
+            "data": price_data,
+            "markArea": {
+                "silent": True,
+                "itemStyle": {
+                    "color": "rgba(255, 165, 0, 0.5)",
+                },
+                "data": [
+                    [
+                        {
+                            "name": "Korting!",
+                            "xAxis": str(sale[0] - timedelta(hours=12)),
+                        },
+                        {
+                            "xAxis": str(sale[-1] + timedelta(hours=12)),
+                        },
+                    ]
+                    for sale in sales_data
+                ],
+            },
         },
     }
 
