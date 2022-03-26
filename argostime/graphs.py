@@ -63,6 +63,9 @@ def generate_price_graph_data(offer: ProductOffer) -> str:
         "title": {
             "text": f"Prijsontwikkeling van {offer.product.name} bij {offer.webshop.name}",
             "left": "center",
+            "textStyle": {
+                "color": "#000",
+            },
         },
         "series": {
             "name": offer.product.name,
@@ -72,6 +75,9 @@ def generate_price_graph_data(offer: ProductOffer) -> str:
             "data": price_data,
             "markArea": {
                 "silent": True,
+                "label": {
+                    "color": "#000",
+                },
                 "itemStyle": {
                     "color": "rgba(255, 165, 0, 0.5)",
                 },

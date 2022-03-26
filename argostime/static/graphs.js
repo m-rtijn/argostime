@@ -36,8 +36,14 @@ var defaultOptions = {
     tooltip: {
         trigger: "axis",
         formatter: tooltipFormatter,
+        textStyle: {
+            color: "#000",
+        },
     },
     toolbox: {
+        iconStyle: {
+            borderColor: "#000",
+        },
         feature: {
             dataZoom: {
                 yAxisIndex: "none",
@@ -62,12 +68,14 @@ var defaultOptions = {
         max: "dataMax",
         axisLabel: {
             formatter: yFormatter,
+            color: "#000",
         },
     },
     xAxis: {
         type: "time",
         axisLabel: {
             formatter: "{yyyy}-{MM}-{dd}",
+            color: "#000",
         },
     },
 };
