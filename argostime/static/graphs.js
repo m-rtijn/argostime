@@ -21,6 +21,32 @@ You should have received a copy of the GNU General Public License
 along with Argostimè. If not, see <https://www.gnu.org/licenses/>.
 */
 
+function tooltipFormatter(object) {
+    var date = new Date(object[0].data[0]).toISOString().split("T")[0];
+    var price = object[0].data[1].toFixed(2);
+    return `<center>${date}<br>€ ${price}</center>`;
+}
+
+function yFormatter(value) {
+    var price = value.toFixed(2);
+    return `€ ${price}`
+}
+
+var defaultOptions = {
+    tooltip: {
+        trigger: "axis",
+        formatter: tooltipFormatter,
+    },
+    yAxis: {
+        type: "value",
+        min: "dataMin",
+        max: "dataMax",
+        axisLabel: {
+            formatter: yFormatter,
+        },
+    },
+};
+
 var graphDivs = document.getElementsByClassName("graph");
 for (var i = 0; i < graphDivs.length; i++) {
     var offer = graphDivs[i].id.substring(6);
@@ -28,7 +54,7 @@ for (var i = 0; i < graphDivs.length; i++) {
 
     var xhr = new XMLHttpRequest();
     xhr.addEventListener("load", function() {
-        graph.setOption(JSON.parse(xhr.response));
+        graph.setOption(Object.assign({}, defaultOptions, JSON.parse(xhr.response)));
     });
     xhr.open("GET", `/productoffer/${offer}/price_step_graph_data.json`);
     xhr.send();

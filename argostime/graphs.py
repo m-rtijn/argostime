@@ -64,9 +64,10 @@ def generate_price_graph_data(offer: ProductOffer) -> str:
             "text": f"Prijsontwikkeling van {offer.product.name} bij {offer.webshop.name}",
             "left": "center",
         },
-        "tooltip": {
-            "trigger": "axis",
-        },
+        # "tooltip": {
+        #     "trigger": "axis",
+        #     "formatter": "{c}",
+        # },
         "toolbox": {
             "feature": {
                 "dataZoom": {
@@ -90,14 +91,6 @@ def generate_price_graph_data(offer: ProductOffer) -> str:
             "type": "time",
             "axisLabel": {
                 "formatter": "{yyyy}-{MM}-{dd}",
-            },
-        },
-        "yAxis": {
-            "type": "value",
-            "min": "dataMin",
-            "max": "dataMax",
-            "axisLabel": {
-                "formatter": "€ {value}",
             },
         },
         "series": {
