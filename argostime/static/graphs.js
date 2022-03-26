@@ -37,12 +37,37 @@ var defaultOptions = {
         trigger: "axis",
         formatter: tooltipFormatter,
     },
+    toolbox: {
+        feature: {
+            dataZoom: {
+                yAxisIndex: "none",
+            },
+        },
+    },
+    dataZoom: [
+        {
+            type: "inside",
+            filterMode: "none",
+            start: 0,
+            end: 100,
+        },
+        {
+            start: 0,
+            end: 100,
+        },
+    ],
     yAxis: {
         type: "value",
         min: "dataMin",
         max: "dataMax",
         axisLabel: {
             formatter: yFormatter,
+        },
+    },
+    xAxis: {
+        type: "time",
+        axisLabel: {
+            formatter: "{yyyy}-{MM}-{dd}",
         },
     },
 };
