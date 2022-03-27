@@ -82,13 +82,15 @@ var defaultOptions = {
 
 var graphDivs = document.getElementsByClassName("graph");
 for (var i = 0; i < graphDivs.length; i++) {
-    var offer = graphDivs[i].id.substring(6);
-    var graph = echarts.init(graphDivs[i]);
+    (function () {
+        var offer = graphDivs[i].id.substring(6);
+        var graph = echarts.init(graphDivs[i]);
 
-    var xhr = new XMLHttpRequest();
-    xhr.addEventListener("load", function() {
-        graph.setOption(Object.assign({}, defaultOptions, JSON.parse(xhr.response)));
-    });
-    xhr.open("GET", `/productoffer/${offer}/price_step_graph_data.json`);
-    xhr.send();
+        var xhr = new XMLHttpRequest();
+        xhr.addEventListener("load", function() {
+            graph.setOption(Object.assign({}, defaultOptions, JSON.parse(xhr.response)));
+        });
+        xhr.open("GET", `/productoffer/${offer}/price_step_graph_data.json`);
+        xhr.send();
+    }());
 }
