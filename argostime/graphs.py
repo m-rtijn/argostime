@@ -39,25 +39,42 @@ def generate_price_graph_data(offer: ProductOffer) -> str:
     prices: List[Price] = Price.query.filter_by(
         product_offer_id=offer.id).order_by(Price.datetime).all()
 
-    price_data: List[Tuple[str, float]] = []
-    sales_data: List[List[datetime]] = [[]]
+    dates: List[datetime] = []
+    effective_prices: List[float] = []
+    sales_index: List[Tuple[int, int]] = []
+    sales_dates: List[Tuple[datetime, datetime]] = []
 
+    index = 0
     for price in prices:
         try:
-            price_data.append((
-                str(price.datetime.replace(hour=0, minute=0, second=0, microsecond=0)),
-                price.get_effective_price(),
-            ))
+            effective_prices.append(price.get_effective_price())
+            dates.append(price.datetime.replace(hour=12, minute=0, second=0, microsecond=0))
 
             if price.on_sale:
-                sales_data[-1].append(price.datetime.replace(hour=0, minute=0, second=0, microsecond=0))
-            elif sales_data[-1] != []:
-                sales_data.append([])
+                if len(sales_index) == 0 or sales_index[-1][1] != (index - 1):
+                    sales_index.append((index, index))
+                else:
+                    sales_index[-1] = (sales_index[-1][0], index)
+            
+            index += 1
         except NoEffectivePriceAvailableException:
             pass
     
-    if sales_data[-1] == []:
-        sales_data = sales_data[:-1]
+    for sale in sales_index:
+        start: datetime
+        end: datetime
+
+        if sale[0] == 0:
+            start = dates[sale[0]] - timedelta(hours=12)
+        else:
+            start = dates[sale[0]] - (dates[sale[0]] - dates[sale[0]-1]) / 2
+        
+        if sale[1] == len(dates)-1:
+            end = dates[sale[1]] + timedelta(hours=12)
+        else:
+            end = dates[sale[1]] + (dates[sale[1] + 1] - dates[sale[1]]) / 2
+
+        sales_dates.append((start, end))
 
     data = {
         "title": {
@@ -72,7 +89,7 @@ def generate_price_graph_data(offer: ProductOffer) -> str:
             "type": "line",
             "symbolSize": 10,
             "step": "middle",
-            "data": price_data,
+            "data": list(zip([str(date) for date in dates], effective_prices)),
             "markArea": {
                 "silent": True,
                 "label": {
@@ -85,13 +102,13 @@ def generate_price_graph_data(offer: ProductOffer) -> str:
                     [
                         {
                             "name": "Korting!",
-                            "xAxis": str(sale[0] - timedelta(hours=12)),
+                            "xAxis": str(start)
                         },
                         {
-                            "xAxis": str(sale[-1] + timedelta(hours=12)),
+                            "xAxis": str(end)
                         },
                     ]
-                    for sale in sales_data
+                    for (start, end) in sales_dates
                 ],
             },
         },
