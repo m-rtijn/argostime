@@ -28,6 +28,7 @@ except Exception as exception:
 
 # Crawling was succesful, print results...
 print("Crawling result:")
+print(f"  -> URL:         {result.url}")
 print(f"  -> Name:        {result.product_name}")
 print(f"  -> Description: {result.product_description}")
 print(f"  -> Code:        {result.product_code}")
