@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-    crawler/gamma.py
+    crawler/intergamma.py
 
-    Crawler for gamma.nl
+    Crawler for gamma.nl and karwei.nl
 
     Copyright (c) 2022 Kevin Nobel <kevin [at] 2sk.nl>
 
@@ -32,8 +32,8 @@ from argostime.exceptions import PageNotFoundException
 
 from argostime.crawler.crawl_utils import CrawlResult
 
-def crawl_gamma(url: str) -> CrawlResult:
-    """Crawler for gamma.nl"""
+def crawl_intergamma(url: str) -> CrawlResult:
+    """Crawler for gamma.nl and karwei.nl"""
 
     response: requests.Response = requests.get(url)
     if response.status_code != 200:
