@@ -63,6 +63,10 @@ shops_info = {
         "name": "Praxis",
         "hostname": "praxis.nl"
     },
+    "gamma": {
+        "name": "Gamma",
+        "hostname": "gamma.nl"
+    },
 }
 
 enabled_shops = {
@@ -83,4 +87,5 @@ enabled_shops = {
     "www.pipa-shop.nl": "pipashop",
     "www.ikea.com": "ikea",
     "www.praxis.nl": "praxis",
+    "www.gamma.nl": "gamma",
 }
