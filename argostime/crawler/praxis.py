@@ -88,7 +88,7 @@ def crawl_praxis(url: str) -> CrawlResult:
         raise CrawlerException from exception
 
     try:
-        result.ean = result.product_code = int(product["ean"])
+        result.ean = int(product["ean"])
     except KeyError as exception:
         # Don't raise an exception since EAN is not strictly necessary!
         logging.error("No key ean found in JSON")
