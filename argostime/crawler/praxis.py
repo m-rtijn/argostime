@@ -42,9 +42,9 @@ def crawl_praxis(url: str) -> CrawlResult:
 
     response: requests.Response = requests.get(url)
     if response.status_code != 200:
-        logging.error(f"Got status code {response.status_code} while getting url {url}")
+        logging.error("Got status code %s while getting url %s", response.status_code, url)
         raise PageNotFoundException(url)
-    
+
     soup: BeautifulSoup = BeautifulSoup(response.text, "html.parser")
     result: CrawlResult = CrawlResult()
 
@@ -61,13 +61,11 @@ def crawl_praxis(url: str) -> CrawlResult:
         json_data = json.loads(__fix_bad_json(raw_product_json))
         product = json_data["productDetails"]
     except json.decoder.JSONDecodeError as exception:
-        logging.error(f"Could not decode JSON {raw_product_json}, raising CrawlerException")
+        logging.error("Could not decode JSON %s, raising CrawlerException", raw_product_json)
         raise CrawlerException from exception
     except KeyError as exception:
         logging.error("No key productDetails found in JSON data")
         raise CrawlerException from exception
-    
-    logging.debug(product)
 
     try:
         result.url = f"https://www.praxis.nl{json_data['productUrl']}"
@@ -80,7 +78,7 @@ def crawl_praxis(url: str) -> CrawlResult:
     except KeyError as exception:
         logging.error("No key name found in JSON")
         raise CrawlerException from exception
-    
+
     try:
         result.product_code = product["code"].lstrip("0")
     except KeyError as exception:

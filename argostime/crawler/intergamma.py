@@ -37,9 +37,9 @@ def crawl_intergamma(url: str) -> CrawlResult:
 
     response: requests.Response = requests.get(url)
     if response.status_code != 200:
-        logging.error(f"Got status code {response.status_code} while getting url {url}")
+        logging.error("Got status code %s while getting url %s", response.status_code, url)
         raise PageNotFoundException(url)
-    
+
     soup: BeautifulSoup = BeautifulSoup(response.text, "html.parser")
     result: CrawlResult = CrawlResult()
 
@@ -50,9 +50,10 @@ def crawl_intergamma(url: str) -> CrawlResult:
         )["href"]
     except Exception as exception:
         logging.error("Could not find canonical URL")
+        logging.debug("Got exception: %s", exception)
         # Don't raise an exception, just use the url given by the user.
         result.url = url
-    
+
     try:
         result.product_name = soup.find(
             "h1",
@@ -60,6 +61,7 @@ def crawl_intergamma(url: str) -> CrawlResult:
         ).text
     except Exception as exception:
         logging.error("Could not find product name, raising CrawlerException")
+        logging.debug("Got exception: %s", exception)
         raise CrawlerException from exception
 
     try:
@@ -69,8 +71,9 @@ def crawl_intergamma(url: str) -> CrawlResult:
         )["data-product-code"]
     except Exception as exception:
         logging.error("Could not find a product code, raising CrawlerException")
+        logging.debug("Got exception: %s", exception)
         raise CrawlerException from exception
-    
+
     try:
         result.ean = int(soup.find(
             "div",
@@ -79,7 +82,8 @@ def crawl_intergamma(url: str) -> CrawlResult:
     except Exception as exception:
         # Don't raise an exception since EAN is not strictly necessary!
         logging.error("Could not find EAN code")
-    
+        logging.debug("Got exception: %s", exception)
+
     try:
         price_tag = soup.find(
             "div",
@@ -98,6 +102,7 @@ def crawl_intergamma(url: str) -> CrawlResult:
             result.normal_price = price
     except Exception as exception:
         logging.error("Could not find price, raising CrawlerException")
+        logging.debug("Got exception: %s", exception)
         raise CrawlerException from exception
 
     return result
