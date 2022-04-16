@@ -116,6 +116,8 @@ def parse_promotional_message(message: str, price: float) -> float:
     elif "voor" in message_no_whitespace:
         msg_split = voor_regex.split(message_no_whitespace)
         try:
+            if msg_split[0] == '':
+                return float(msg_split[1])
             return float(msg_split[1]) / float(msg_split[0])
         except ArithmeticError as exception:
             logging.error("Calculation error parsing %s %s", message_no_whitespace, exception)
