@@ -40,6 +40,9 @@ def crawl_intergamma(url: str) -> CrawlResult:
         logging.error("Got status code %s while getting url %s", response.status_code, url)
         raise PageNotFoundException(url)
 
+    # Use UTF-8 encoding instead of ISO-8859-1
+    response.encoding = 'UTF-8'
+
     soup: BeautifulSoup = BeautifulSoup(response.text, "html.parser")
     result: CrawlResult = CrawlResult()
 
