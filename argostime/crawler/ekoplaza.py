@@ -25,7 +25,6 @@
 
 import json
 import logging
-from pprint import pprint
 
 
 import requests
