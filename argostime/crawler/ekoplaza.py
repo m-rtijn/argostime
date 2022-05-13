@@ -34,7 +34,7 @@ from argostime.exceptions import PageNotFoundException
 from argostime.crawler.crawl_utils import CrawlResult
 
 
-def crawl_ekoplaza(url: str):  # -> CrawlResult:
+def crawl_ekoplaza(url: str) -> CrawlResult:
     """Ekoplaza crawler"""
 
     info = url.split('product/')[-1]
