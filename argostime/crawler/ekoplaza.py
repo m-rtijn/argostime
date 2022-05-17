@@ -61,7 +61,9 @@ def crawl_ekoplaza(url: str) -> CrawlResult:
         raise CrawlerException from exception
 
     try:
-        result.product_code = product['DefaultScanCode']['Code']  # EAN ?
+        # Product codes seem to be valid EANs
+        result.product_code = product['DefaultScanCode']['Code']
+        reuslt.ean = product['DefaultScanCode']['Code']
     except KeyError as exception:
         logging.error("No product code found in %s", product)
         raise CrawlerException from exception
