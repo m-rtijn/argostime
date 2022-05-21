@@ -42,6 +42,7 @@ from argostime.crawler.steam import crawl_steam
 from argostime.crawler.ikea import crawl_ikea
 from argostime.crawler.praxis import crawl_praxis
 from argostime.crawler.intergamma import crawl_intergamma
+from argostime.crawler.ekoplaza import crawl_ekoplaza
 
 def crawl_url(url: str) -> CrawlResult:
     """Crawl a product at the given URL
@@ -82,6 +83,8 @@ def crawl_url(url: str) -> CrawlResult:
         result = crawl_intergamma(url)
     elif shops_info["karwei"]["hostname"] in hostname:
         result = crawl_intergamma(url)
+    elif shops_info["ekoplaza"]["hostname"] in hostname:
+        result = crawl_ekoplaza(url)
     else:
         raise WebsiteNotImplementedException(url)
 

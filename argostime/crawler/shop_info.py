@@ -35,7 +35,7 @@ shops_info = {
         "name": "Brandzaak",
         "hostname": "brandzaak.nl"
     },
-    "etos" : {
+    "etos": {
         "name": "Etos",
         "hostname": "etos.nl"
     },
@@ -71,6 +71,10 @@ shops_info = {
         "name": "Karwei",
         "hostname": "karwei.nl"
     },
+    "ekoplaza": {
+        "name": "Ekoplaza",
+        "hostname": "ekoplaza.nl"
+    }
 }
 
 enabled_shops = {
@@ -93,4 +97,5 @@ enabled_shops = {
     "www.praxis.nl": "praxis",
     "www.gamma.nl": "gamma",
     "www.karwei.nl": "karwei",
+    "www.ekoplaza.nl": "ekoplaza",
 }
