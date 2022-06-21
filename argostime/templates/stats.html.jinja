@@ -1,0 +1,11 @@
+{% extends "base.html.jinja" %}
+{% block title %}Statistieken | Argostimè{% endblock %}
+{% block content %}
+<h1>Statistieken</h1>
+<ul>
+<li>Totaal aantal producten: {{ total_products }}</li>
+<li>Totaal aantal aanbiedingen van producten: {{ total_offers }}.</li>
+<li>Totaal aantal prijsdatapunten: {{ total_prices_count }}.</li>
+</ul>
+
+{% endblock %}
