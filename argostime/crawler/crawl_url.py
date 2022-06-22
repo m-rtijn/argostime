@@ -10,16 +10,16 @@
     This file is part of Argostimè.
 
     Argostimè is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
+    it under the terms of the GNU Affero General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
     Argostimè is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-    GNU General Public License for more details.
+    GNU Affero General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
+    You should have received a copy of the GNU Affero General Public License
     along with Argostimè. If not, see <https://www.gnu.org/licenses/>.
 """
 
@@ -42,6 +42,7 @@ from argostime.crawler.steam import crawl_steam
 from argostime.crawler.ikea import crawl_ikea
 from argostime.crawler.praxis import crawl_praxis
 from argostime.crawler.intergamma import crawl_intergamma
+from argostime.crawler.ekoplaza import crawl_ekoplaza
 
 def crawl_url(url: str) -> CrawlResult:
     """Crawl a product at the given URL
@@ -82,6 +83,8 @@ def crawl_url(url: str) -> CrawlResult:
         result = crawl_intergamma(url)
     elif shops_info["karwei"]["hostname"] in hostname:
         result = crawl_intergamma(url)
+    elif shops_info["ekoplaza"]["hostname"] in hostname:
+        result = crawl_ekoplaza(url)
     else:
         raise WebsiteNotImplementedException(url)
 

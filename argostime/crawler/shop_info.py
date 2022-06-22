@@ -9,16 +9,16 @@
     This file is part of Argostimè.
 
     Argostimè is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
+    it under the terms of the GNU Affero General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
     Argostimè is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-    GNU General Public License for more details.
+    GNU Affero General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
+    You should have received a copy of the GNU Affero General Public License
     along with Argostimè. If not, see <https://www.gnu.org/licenses/>.
 """
 
@@ -35,7 +35,7 @@ shops_info = {
         "name": "Brandzaak",
         "hostname": "brandzaak.nl"
     },
-    "etos" : {
+    "etos": {
         "name": "Etos",
         "hostname": "etos.nl"
     },
@@ -71,6 +71,10 @@ shops_info = {
         "name": "Karwei",
         "hostname": "karwei.nl"
     },
+    "ekoplaza": {
+        "name": "Ekoplaza",
+        "hostname": "ekoplaza.nl"
+    }
 }
 
 enabled_shops = {
@@ -93,4 +97,5 @@ enabled_shops = {
     "www.praxis.nl": "praxis",
     "www.gamma.nl": "gamma",
     "www.karwei.nl": "karwei",
+    "www.ekoplaza.nl": "ekoplaza",
 }

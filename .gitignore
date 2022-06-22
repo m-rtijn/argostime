@@ -139,5 +139,7 @@ dmypy.json
 cython_debug/
 
 argostime/test.db
+*.db
+*.sql
 
 *.vscode/

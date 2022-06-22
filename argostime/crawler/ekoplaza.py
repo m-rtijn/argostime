@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 """
-    crawler/brandzaak.py
+    crawler/ekoplaza.py
 
-    Crawler for brandzaak.nl
+    Crawler for ekoplaza.nl
 
-    Copyright (c) 2022 Martijn <martijn [at] mrtijn.nl>
-    Copyright (c) 2022 semyon
+    Copyright (c) 2022 Anna <anna [at] anna.computer>
 
     This file is part of Argostimè.
 
@@ -24,46 +23,58 @@
 """
 
 
+import json
 import logging
 
 import requests
-from bs4 import BeautifulSoup
 
 from argostime.exceptions import CrawlerException
 from argostime.exceptions import PageNotFoundException
-
 from argostime.crawler.crawl_utils import CrawlResult
 
-def crawl_brandzaak(url: str) -> CrawlResult:
-    """Parse a product from brandzaak.nl"""
 
-    response = requests.get(url)
+def crawl_ekoplaza(url: str) -> CrawlResult:
+    """Ekoplaza crawler"""
+
+    info = url.split('product/')[-1]
+    response = requests.get(
+        f'https://www.ekoplaza.nl/api/aspos/products/url/{info}')
 
     if response.status_code != 200:
-        logging.error("Got status code %d while getting url %s", response.status_code, url)
+        logging.error("Got status code %d while getting url %s",
+                      response.status_code, url)
         raise PageNotFoundException(url)
-
-    soup = BeautifulSoup(response.text, "html.parser")
-
-    result: CrawlResult = CrawlResult(url=url)
-
-    product_title = soup.find("meta", attrs={ "name": "title"})
-    product_price = soup.find("meta", attrs={ "property": "product:price:amount"})
-
     try:
-        result.product_name = product_title['content']
+        product = response.json()["Product"]
     except KeyError as exception:
-        logging.error("Could not find product name in %s", product_title)
+        logging.error("No product found at %s", url)
         raise CrawlerException from exception
+
+    result = CrawlResult(url=url)
+
     try:
-        result.normal_price = float(product_price['content'])
+        result.product_name = product['Description'].title()
     except KeyError as exception:
-        logging.error("Could not find price in %s", product_price)
+        logging.error("No product name found in %s", product)
         raise CrawlerException from exception
+
     try:
-        result.product_code = product_title['content'].replace(" ", "-")
+        # Product codes seem to be valid EANs
+        result.product_code = product['DefaultScanCode']['Code']
+        result.ean = product['DefaultScanCode']['Code']
     except KeyError as exception:
-        logging.error("Could not find product code in %s", product_title)
+        logging.error("No product code found in %s", product)
+        raise CrawlerException from exception
+
+    try:
+        result.discount_price = float(product['Discount']['PriceInclTax'])
+    except KeyError:
+        pass
+
+    try:
+        result.normal_price = float(product['PriceInclTax'])
+    except KeyError as exception:
+        logging.error("No normal price found in %s", product)
         raise CrawlerException from exception
 
     return result
