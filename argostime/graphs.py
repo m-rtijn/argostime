@@ -5,7 +5,7 @@
     Create graphs using Apache ECharts
 
     Copyright (c) 2022 Martijn <martijn [at] mrtijn.nl>
-    Copyright (c) 2022 Kevin
+    Copyright (c) 2022 Kevin <kevin [at] 2sk.nl>
 
     This file is part of Argostimè.
 
@@ -76,12 +76,19 @@ def generate_price_graph_data(offer: ProductOffer) -> str:
 
         sales_dates.append((start, end))
 
+    title_size = 24
+    if len(offer.product.name) + len(offer.webshop.name) > 40:
+        title_size = 18
+    if len(offer.product.name) + len(offer.webshop.name) > 65:
+        title_size = 12
+
     data = {
         "title": {
             "text": f"Prijsontwikkeling van {offer.product.name} bij {offer.webshop.name}",
             "left": "center",
             "textStyle": {
                 "color": "#000",
+                "fontSize": title_size,
             },
         },
         "series": {
@@ -94,6 +101,7 @@ def generate_price_graph_data(offer: ProductOffer) -> str:
                 "silent": True,
                 "label": {
                     "color": "#000",
+                    "fontSize": 18,
                 },
                 "itemStyle": {
                     "color": "rgba(255, 165, 0, 0.5)",

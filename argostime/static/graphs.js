@@ -38,6 +38,7 @@ var defaultOptions = {
         formatter: tooltipFormatter,
         textStyle: {
             color: "#000",
+            fontSize: 18,
         },
     },
     toolbox: {
@@ -69,6 +70,7 @@ var defaultOptions = {
         axisLabel: {
             formatter: yFormatter,
             color: "#000",
+            fontSize: 18,
         },
     },
     xAxis: {
@@ -76,11 +78,14 @@ var defaultOptions = {
         axisLabel: {
             formatter: "{yyyy}-{MM}-{dd}",
             color: "#000",
+            fontSize: 18,
         },
     },
 };
 
 var graphDivs = document.getElementsByClassName("graph");
+var r = document.querySelector(':root');
+r.style.setProperty('--vw', document.documentElement.clientWidth);
 for (var i = 0; i < graphDivs.length; i++) {
     (function () {
         var offer = graphDivs[i].id.substring(6);
@@ -92,5 +97,9 @@ for (var i = 0; i < graphDivs.length; i++) {
         });
         xhr.open("GET", `/productoffer/${offer}/price_step_graph_data.json`);
         xhr.send();
+
+        window.addEventListener('resize', function(event) {
+            r.style.setProperty('--vw', document.documentElement.clientWidth);
+        }, true);
     }());
 }
