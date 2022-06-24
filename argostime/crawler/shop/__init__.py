@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
-    crawler/__init__.py
+    crawler/shop/__init__.py
 
-    Submodule for crawling websites to get pricing information.
+    Submodule for the actual crawlers to get pricing information.
 
-    Copyright (c) 2022 Martijn <martijn [at] mrtijn.nl>
+    Copyright (c) 2022 Kevin <kevin [at] 2sk.nl>
 
     This file is part of Argostimè.
 
@@ -22,6 +22,10 @@
     along with Argostimè. If not, see <https://www.gnu.org/licenses/>.
 """
 
-from argostime.crawler.crawl_utils import CrawlResult, shops_info, enabled_shops
-from argostime.crawler.crawl_url import crawl_url
-from argostime.crawler.shop import *
+from os.path import dirname, basename, isfile, join
+import glob
+
+# Load all modules in the current directory, based on the answer from Anurag Uniyal:
+# https://stackoverflow.com/questions/1057431/how-to-load-all-modules-in-a-folder
+modules = glob.glob(join(dirname(__file__), "*.py"))
+__all__ = [basename(f)[:-3] for f in modules if isfile(f) and not f.endswith('__init__.py')]

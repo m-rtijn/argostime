@@ -5,6 +5,7 @@
     Utilities for the crawler submodule
 
     Copyright (c) 2022 Martijn <martijn [at] mrtijn.nl>
+    Copyright (c) 2022 Kevin <kevin [at] 2sk.nl>
 
     This file is part of Argostimè.
 
@@ -24,11 +25,31 @@
 
 import logging
 import re
-from typing import Optional
+from typing import Callable, List, Optional
 
-voor_regex = re.compile("voor")
+__voor_regex = re.compile("voor")
+shops_info = {}
+enabled_shops = {}
 
-class CrawlResult():
+
+def register_crawler(ident: str, name: str, hostnames: List[str]):
+    """Decorator to register a new crawler function."""
+
+    def decorate(func: Callable[[str], CrawlResult]):
+        logging.debug("Registering crawler function: %s", func.__name__)
+
+        shops_info[ident] = {
+            "name": name,
+            "hostname": hostnames[0],
+            "function": func,
+        }
+        for hostname in hostnames:
+            enabled_shops[hostname] = ident
+
+    return decorate
+
+
+class CrawlResult:
     """Data structure for returning the results of a crawler in a uniform way."""
 
     url: Optional[str]
@@ -68,6 +89,7 @@ class CrawlResult():
             f"discount={self.discount_price},sale={self.on_sale},ean={self.ean}"
 
         return string
+
 
 def parse_promotional_message(message: str, price: float) -> float:
     """Parse a given promotional message, and returns the calculated effective price.
@@ -114,7 +136,7 @@ def parse_promotional_message(message: str, price: float) -> float:
     elif message_no_whitespace == "2+3gratis":
         return 0.4 * price
     elif "voor" in message_no_whitespace:
-        msg_split = voor_regex.split(message_no_whitespace)
+        msg_split = __voor_regex.split(message_no_whitespace)
         try:
             if msg_split[0] == '':
                 return float(msg_split[1])

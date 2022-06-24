@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-    crawler/hema.py
+    crawler/shop/hema.py
 
     Crawler for hema.nl
 
@@ -34,8 +34,10 @@ from bs4 import BeautifulSoup
 from argostime.exceptions import CrawlerException
 from argostime.exceptions import PageNotFoundException
 
-from argostime.crawler.crawl_utils import CrawlResult
+from argostime.crawler.crawl_utils import CrawlResult, register_crawler
 
+
+@register_crawler("hema", "HEMA", ["hema.nl", "www.hema.nl"])
 def crawl_hema(url: str) -> CrawlResult:
     """Crawler for hema.nl"""
 

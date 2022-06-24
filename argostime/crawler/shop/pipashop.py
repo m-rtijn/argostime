@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-    crawler/pipashop.py
+    crawler/shop/pipashop.py
 
     Crawler for pipa-shop.nl/
 
@@ -31,8 +31,10 @@ from bs4 import BeautifulSoup
 from argostime.exceptions import CrawlerException
 from argostime.exceptions import PageNotFoundException
 
-from argostime.crawler.crawl_utils import CrawlResult
+from argostime.crawler.crawl_utils import CrawlResult, register_crawler
 
+
+@register_crawler("pipashop", "Pipa Shop", ["pipa-shop.nl", "www.pipa-shop.nl"])
 def crawl_pipashop(url: str) -> CrawlResult:
     """Crawler for pipa-shop.nl meme website."""
     result: CrawlResult = CrawlResult(url=url)

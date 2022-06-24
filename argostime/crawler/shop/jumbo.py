@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-    crawler/jumbo.py
+    crawler/shop/jumbo.py
 
     Crawler for jumbo.com
 
@@ -31,8 +31,10 @@ from bs4 import BeautifulSoup
 from argostime.exceptions import CrawlerException
 from argostime.exceptions import PageNotFoundException
 
-from argostime.crawler.crawl_utils import CrawlResult
+from argostime.crawler.crawl_utils import CrawlResult, register_crawler
 
+
+@register_crawler("jumbo", "Jumbo", ["jumbo.com", "www.jumbo.nl"])
 def crawl_jumbo(url: str) -> CrawlResult:
     """Crawler for jumbo.com
 

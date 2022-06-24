@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
-    crawler/praxis.py
+    crawler/shop/praxis.py
 
     Crawler for praxis.nl
 
-    Copyright (c) 2022 Kevin Nobel <kevin [at] 2sk.nl>
+    Copyright (c) 2022 Kevin <kevin [at] 2sk.nl>
 
     This file is part of Argostimè.
 
@@ -32,11 +32,14 @@ from bs4 import BeautifulSoup
 from argostime.exceptions import CrawlerException
 from argostime.exceptions import PageNotFoundException
 
-from argostime.crawler.crawl_utils import CrawlResult
+from argostime.crawler.crawl_utils import CrawlResult, register_crawler
+
 
 def __fix_bad_json(bad_json: str) -> str:
     return re.sub(r'(?<!\\)\\(?!["\\/bfnrt]|u[0-9a-fA-F]{4})', r'', bad_json)
 
+
+@register_crawler("praxis", "Praxis", ["praxis.nl", "www.praxis.nl"])
 def crawl_praxis(url: str) -> CrawlResult:
     """Crawler for praxis.nl"""
 

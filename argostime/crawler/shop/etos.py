@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-    crawler/etos.py
+    crawler/shop/etos.py
 
     Crawler for etos.nl
 
@@ -32,9 +32,11 @@ from bs4 import BeautifulSoup
 from argostime.exceptions import CrawlerException
 from argostime.exceptions import PageNotFoundException
 
-from argostime.crawler.crawl_utils import CrawlResult
+from argostime.crawler.crawl_utils import CrawlResult, register_crawler
 from argostime.crawler.crawl_utils import parse_promotional_message
 
+
+@register_crawler("etos", "Etos", ["etos.nl", "www.etos.nl"])
 def crawl_etos(url: str) -> CrawlResult:
     """Crawler for etos.nl"""
 
