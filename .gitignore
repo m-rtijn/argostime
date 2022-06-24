@@ -143,3 +143,4 @@ argostime/test.db
 *.sql
 
 *.vscode/
+*.idea/
