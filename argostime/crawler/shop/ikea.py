@@ -34,7 +34,7 @@ from argostime.exceptions import PageNotFoundException
 from argostime.crawler.crawl_utils import CrawlResult, register_crawler
 
 
-@register_crawler("ikea", "IKEA", ["ikea.com", "www.ikea.com"])
+@register_crawler("IKEA", "ikea.com")
 def crawl_ikea(url: str) -> CrawlResult:  # pylint: disable=R0915
     """Crawler for ikea.com"""
 

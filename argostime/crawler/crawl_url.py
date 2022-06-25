@@ -29,7 +29,7 @@ import urllib.parse
 
 from argostime.exceptions import WebsiteNotImplementedException
 
-from argostime.crawler.crawl_utils import CrawlResult, shops_info, enabled_shops
+from argostime.crawler.crawl_utils import CrawlResult, enabled_shops
 
 
 def crawl_url(url: str) -> CrawlResult:
@@ -43,10 +43,10 @@ def crawl_url(url: str) -> CrawlResult:
     logging.debug("Crawling %s", url)
     hostname: str = urllib.parse.urlparse(url).netloc
 
-    if hostname not in enabled_shops or enabled_shops[hostname] not in shops_info:
+    if hostname not in enabled_shops:
         raise WebsiteNotImplementedException(url)
 
-    result: CrawlResult = shops_info[enabled_shops[hostname]]["function"](url)  # type: ignore
+    result: CrawlResult = enabled_shops[hostname]["crawler"](url)  # type: ignore
 
     if result.discount_price > 0:
         result.on_sale = True

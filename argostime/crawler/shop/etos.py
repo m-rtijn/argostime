@@ -36,7 +36,7 @@ from argostime.crawler.crawl_utils import CrawlResult, register_crawler
 from argostime.crawler.crawl_utils import parse_promotional_message
 
 
-@register_crawler("etos", "Etos", ["etos.nl", "www.etos.nl"])
+@register_crawler("Etos", "etos.nl")
 def crawl_etos(url: str) -> CrawlResult:
     """Crawler for etos.nl"""
 

@@ -35,7 +35,7 @@ from argostime.exceptions import PageNotFoundException
 from argostime.crawler.crawl_utils import CrawlResult, register_crawler
 
 
-@register_crawler("brandzaak", "Brandzaak", ["brandzaak.nl", "www.brandzaak.nl"])
+@register_crawler("Brandzaak", "brandzaak.nl")
 def crawl_brandzaak(url: str) -> CrawlResult:
     """Parse a product from brandzaak.nl"""
 

@@ -34,7 +34,7 @@ from argostime.exceptions import PageNotFoundException
 from argostime.crawler.crawl_utils import CrawlResult, register_crawler
 
 
-@register_crawler("jumbo", "Jumbo", ["jumbo.com", "www.jumbo.nl"])
+@register_crawler("Jumbo", "jumbo.com")
 def crawl_jumbo(url: str) -> CrawlResult:
     """Crawler for jumbo.com
 

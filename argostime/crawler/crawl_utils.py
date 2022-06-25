@@ -26,37 +26,34 @@
 import configparser
 import logging
 import re
-from typing import Callable, List, Optional
+from typing import Callable, Optional
 
 __config = configparser.ConfigParser()
 __config.read("argostime.conf")
 __voor_regex = re.compile("voor")
 
-
-shops_info = {}
 enabled_shops = {}
 
 
-def register_crawler(ident: str, name: str, hostnames: List[str]):
+def register_crawler(name: str, host: str, use_www: bool = True):
     """Decorator to register a new crawler function."""
 
     def decorate(func: Callable[[str], CrawlResult]):
-        logging.debug("Registering crawler function: %s", func.__name__)
-
-        shops_info[ident] = {
-            "name": name,
-            "hostname": hostnames[0],
-            "function": func,
-        }
-
         if "argostime" in __config and "disabled_shops" in __config["argostime"]:
-            if ident in __config["argostime"]["disabled_shops"]:
-                logging.debug("Shop %s is disabled", ident)
+            if host in __config["argostime"]["disabled_shops"]:
+                logging.debug("Shop %s is disabled", host)
                 return
 
-        for hostname in hostnames:
-            enabled_shops[hostname] = ident
-        logging.debug("Shop %s is enabled", ident)
+        shop_info = {
+            "name": name,
+            "hostname": host,
+            "crawler": func,
+        }
+
+        enabled_shops[host] = shop_info
+        if use_www:
+            enabled_shops[f"www.{host}"] = shop_info
+        logging.debug("Shop %s is enabled", host)
 
     return decorate
 

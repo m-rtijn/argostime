@@ -34,7 +34,7 @@ from argostime.exceptions import PageNotFoundException
 from argostime.crawler.crawl_utils import CrawlResult, register_crawler
 
 
-@register_crawler("pipashop", "Pipa Shop", ["pipa-shop.nl", "www.pipa-shop.nl"])
+@register_crawler("Pipa Shop", "pipa-shop.nl")
 def crawl_pipashop(url: str) -> CrawlResult:
     """Crawler for pipa-shop.nl meme website."""
     result: CrawlResult = CrawlResult(url=url)

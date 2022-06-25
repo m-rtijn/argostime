@@ -32,7 +32,7 @@ from argostime.exceptions import PageNotFoundException
 from argostime.crawler.crawl_utils import CrawlResult, register_crawler
 
 
-@register_crawler("ekoplaza", "Ekoplaza", ["ekoplaza.nl", "www.ekoplaza.nl"])
+@register_crawler("Ekoplaza", "ekoplaza.nl")
 def crawl_ekoplaza(url: str) -> CrawlResult:
     """Ekoplaza crawler"""
 

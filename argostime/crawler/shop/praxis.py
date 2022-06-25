@@ -39,7 +39,7 @@ def __fix_bad_json(bad_json: str) -> str:
     return re.sub(r'(?<!\\)\\(?!["\\/bfnrt]|u[0-9a-fA-F]{4})', r'', bad_json)
 
 
-@register_crawler("praxis", "Praxis", ["praxis.nl", "www.praxis.nl"])
+@register_crawler("Praxis", "praxis.nl")
 def crawl_praxis(url: str) -> CrawlResult:
     """Crawler for praxis.nl"""
 

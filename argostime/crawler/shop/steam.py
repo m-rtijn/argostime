@@ -33,7 +33,7 @@ from argostime.exceptions import PageNotFoundException
 from argostime.crawler.crawl_utils import CrawlResult, register_crawler
 
 
-@register_crawler("steam", "Steam", ["store.steampowered.com"])
+@register_crawler("Steam", "store.steampowered.com", False)
 def crawl_steam(url: str) -> CrawlResult:
     """Crawler for store.steampowered.com"""
 
