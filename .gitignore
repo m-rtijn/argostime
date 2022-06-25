@@ -141,6 +141,7 @@ cython_debug/
 argostime/test.db
 *.db
 *.sql
+argostime.conf
 
 *.vscode/
 *.idea/

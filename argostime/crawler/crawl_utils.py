@@ -23,11 +23,16 @@
     along with Argostimè. If not, see <https://www.gnu.org/licenses/>.
 """
 
+import configparser
 import logging
 import re
 from typing import Callable, List, Optional
 
+__config = configparser.ConfigParser()
+__config.read("argostime.conf")
 __voor_regex = re.compile("voor")
+
+
 shops_info = {}
 enabled_shops = {}
 
@@ -43,8 +48,15 @@ def register_crawler(ident: str, name: str, hostnames: List[str]):
             "hostname": hostnames[0],
             "function": func,
         }
+
+        if "argostime" in __config and "disabled_shops" in __config["argostime"]:
+            if ident in __config["argostime"]["disabled_shops"]:
+                logging.debug("Shop %s is disabled", ident)
+                return
+
         for hostname in hostnames:
             enabled_shops[hostname] = ident
+        logging.debug("Shop %s is enabled", ident)
 
     return decorate
 
