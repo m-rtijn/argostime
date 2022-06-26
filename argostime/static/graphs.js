@@ -85,6 +85,8 @@ var defaultOptions = {
 
 var graphDivs = document.getElementsByClassName("graph");
 var r = document.querySelector(':root');
+// A viewport-width variable as number type is required for a scale transform
+// in CSS. Without this variable it is only available as a length type (pixels).
 r.style.setProperty('--vw', document.documentElement.clientWidth);
 for (var i = 0; i < graphDivs.length; i++) {
     (function () {
@@ -99,6 +101,7 @@ for (var i = 0; i < graphDivs.length; i++) {
         xhr.send();
 
         window.addEventListener('resize', function(event) {
+            // Update the "vw" variable in CSS when the viewport is resized
             r.style.setProperty('--vw', document.documentElement.clientWidth);
         }, true);
     }());

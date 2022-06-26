@@ -76,6 +76,9 @@ def generate_price_graph_data(offer: ProductOffer) -> str:
 
         sales_dates.append((start, end))
 
+    # Choose a font size for the title of the graph based on the expected
+    # title length. Longer titles will be rendered using a smaller font size
+    # in order to fit on one line.
     title_size = 24
     if len(offer.product.name) + len(offer.webshop.name) > 40:
         title_size = 18
