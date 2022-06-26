@@ -37,6 +37,7 @@ def crawl_url(url: str) -> CrawlResult:
 
     Returns a CrawlResult object.
     May raise any of the following exceptions:
+        CrawlerException
         PageNotFoundException
         WebsiteNotImplementedException
     """
@@ -46,13 +47,8 @@ def crawl_url(url: str) -> CrawlResult:
     if hostname not in enabled_shops:
         raise WebsiteNotImplementedException(url)
 
-    result: CrawlResult = enabled_shops[hostname]["crawler"](url)  # type: ignore
-
-    if result.discount_price > 0:
-        result.on_sale = True
-    else:
-        result.on_sale = False
+    result: CrawlResult = enabled_shops[hostname]["crawler"](url)
+    result.check()
 
     logging.debug("Crawl resulted in %s", result)
-
     return result

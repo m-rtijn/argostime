@@ -26,36 +26,13 @@
 import configparser
 import logging
 import re
-from typing import Callable, Optional
+from typing import Callable, Dict, Optional, TypedDict
+
+from argostime.exceptions import CrawlerException
 
 __config = configparser.ConfigParser()
 __config.read("argostime.conf")
 __voor_regex = re.compile("voor")
-
-enabled_shops = {}
-
-
-def register_crawler(name: str, host: str, use_www: bool = True):
-    """Decorator to register a new crawler function."""
-
-    def decorate(func: Callable[[str], CrawlResult]):
-        if "argostime" in __config and "disabled_shops" in __config["argostime"]:
-            if host in __config["argostime"]["disabled_shops"]:
-                logging.debug("Shop %s is disabled", host)
-                return
-
-        shop_info = {
-            "name": name,
-            "hostname": host,
-            "crawler": func,
-        }
-
-        enabled_shops[host] = shop_info
-        if use_www:
-            enabled_shops[f"www.{host}"] = shop_info
-        logging.debug("Shop %s is enabled", host)
-
-    return decorate
 
 
 class CrawlResult:
@@ -98,6 +75,51 @@ class CrawlResult:
             f"discount={self.discount_price},sale={self.on_sale},ean={self.ean}"
 
         return string
+
+    def check(self) -> None:
+        """Check if CrawlResult contains the mandatory data."""
+
+        # Check if url, product name and product code fields are set
+        if not self.url or self.url == "":
+            raise CrawlerException("No url given for item!")
+        if not self.product_name or self.product_name == "":
+            raise CrawlerException("No product name given for item!")
+        if not self.product_code or self.product_code == "":
+            raise CrawlerException("No product code given for item!")
+
+        # Check price and on_sale flag consistency
+        if self.discount_price < 0 and self.on_sale:
+            raise CrawlerException("No discount price given for item on sale!")
+        if self.normal_price < 0 and not self.on_sale:
+            raise CrawlerException("No normal price given for item not on sale!")
+
+
+CrawlerFunc = Callable[[str], CrawlResult]
+ShopDict = TypedDict("ShopDict", {"name": str, "hostname": str, "crawler": CrawlerFunc})
+enabled_shops: Dict[str, ShopDict] = {}
+
+
+def register_crawler(name: str, host: str, use_www: bool = True) -> Callable[[CrawlerFunc], None]:
+    """Decorator to register a new crawler function."""
+
+    def decorate(func: Callable[[str], CrawlResult]) -> None:
+        if "argostime" in __config and "disabled_shops" in __config["argostime"]:
+            if host in __config["argostime"]["disabled_shops"]:
+                logging.debug("Shop %s is disabled", host)
+                return
+
+        shop_info: ShopDict = {
+            "name": name,
+            "hostname": host,
+            "crawler": func,
+        }
+
+        enabled_shops[host] = shop_info
+        if use_www:
+            enabled_shops[f"www.{host}"] = shop_info
+        logging.debug("Shop %s is enabled", host)
+
+    return decorate
 
 
 def parse_promotional_message(message: str, price: float) -> float:

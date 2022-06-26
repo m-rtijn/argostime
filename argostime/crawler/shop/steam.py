@@ -95,6 +95,7 @@ def crawl_steam(url: str) -> CrawlResult:
                 "discount_block",
                 "game_purchase_discount"
                 ).get("data-price-final")) / 100.0
+        result.on_sale = True
         # There is info in the page about the normal price when there is a discount,
         # it's just more of a hassle to find that information
     except Exception as exception:

@@ -147,6 +147,7 @@ def crawl_ah(url: str) -> CrawlResult:
                 result.discount_price = promotion
             else:
                 result.discount_price = price
+            result.on_sale = True
         else:
             # No valid bonus, so there's no valid price available.
             logging.info("No valid price found for %s", url)

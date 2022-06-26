@@ -88,7 +88,7 @@ def crawl_hema(url: str) -> CrawlResult:
         raise CrawlerException from exception
 
     try:
-        result.normal_price = product_dict["ecommerce"]["detail"]["products"][0]["price"]
+        result.normal_price = float(product_dict["ecommerce"]["detail"]["products"][0]["price"])
     except KeyError as exception:
         logging.error("Could not find a valid price in %s via %s", raw_json, url)
         result.normal_price = -1

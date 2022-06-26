@@ -33,13 +33,7 @@ from argostime.exceptions import PageNotFoundException
 from argostime.crawler.crawl_utils import CrawlResult, register_crawler
 
 
-@register_crawler("Karwei", "karwei.nl")
-def crawl_karwei(url: str) -> CrawlResult:
-    return crawl_gamma(url)
-
-
-@register_crawler("Gamma", "gamma.nl")
-def crawl_gamma(url: str) -> CrawlResult:
+def crawl_intergamma(url: str) -> CrawlResult:
     """Crawler for gamma.nl and karwei.nl"""
 
     response: requests.Response = requests.get(url)
@@ -116,3 +110,13 @@ def crawl_gamma(url: str) -> CrawlResult:
         raise CrawlerException from exception
 
     return result
+
+
+@register_crawler("Gamma", "gamma.nl")
+def crawl_gamma(url: str) -> CrawlResult:
+    return crawl_intergamma(url)
+
+
+@register_crawler("Karwei", "karwei.nl")
+def crawl_karwei(url: str) -> CrawlResult:
+    return crawl_intergamma(url)
