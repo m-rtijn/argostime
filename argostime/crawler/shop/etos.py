@@ -92,6 +92,7 @@ def crawl_etos(url: str) -> CrawlResult:
         # Try to parse this promotion
         if promotion != -1.0:
             result.discount_price = promotion
+            result.on_sale = True
         else:
             # Couldn't parse the promotion!
             logging.info("Couldn't parse promotion %s, assuming no discount", promotion_message)

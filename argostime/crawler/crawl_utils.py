@@ -77,7 +77,16 @@ class CrawlResult:
         return string
 
     def check(self) -> None:
-        """Check if CrawlResult contains the mandatory data."""
+        """
+        Check if CrawlResult contains the mandatory data needed to store the
+        product in the database and if the data is consistent.
+        The mandatory data is:
+          - url
+          - product_name
+          - product_code
+        If on_sale is True, discount_price must be non-negative and non-zero.
+        If on_sale is False, normal_price must be non-negative and non-zero.
+        """
 
         # Check if url, product name and product code fields are set
         if not self.url or self.url == "":

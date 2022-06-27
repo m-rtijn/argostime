@@ -106,6 +106,7 @@ def crawl_jumbo(url: str) -> CrawlResult:
 
     try:
         result.discount_price = float(offer["lowPrice"])
+        result.on_sale = True
     except KeyError:
         logging.info("No discount / low price found in %s", raw_json)
 

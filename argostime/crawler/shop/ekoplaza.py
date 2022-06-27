@@ -68,6 +68,7 @@ def crawl_ekoplaza(url: str) -> CrawlResult:
 
     try:
         result.discount_price = float(product['Discount']['PriceInclTax'])
+        result.on_sale = True
     except KeyError:
         pass
 
