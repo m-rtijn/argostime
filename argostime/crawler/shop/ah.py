@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-    crawler/ah.py
+    crawler/shop/ah.py
 
     Crawler for ah.nl
 
@@ -26,15 +26,16 @@ from datetime import date
 import json
 import logging
 
-
 import requests
 from bs4 import BeautifulSoup
 
 from argostime.exceptions import CrawlerException
 from argostime.exceptions import PageNotFoundException
 
-from argostime.crawler.crawl_utils import CrawlResult, parse_promotional_message
+from argostime.crawler.crawl_utils import CrawlResult, parse_promotional_message, register_crawler
 
+
+@register_crawler("Albert Heijn", "ah.nl")
 def crawl_ah(url: str) -> CrawlResult:
     """Crawler for ah.nl"""
     response: requests.Response = requests.get(url)
@@ -146,6 +147,7 @@ def crawl_ah(url: str) -> CrawlResult:
                 result.discount_price = promotion
             else:
                 result.discount_price = price
+            result.on_sale = True
         else:
             # No valid bonus, so there's no valid price available.
             logging.info("No valid price found for %s", url)

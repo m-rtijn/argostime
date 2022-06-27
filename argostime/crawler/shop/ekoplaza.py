@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-    crawler/ekoplaza.py
+    crawler/shop/ekoplaza.py
 
     Crawler for ekoplaza.nl
 
@@ -22,17 +22,17 @@
     along with Argostimè. If not, see <https://www.gnu.org/licenses/>.
 """
 
-
-import json
 import logging
 
 import requests
 
 from argostime.exceptions import CrawlerException
 from argostime.exceptions import PageNotFoundException
-from argostime.crawler.crawl_utils import CrawlResult
+
+from argostime.crawler.crawl_utils import CrawlResult, register_crawler
 
 
+@register_crawler("Ekoplaza", "ekoplaza.nl")
 def crawl_ekoplaza(url: str) -> CrawlResult:
     """Ekoplaza crawler"""
 
@@ -68,6 +68,7 @@ def crawl_ekoplaza(url: str) -> CrawlResult:
 
     try:
         result.discount_price = float(product['Discount']['PriceInclTax'])
+        result.on_sale = True
     except KeyError:
         pass
 
