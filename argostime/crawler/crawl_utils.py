@@ -112,6 +112,11 @@ def register_crawler(name: str, host: str, use_www: bool = True) -> Callable[[Cr
     """Decorator to register a new crawler function."""
 
     def decorate(func: Callable[[str], CrawlResult]) -> None:
+        """
+        This function will be called when you put the "@register_crawler" decorator above
+        a function defined in a file in the "shop" directory! The argument will be the
+        function above which you put the decorator.
+        """
         if "argostime" in __config and "disabled_shops" in __config["argostime"]:
             if host in __config["argostime"]["disabled_shops"]:
                 logging.debug("Shop %s is disabled", host)

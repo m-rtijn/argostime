@@ -47,6 +47,8 @@ def crawl_url(url: str) -> CrawlResult:
     if hostname not in enabled_shops:
         raise WebsiteNotImplementedException(url)
 
+    # Note: This is a function call! The called function is the corresponding crawler
+    # registered using the "@register_crawler" decorator in the "shop" directory.
     result: CrawlResult = enabled_shops[hostname]["crawler"](url)
     result.check()
 
