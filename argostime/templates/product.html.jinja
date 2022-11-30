@@ -31,7 +31,9 @@
 </tr>
 </table>
 
-<div class="graph" id="graph-{{ offer.id }}" style="width: 100%;height:600px;"></div>
+<div class="graphwrapper">
+    <div class="graph" id="graph-{{ offer.id }}" style="width: 100%;height:600px;"></div>
+</div>
 {% endfor %}
 <script src="/static/graphs.js"></script>
 {% endblock %}
