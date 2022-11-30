@@ -48,7 +48,7 @@ def crawl_ikea(url: str) -> CrawlResult: # pylint: disable=R0915
 
     info_wrapper = soup.find(
         "div",
-        class_= re.compile("price-package__wrapper")
+        id= re.compile("buy-module-content")
         )
 
     try:
@@ -84,22 +84,31 @@ def crawl_ikea(url: str) -> CrawlResult: # pylint: disable=R0915
         raise CrawlerException from exception
 
     try:
+        # Todo: Verify if this is needed with discounted product page...
         price_tag_prev = info_wrapper.find(
             "div",
             class_= re.compile("price-package__previous-price-hasStrikeThrough")
             )
 
+        if not price_tag_prev:
+            price_tag_prev = info_wrapper.find(
+                "div",
+                class_=re.compile("price-module__addon")
+            )
+
         integers = float(
-            price_tag_prev.find(
-                "span",
-                class_= re.compile("price__integer")
-                ).text)
+            re.sub(
+                ".-", "",
+                price_tag_prev.find(
+                    "span",
+                    class_=re.compile("price__integer")
+                ).text))
 
         try:
             decimals = float(
                 price_tag_prev.find(
                     "span",
-                    class_= re.compile("price__decimals")
+                    class_= re.compile("price__decimal")
                     ).text)
         except Exception as exception:
             logging.debug("No decimals found, assuming 0 %s", exception)
@@ -111,21 +120,23 @@ def crawl_ikea(url: str) -> CrawlResult: # pylint: disable=R0915
 
     try:
         price_tag_curr = info_wrapper.find(
-            "div",
-            class_= re.compile("price-package__main-price")
+            # "div",
+            class_= re.compile("price-module__current-price")
             )
 
         integers = float(
-            price_tag_curr.find(
-                "span",
-                class_= re.compile("price__integer")
-                ).text)
+            re.sub(
+                ".-", "",
+                price_tag_curr.find(
+                    "span",
+                    class_= re.compile("price__integer")
+                    ).text))
 
         try:
             decimals = float(
                 price_tag_curr.find(
                     "span",
-                    class_= re.compile("price__decimals")
+                    class_= re.compile("price__decimal")
                     ).text)
         except Exception as exception:
             logging.debug("No decimals found, assuming 0 %s", exception)

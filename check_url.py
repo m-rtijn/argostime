@@ -22,8 +22,8 @@
     along with Argostimè. If not, see <https://www.gnu.org/licenses/>.
 """
 
-import logging
 import sys
+import traceback
 
 from argostime.crawler.crawl_url import crawl_url
 
@@ -38,10 +38,11 @@ if len(sys.argv) < 2 or len(sys.argv) > 2 or "help" in sys.argv[1]:
 try:
     result: CrawlResult = crawl_url(sys.argv[1])
 except Exception as exception:
-    print(f"Exception thrown during crawling:\n{exception}\nExiting...", file=sys.stderr)
+    print("Exception thrown during crawling:", file=sys.stderr)
+    traceback.print_exc()
     exit()
 
-# Crawling was succesful, print results...
+# Crawling was successful, print results...
 print("Crawling result:")
 print(f"  -> URL:         {result.url}")
 print(f"  -> Name:        {result.product_name}")
