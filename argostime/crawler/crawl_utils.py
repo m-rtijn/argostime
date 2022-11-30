@@ -50,14 +50,14 @@ class CrawlResult:
 
     def __init__(
         self,
-        url: str=None,
-        product_name: str=None,
-        product_description: str=None,
-        product_code: str=None,
+        url: Optional[str]=None,
+        product_name: Optional[str]=None,
+        product_description: Optional[str]=None,
+        product_code: Optional[str]=None,
         normal_price: float=-1.0,
         discount_price: float=-1.0,
         on_sale: bool=False,
-        ean: int=None,
+        ean: Optional[int]=None,
         ):
         self.url = url
         self.product_name = product_name
