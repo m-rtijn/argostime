@@ -36,7 +36,7 @@ from argostime.crawler.crawl_utils import CrawlResult, register_crawler
 def crawl_intergamma(url: str) -> CrawlResult:
     """Crawler for gamma.nl and karwei.nl"""
 
-    response: requests.Response = requests.get(url)
+    response: requests.Response = requests.get(url, timeout=10)
     if response.status_code != 200:
         logging.error("Got status code %s while getting url %s", response.status_code, url)
         raise PageNotFoundException(url)

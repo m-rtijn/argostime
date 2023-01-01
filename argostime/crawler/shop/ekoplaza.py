@@ -38,7 +38,7 @@ def crawl_ekoplaza(url: str) -> CrawlResult:
 
     info = url.split('product/')[-1]
     response = requests.get(
-        f'https://www.ekoplaza.nl/api/aspos/products/url/{info}')
+        f'https://www.ekoplaza.nl/api/aspos/products/url/{info}', timeout=10)
 
     if response.status_code != 200:
         logging.error("Got status code %d while getting url %s",

@@ -43,7 +43,7 @@ def __fix_bad_json(bad_json: str) -> str:
 def crawl_praxis(url: str) -> CrawlResult:
     """Crawler for praxis.nl"""
 
-    response: requests.Response = requests.get(url)
+    response: requests.Response = requests.get(url, timeout=10)
     if response.status_code != 200:
         logging.error("Got status code %s while getting url %s", response.status_code, url)
         raise PageNotFoundException(url)

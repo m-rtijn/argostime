@@ -41,7 +41,7 @@ from argostime.crawler.crawl_utils import CrawlResult, register_crawler
 def crawl_hema(url: str) -> CrawlResult:
     """Crawler for hema.nl"""
 
-    response: requests.Response = requests.get(url)
+    response: requests.Response = requests.get(url, timeout=10)
 
     if response.status_code != 200:
         logging.error("Got status code %d while getting url %s", response.status_code, url)

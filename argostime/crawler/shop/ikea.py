@@ -40,7 +40,7 @@ def crawl_ikea(url: str) -> CrawlResult:  # pylint: disable=R0915
 
     result: CrawlResult = CrawlResult(url=url)
 
-    response: requests.Response = requests.get(url)
+    response: requests.Response = requests.get(url, timeout=10)
 
     if response.status_code != 200:
         logging.error("Got status code %d while getting url %s", response.status_code, url)

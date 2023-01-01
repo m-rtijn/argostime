@@ -40,7 +40,7 @@ from argostime.crawler.crawl_utils import parse_promotional_message
 def crawl_etos(url: str) -> CrawlResult:
     """Crawler for etos.nl"""
 
-    response = requests.get(url)
+    response = requests.get(url, timeout=10)
 
     if response.status_code != 200:
         logging.error("Got status code %d while getting url %s", response.status_code, url)
