@@ -5,6 +5,7 @@
     Utilities for the crawler submodule
 
     Copyright (c) 2022 Martijn <martijn [at] mrtijn.nl>
+    Copyright (c) 2022 Kevin <kevin [at] 2sk.nl>
 
     This file is part of Argostimè.
 
@@ -22,13 +23,19 @@
     along with Argostimè. If not, see <https://www.gnu.org/licenses/>.
 """
 
+import configparser
 import logging
 import re
-from typing import Optional
+from typing import Callable, Dict, Optional, TypedDict
 
-voor_regex = re.compile("voor")
+from argostime.exceptions import CrawlerException
 
-class CrawlResult():
+__config = configparser.ConfigParser()
+__config.read("argostime.conf")
+__voor_regex = re.compile("voor")
+
+
+class CrawlResult:
     """Data structure for returning the results of a crawler in a uniform way."""
 
     url: Optional[str]
@@ -43,14 +50,14 @@ class CrawlResult():
 
     def __init__(
         self,
-        url: str=None,
-        product_name: str=None,
-        product_description: str=None,
-        product_code: str=None,
+        url: Optional[str]=None,
+        product_name: Optional[str]=None,
+        product_description: Optional[str]=None,
+        product_code: Optional[str]=None,
         normal_price: float=-1.0,
         discount_price: float=-1.0,
         on_sale: bool=False,
-        ean: int=None,
+        ean: Optional[int]=None,
         ):
         self.url = url
         self.product_name = product_name
@@ -68,6 +75,66 @@ class CrawlResult():
             f"discount={self.discount_price},sale={self.on_sale},ean={self.ean}"
 
         return string
+
+    def check(self) -> None:
+        """
+        Check if CrawlResult contains the mandatory data needed to store the
+        product in the database and if the data is consistent.
+        The mandatory data is:
+          - url
+          - product_name
+          - product_code
+        If on_sale is True, discount_price must be non-negative and non-zero.
+        If on_sale is False, normal_price must be non-negative and non-zero.
+        """
+
+        # Check if url, product name and product code fields are set
+        if not self.url or self.url == "":
+            raise CrawlerException("No url given for item!")
+        if not self.product_name or self.product_name == "":
+            raise CrawlerException("No product name given for item!")
+        if not self.product_code or self.product_code == "":
+            raise CrawlerException("No product code given for item!")
+
+        # Check price and on_sale flag consistency
+        if self.discount_price < 0 and self.on_sale:
+            raise CrawlerException("No discount price given for item on sale!")
+        if self.normal_price < 0 and not self.on_sale:
+            raise CrawlerException("No normal price given for item not on sale!")
+
+
+CrawlerFunc = Callable[[str], CrawlResult]
+ShopDict = TypedDict("ShopDict", {"name": str, "hostname": str, "crawler": CrawlerFunc})
+enabled_shops: Dict[str, ShopDict] = {}
+
+
+def register_crawler(name: str, host: str, use_www: bool = True) -> Callable[[CrawlerFunc], None]:
+    """Decorator to register a new crawler function."""
+
+    def decorate(func: Callable[[str], CrawlResult]) -> None:
+        """
+        This function will be called when you put the "@register_crawler" decorator above
+        a function defined in a file in the "shop" directory! The argument will be the
+        function above which you put the decorator.
+        """
+        if "argostime" in __config and "disabled_shops" in __config["argostime"]:
+            if host in __config["argostime"]["disabled_shops"]:
+                logging.debug("Shop %s is disabled", host)
+                return
+
+        shop_info: ShopDict = {
+            "name": name,
+            "hostname": host,
+            "crawler": func,
+        }
+
+        enabled_shops[host] = shop_info
+        if use_www:
+            enabled_shops[f"www.{host}"] = shop_info
+        logging.debug("Shop %s is enabled", host)
+
+    return decorate
+
 
 def parse_promotional_message(message: str, price: float) -> float:
     """Parse a given promotional message, and returns the calculated effective price.
@@ -114,7 +181,7 @@ def parse_promotional_message(message: str, price: float) -> float:
     elif message_no_whitespace == "2+3gratis":
         return 0.4 * price
     elif "voor" in message_no_whitespace:
-        msg_split = voor_regex.split(message_no_whitespace)
+        msg_split = __voor_regex.split(message_no_whitespace)
         try:
             if msg_split[0] == '':
                 return float(msg_split[1])

@@ -37,7 +37,8 @@ from argostime.exceptions import NoEffectivePriceAvailableException
 
 db: SQLAlchemy = SQLAlchemy()
 
-class Webshop(db.Model):
+
+class Webshop(db.Model):  # type: ignore
     """A webshop, which may offer products."""
     __tablename__ = "Webshop"
     id = db.Column(db.Integer, primary_key=True)
@@ -48,7 +49,7 @@ class Webshop(db.Model):
                                 lazy=True, cascade="all, delete", passive_deletes=True)
 
 
-class Product(db.Model):
+class Product(db.Model):  # type: ignore
     """A product, which may be sold by multiple webshops."""
     __tablename__ = "Product"
     id = db.Column(db.Integer, primary_key=True)
@@ -61,7 +62,7 @@ class Product(db.Model):
                                         cascade="all, delete", passive_deletes=True)
 
 
-class Price(db.Model):
+class Price(db.Model):  # type: ignore
     """Pricing information of a specific ProductOffer at some point in time."""
     __tablename__ = "Price"
     id = db.Column(db.Integer, primary_key=True)
@@ -84,7 +85,7 @@ class Price(db.Model):
                 raise NoEffectivePriceAvailableException
 
 
-class ProductOffer(db.Model):
+class ProductOffer(db.Model):  # type: ignore
     """An offer of a Webshop to sell a specific product."""
     __tablename__ = "ProductOffer"
     id = db.Column(db.Integer, primary_key=True)

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-    crawler/etos.py
+    crawler/shop/etos.py
 
     Crawler for etos.nl
 
@@ -32,13 +32,15 @@ from bs4 import BeautifulSoup
 from argostime.exceptions import CrawlerException
 from argostime.exceptions import PageNotFoundException
 
-from argostime.crawler.crawl_utils import CrawlResult
+from argostime.crawler.crawl_utils import CrawlResult, register_crawler
 from argostime.crawler.crawl_utils import parse_promotional_message
 
+
+@register_crawler("Etos", "etos.nl")
 def crawl_etos(url: str) -> CrawlResult:
     """Crawler for etos.nl"""
 
-    response = requests.get(url)
+    response = requests.get(url, timeout=10)
 
     if response.status_code != 200:
         logging.error("Got status code %d while getting url %s", response.status_code, url)
@@ -90,6 +92,7 @@ def crawl_etos(url: str) -> CrawlResult:
         # Try to parse this promotion
         if promotion != -1.0:
             result.discount_price = promotion
+            result.on_sale = True
         else:
             # Couldn't parse the promotion!
             logging.info("Couldn't parse promotion %s, assuming no discount", promotion_message)

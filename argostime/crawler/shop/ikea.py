@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
-    crawler/ikea.py
+    crawler/shop/ikea.py
 
     Crawler for ikea.com
 
-    Copyright (c) 2022 Kevin
+    Copyright (c) 2022 Kevin <kevin [at] 2sk.nl>
 
     This file is part of Argostimè.
 
@@ -31,14 +31,16 @@ from bs4 import BeautifulSoup
 from argostime.exceptions import CrawlerException
 from argostime.exceptions import PageNotFoundException
 
-from argostime.crawler.crawl_utils import CrawlResult
+from argostime.crawler.crawl_utils import CrawlResult, register_crawler
 
-def crawl_ikea(url: str) -> CrawlResult: # pylint: disable=R0915
+
+@register_crawler("IKEA", "ikea.com")
+def crawl_ikea(url: str) -> CrawlResult:  # pylint: disable=R0915
     """Crawler for ikea.com"""
 
     result: CrawlResult = CrawlResult(url=url)
 
-    response: requests.Response = requests.get(url)
+    response: requests.Response = requests.get(url, timeout=10)
 
     if response.status_code != 200:
         logging.error("Got status code %d while getting url %s", response.status_code, url)

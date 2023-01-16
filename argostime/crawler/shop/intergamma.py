@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
-    crawler/intergamma.py
+    crawler/shop/intergamma.py
 
     Crawler for gamma.nl and karwei.nl
 
-    Copyright (c) 2022 Kevin Nobel <kevin [at] 2sk.nl>
+    Copyright (c) 2022 Kevin <kevin [at] 2sk.nl>
 
     This file is part of Argostimè.
 
@@ -30,12 +30,13 @@ from bs4 import BeautifulSoup
 from argostime.exceptions import CrawlerException
 from argostime.exceptions import PageNotFoundException
 
-from argostime.crawler.crawl_utils import CrawlResult
+from argostime.crawler.crawl_utils import CrawlResult, register_crawler
+
 
 def crawl_intergamma(url: str) -> CrawlResult:
     """Crawler for gamma.nl and karwei.nl"""
 
-    response: requests.Response = requests.get(url)
+    response: requests.Response = requests.get(url, timeout=10)
     if response.status_code != 200:
         logging.error("Got status code %s while getting url %s", response.status_code, url)
         raise PageNotFoundException(url)
@@ -109,3 +110,13 @@ def crawl_intergamma(url: str) -> CrawlResult:
         raise CrawlerException from exception
 
     return result
+
+
+@register_crawler("Gamma", "gamma.nl")
+def crawl_gamma(url: str) -> CrawlResult:
+    return crawl_intergamma(url)
+
+
+@register_crawler("Karwei", "karwei.nl")
+def crawl_karwei(url: str) -> CrawlResult:
+    return crawl_intergamma(url)

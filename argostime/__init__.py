@@ -20,8 +20,15 @@
     along with Argostimè. If not, see <https://www.gnu.org/licenses/>.
 """
 
-import configparser
+# Configure the logger before anything else, so it can be used in decorators!
 import logging
+logging.basicConfig(
+    filename="argostime.log",
+    level=logging.DEBUG,
+    format="%(asctime)s - %(levelname)s - %(module)s - %(funcName)s - %(message)s"
+)
+
+import configparser
 from os import getcwd
 
 from flask import Flask
@@ -41,11 +48,6 @@ def get_current_commit() -> str:
 
 def create_app():
     """Return a flask object for argostime, initialize logger and db."""
-    logging.basicConfig(
-        filename="argostime.log",
-        level=logging.DEBUG,
-        format="%(asctime)s - %(levelname)s - %(module)s - %(funcName)s - %(message)s"
-        )
     logging.getLogger("matplotlib.font_manager").disabled = True
 
     config = configparser.ConfigParser()
