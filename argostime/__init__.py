@@ -28,8 +28,7 @@ logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(module)s - %(funcName)s - %(message)s"
 )
 
-from os.path import dirname
-from subprocess import run
+import os.path
 
 import configparser
 
@@ -41,13 +40,13 @@ from argostime.models import *
 
 def get_current_commit() -> str:
     """Return the hexadecimal hash of the current running commit."""
-    path = dirname(__file__)
-    hexsha = run(
-        ["git", "-C", path, "log", "-n", "1", "--pretty=format:%H"],
-        capture_output=True,
-        encoding="UTF-8",
-    ).stdout
-    return hexsha.strip() if hexsha else ""
+    git_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.git"))
+    with open(os.path.join(git_path, "HEAD"), "r") as file_head:
+        hexsha = file_head.read().strip()
+        while hexsha.startswith("ref: "):
+            with open(os.path.join(git_path, hexsha[5:])) as file_ref:
+                hexsha = file_ref.read().strip()
+    return hexsha
 
 def create_app():
     """Return a flask object for argostime, initialize logger and db."""
