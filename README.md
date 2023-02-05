@@ -1,8 +1,6 @@
 # Argostimè
 
-[![Code quality](https://github.com/m-rtijn/argostime/actions/workflows/code_quality.yml/badge.svg?branch=master)](https://github.com/m-rtijn/argostime/actions/workflows/code_quality.yml)
-
-![GitHub](https://img.shields.io/github/license/m-rtijn/argostime)
+[![Code quality](https://github.com/m-rtijn/argostime/actions/workflows/code_quality.yml/badge.svg?branch=master)](https://github.com/m-rtijn/argostime/actions/workflows/code_quality.yml) ![GitHub](https://img.shields.io/github/license/m-rtijn/argostime)
 
 Argostimè is a web-app to keep an eye on prices in webshops. The name is derived from
 Argos, the mythical giant with a hundred eyes, and "timè", Greek for price.
