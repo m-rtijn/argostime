@@ -4,7 +4,7 @@
 
     Standalone script to update prices in the database.
 
-    Copyright (c) 2022 Martijn <martijn [at] mrtijn.nl>
+    Copyright (c) 2022, 2023 Martijn <martijn [at] mrtijn.nl>
 
     This file is part of Argostimè.
 
@@ -26,7 +26,7 @@ import random
 import logging
 import time
 
-from argostime.models import ProductOffer
+from argostime.models import ProductOffer, Webshop
 from argostime import create_app
 
 app = create_app()
@@ -34,17 +34,23 @@ app.app_context().push()
 
 initial_sleep_time: float = random.uniform(0, 600)
 logging.debug("Sleeping for %f seconds", initial_sleep_time)
-time.sleep(initial_sleep_time)
+#time.sleep(initial_sleep_time)
 
-offer: ProductOffer
-for offer in ProductOffer.query.all():
-    logging.info("Crawling %s", str(offer))
+def update_shop_offers(shop_id: int) -> None:
+    """Crawl all the offers of one shop"""
 
-    try:
-        offer.crawl_new_price()
-    except Exception as exception:
-        logging.error("Received %s while updating price of %s, continuing...", exception, offer)
+    for offer in ProductOffer.query.filter_by(shop_id=shop_id).all():
+        logging.info("Crawling %s", str(offer))
 
-    next_sleep_time: float = random.uniform(1, 180)
-    logging.debug("Sleeping for %f seconds", next_sleep_time)
-    time.sleep(next_sleep_time)
+        try:
+            offer.crawl_new_price()
+        except Exception as exception:
+            logging.error("Received %s while updating price of %s, continuing...", exception, offer)
+
+        next_sleep_time: float = random.uniform(1, 180)
+        logging.debug("Sleeping for %f seconds", next_sleep_time)
+        time.sleep(next_sleep_time)
+
+for shop in Webshop.query.all():
+    logging.info(f"Starting crawler for {shop}")
+    update_shop_offers(shop.id)
