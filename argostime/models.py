@@ -83,7 +83,7 @@ class Price(db.Model):  # type: ignore
 
     def __str__(self) -> str:
         return (f"Price(id={self.id}, normal_price={self.normal_price},"
-                f"discount_price={self.discount_price}, on_sale={self.on_sale}",
+                f"discount_price={self.discount_price}, on_sale={self.on_sale}"
                 f"datetime={self.datetime}, product_offer_id={self.product_offer_id})")
 
     def get_effective_price(self) -> float:
