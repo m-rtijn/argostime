@@ -20,32 +20,37 @@
     along with Argostimè. If not, see <https://www.gnu.org/licenses/>.
 """
 
-import configparser
+# Configure the logger before anything else, so it can be used in decorators!
 import logging
-from os import getcwd
+logging.basicConfig(
+    filename="argostime.log",
+    level=logging.DEBUG,
+    format="%(asctime)s - %(levelname)s - %(module)s - %(funcName)s - %(message)s"
+)
+
+from os.path import dirname
+from subprocess import run
+
+import configparser
 
 from flask import Flask
-
-from git import Repo
 
 from argostime.products import *
 from argostime.exceptions import *
 from argostime.models import *
 
 def get_current_commit() -> str:
-    """Return the hexadecimal hash of the current running commit,
-    assuming we're on the HEAD of master.
-    """
-    repo = Repo(getcwd())
-    return repo.heads.master.commit.hexsha
+    """Return the hexadecimal hash of the current running commit."""
+    path = dirname(__file__)
+    hexsha = run(
+        ["git", "-C", path, "log", "-n", "1", "--pretty=format:%H"],
+        capture_output=True,
+        encoding="UTF-8",
+    ).stdout
+    return hexsha.strip() if hexsha else ""
 
 def create_app():
     """Return a flask object for argostime, initialize logger and db."""
-    logging.basicConfig(
-        filename="argostime.log",
-        level=logging.DEBUG,
-        format="%(asctime)s - %(levelname)s - %(module)s - %(funcName)s - %(message)s"
-        )
     logging.getLogger("matplotlib.font_manager").disabled = True
 
     config = configparser.ConfigParser()

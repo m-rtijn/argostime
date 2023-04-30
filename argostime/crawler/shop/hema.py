@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-    crawler/hema.py
+    crawler/shop/hema.py
 
     Crawler for hema.nl
 
@@ -34,12 +34,14 @@ from bs4 import BeautifulSoup
 from argostime.exceptions import CrawlerException
 from argostime.exceptions import PageNotFoundException
 
-from argostime.crawler.crawl_utils import CrawlResult
+from argostime.crawler.crawl_utils import CrawlResult, register_crawler
 
+
+@register_crawler("HEMA", "hema.nl")
 def crawl_hema(url: str) -> CrawlResult:
     """Crawler for hema.nl"""
 
-    response: requests.Response = requests.get(url)
+    response: requests.Response = requests.get(url, timeout=10)
 
     if response.status_code != 200:
         logging.error("Got status code %d while getting url %s", response.status_code, url)
@@ -86,7 +88,7 @@ def crawl_hema(url: str) -> CrawlResult:
         raise CrawlerException from exception
 
     try:
-        result.normal_price = product_dict["ecommerce"]["detail"]["products"][0]["price"]
+        result.normal_price = float(product_dict["ecommerce"]["detail"]["products"][0]["price"])
     except KeyError as exception:
         logging.error("Could not find a valid price in %s via %s", raw_json, url)
         result.normal_price = -1

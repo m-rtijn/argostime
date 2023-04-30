@@ -38,40 +38,42 @@ from argostime.graphs import generate_price_graph_data
 from argostime.models import Webshop, Product, ProductOffer, Price
 from argostime.products import ProductOfferAddResult, add_product_offer_from_url
 
+def add_product_url(url):
+    try:
+        res, offer = add_product_offer_from_url(url)
+    except WebsiteNotImplementedException:
+        hostname: str = urllib.parse.urlparse(url).netloc
+        if len(hostname) == 0:
+            hostname = url
+        return render_template("add_product_result.html.jinja",
+            result=f"Helaas wordt de website {hostname} nog niet ondersteund."), 400
+    except PageNotFoundException:
+        return render_template("add_product_result.html.jinja",
+            result=f"De pagina {url} kon niet worden gevonden."), 404
+    except CrawlerException as exception:
+        logging.info(
+            "Failed to add product from url %s, got CrawlerException %s",
+            url,
+            exception)
+
+        return render_template("add_product_result.html.jinja",
+            result=f"Het is niet gelukt om een product te vinden op de gegeven URL {url}."
+                    " Verwijst de link wel naar een productpagina?")
+
+    if (
+        res == ProductOfferAddResult.ADDED
+        or
+        res == ProductOfferAddResult.ALREADY_EXISTS and offer is not None
+        ):
+        return redirect(f"/product/{offer.product.product_code}")
+
+    return render_template("add_product.html.jinja", result=str(res))
+
 @app.route("/", methods=["GET", "POST"])
 def index():
     """Render home page"""
     if request.method == "POST":
-        url = request.form["url"]
-        try:
-            res, offer = add_product_offer_from_url(url)
-        except WebsiteNotImplementedException:
-            hostname: str = urllib.parse.urlparse(url).netloc
-            if len(hostname) == 0:
-                hostname = url
-            return render_template("add_product_result.html.jinja",
-                result=f"Helaas wordt de website {hostname} nog niet ondersteund."), 400
-        except PageNotFoundException:
-            return render_template("add_product_result.html.jinja",
-                result=f"De pagina {url} kon niet worden gevonden."), 404
-        except CrawlerException as exception:
-            logging.info(
-                "Failed to add product from url %s, got CrawlerException %s",
-                url,
-                exception)
-
-            return render_template("add_product_result.html.jinja",
-                result=f"Het is niet gelukt om een product te vinden op de gegeven URL {url}."
-                        " Verwijst de link wel naar een productpagina?")
-
-        if (
-            res == ProductOfferAddResult.ADDED
-            or
-            res == ProductOfferAddResult.ALREADY_EXISTS and offer is not None
-            ):
-            return redirect(f"/product/{offer.product.product_code}")
-
-        return render_template("add_product.html.jinja", result=str(res))
+        return add_product_url(request.form["url"])
     else:
         products = Product.query.order_by(Product.id.desc()).limit(5).all()
         discounts = Price.query.filter(
@@ -182,6 +184,15 @@ def statistics_page():
         total_offers=total_offers,
         total_prices_count=total_prices_count
     )
+
+@app.route("/add_url", methods=['GET'])
+def add_url():
+    """GET request to allow users to add a URL using a booklet"""
+    try:
+        url = request.args.to_dict()['url']
+    except KeyError:
+        abort(404)
+    return add_product_url(url)
 
 @app.errorhandler(404)
 def not_found(error):

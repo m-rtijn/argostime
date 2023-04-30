@@ -4,7 +4,7 @@
 
 <p>Vul de URL in om een product toe te voegen aan de website:</p>
 <form action="" method="post">
-    <input type="text" name="url" size="50"></input>
+    <input type="text" name="url" size="25"></input>
     <input type="submit" name="submit" value="Toevoegen"></input>
 </form>
 
@@ -31,4 +31,9 @@
     {{ product.name|e }}{% if product.description %} <span class="description">{{ product.description }}</span>{% endif %}</a></li>
 {% endfor %}
 </ul>
+
+<h2>Bookmarklet</h2>
+<p>Voeg pagina's eenvoudig toe met een <a href="https://en.wikipedia.org/wiki/Bookmarklet">bookmarklet</a>! Maak een bladwijzer in uw browser met de onderstaande regel code als URL:</p>
+<code>javascript:void(location.href='http://argostime.mrtijn.nl/add_url?url='+location.href)</code>
+<p>Op een productpagina van een van de ondersteunde winkels kunt u de bookmark gebruiken om met een klik het product toe te voegen en bekijken op Argostimè!</p>
 {% endblock %}

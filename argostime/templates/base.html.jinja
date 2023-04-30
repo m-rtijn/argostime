@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="nl">
 <head>
     {% block head %}
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/static/stylesheet.css">
     <title>{% block title %}Argostimè{% endblock %}</title>
     {% block script %}{% endblock %}
@@ -22,11 +23,11 @@
     <div id="footer">
     {% block footer %}
     <small>
-        Copyright (c) 2022 Martijn en anderen. De <a href="https://github.com/m-rtijn/argostime">bronbestanden</a> van deze website zijn beschikbaar onder de voorwaarden van de <a href="https://www.gnu.org/licenses/agpl-3.0.en.html">AGPLv3</a>.
+        Copyright (c) 2022, 2023 Martijn, Kevin en anderen. De <a href="https://github.com/m-rtijn/argostime">bronbestanden</a> van deze website zijn beschikbaar onder de voorwaarden van de <a href="https://www.gnu.org/licenses/agpl-3.0.en.html">AGPLv3</a>.
     </small>
     <br>
     <small>
-        <pre>versie {{ config["GIT_CURRENT_COMMIT"] }}</pre>
+        <pre>versie <a href="https://github.com/m-rtijn/argostime/tree/{{ config["GIT_CURRENT_COMMIT"] }}">{{ config["GIT_CURRENT_COMMIT"] }}</a></pre>
     </small>
     {% endblock %}
     </div>

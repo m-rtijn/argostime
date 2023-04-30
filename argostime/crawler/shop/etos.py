@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-    crawler/jumbo.py
+    crawler/shop/etos.py
 
-    Crawler for jumbo.com
+    Crawler for etos.nl
 
     Copyright (c) 2022 Martijn <martijn [at] mrtijn.nl>
 
@@ -24,6 +24,7 @@
 
 import json
 import logging
+from typing import Dict
 
 import requests
 from bs4 import BeautifulSoup
@@ -31,15 +32,15 @@ from bs4 import BeautifulSoup
 from argostime.exceptions import CrawlerException
 from argostime.exceptions import PageNotFoundException
 
-from argostime.crawler.crawl_utils import CrawlResult
+from argostime.crawler.crawl_utils import CrawlResult, register_crawler
+from argostime.crawler.crawl_utils import parse_promotional_message
 
-def crawl_jumbo(url: str) -> CrawlResult:
-    """Crawler for jumbo.com
 
-    May raise CrawlerException or PageNotFoundException.
-    """
+@register_crawler("Etos", "etos.nl")
+def crawl_etos(url: str) -> CrawlResult:
+    """Crawler for etos.nl"""
+
     headers = {
-        "Referer": "https://www.jumbo.com",
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
         "Accept-Encoding": "gzip, deflate, br",
         "Accept-Language": "nl,en-US;q=0.7,en;q=0.3",
@@ -62,55 +63,62 @@ def crawl_jumbo(url: str) -> CrawlResult:
         raise PageNotFoundException(url)
 
     soup = BeautifulSoup(response.text, "html.parser")
-    product_json = soup.find("script", attrs={"type": "application/ld+json", "data-n-head": "ssr"})
-    raw_json = product_json.string
 
     result: CrawlResult = CrawlResult(url=url)
 
     try:
-        product = json.loads(raw_json)
+        raw_product_json = soup.find(
+            "div",
+            attrs= {
+                "class": "js-product-detail",
+            }
+        ).get("data-gtm-event")
+    except AttributeError as exception:
+        logging.error("Could not find a product detail json")
+        raise CrawlerException from exception
+
+    try:
+        product_dict = json.loads(raw_product_json)
     except json.decoder.JSONDecodeError as exception:
-        logging.error("Could not decode JSON %s, raising CrawlerException", raw_json)
+        logging.error("Could not decode JSON %s, raising CrawlerException", raw_product_json)
         raise CrawlerException from exception
 
-    if product["offers"]["@type"] == "AggregateOffer":
-        offer = product["offers"]
-    else:
-        logging.error("No price info available in %s, raising CrawlerException", raw_json)
-        raise CrawlerException()
+    logging.debug(product_dict)
+
+    offer: Dict[str, str] = product_dict["ecommerce"]["detail"]["products"][0]
 
     try:
-        result.url = str(product["url"])
-    except KeyError:
-        logging.info("No url found in product data, using the given url")
-        result.url = url
-
-    try:
-        result.product_name = str(product["name"])
+        result.product_name = offer["name"]
     except KeyError as exception:
-        logging.error("No product name found in %s", raw_json)
+        logging.error("No key name found in json %s parsed as %s", raw_product_json, product_dict)
         raise CrawlerException from exception
 
     try:
-        result.ean = int(product["gtin13"])
-    except KeyError:
-        logging.info("No EAN found")
-
-    try:
-        result.product_code = str(product["sku"])
+        result.product_code = offer["id"]
     except KeyError as exception:
-        logging.error("No product code found in %s", raw_json)
+        logging.error("No key sku found in json %s", raw_product_json)
         raise CrawlerException from exception
 
     try:
-        result.discount_price = float(offer["lowPrice"])
-    except KeyError:
-        logging.info("No discount / low price found in %s", raw_json)
+        promotion_message: str = offer["dimension20"]
+        price: float = float(offer["price"])
+        promotion: float = parse_promotional_message(promotion_message, price)
+        logging.debug("Found promotional message %s", promotion_message)
 
-    try:
-        result.normal_price = float(offer["highPrice"])
+        # Try to parse this promotion
+        if promotion != -1.0:
+            result.discount_price = promotion
+            result.on_sale = True
+        else:
+            # Couldn't parse the promotion!
+            logging.info("Couldn't parse promotion %s, assuming no discount", promotion_message)
+            result.normal_price = price
     except KeyError as exception:
-        logging.error("No normal price found in %s", raw_json)
-        raise CrawlerException from exception
+        logging.debug("No promotion found, assuming no discount")
+        try:
+            result.normal_price = price
+        except KeyError as inner_exception:
+            logging.error("No price found in json %s", raw_product_json)
+            raise CrawlerException from inner_exception
 
     return result

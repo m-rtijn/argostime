@@ -3,13 +3,19 @@ body {
     font: 1.2em/1.62 sans-serif;
     margin: auto;
     padding: 20px;
-    max-width: 50em;
+    max-width: 1000px;
     text-align: left;
     background-color: #fff;
     word-wrap: break-word;
     overflow-wrap: break-word;
     line-height: 1.5;
     color: #000000;
+}
+
+@media all and (max-width: 1000px) {
+    body {
+        font-size: 0.8em;
+    }
 }
 
 h1,
@@ -38,17 +44,22 @@ nav a {
 }
 
 input {
-    font-size: 16px;
+    font-size: 1.0em;
 }
 
 content {
     line-height: 1.6;
 }
 
-table, td, tr, th {
+table {
     width: 100%;
-    border: 1px solid black;
+    display: block;
+    overflow-x: auto;
     border-collapse: collapse;
+}
+
+td, tr, th {
+    border: 1px solid black;
 }
 
 tr:nth-child(even) {
@@ -73,7 +84,7 @@ blockquote {
 #footer {
     padding: 25px;
     text-align: center;
-    font: 1em serif;
+    font-family: serif;
     font-style: italic;
 }
 
@@ -81,8 +92,28 @@ blockquote {
     font-style: italic;
 }
 
-.graph {
+.graphwrapper {
+    width: 960px;
+    height: 600px;
     margin: 25px 0;
+    overflow: hidden;
+}
+
+.graph {
+    width: 960px !important;
+    height: 600px !important;
+}
+
+@media all and (max-width: 1000px) {
+    .graphwrapper {
+        width: calc(100vw - 40px);
+        height: calc((100vw - 40px) * 0.625);
+    }
+
+    .graph {
+        transform-origin: top left;
+        transform: scale(calc((var(--vw) - 40) / 960));
+    }
 }
 
 .helptext {

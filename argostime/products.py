@@ -30,7 +30,7 @@ import urllib.parse
 
 from argostime.exceptions import WebsiteNotImplementedException
 from argostime.models import Webshop, Price, Product, ProductOffer, db
-from argostime.crawler import crawl_url, CrawlResult, shops_info, enabled_shops
+from argostime.crawler import crawl_url, CrawlResult, enabled_shops
 
 class ProductOfferAddResult(Enum):
     """Enum to indicate the result of add_product_offer"""
@@ -47,7 +47,7 @@ def add_product_offer_from_url(url: str) -> Tuple[ProductOfferAddResult, Product
     hostname: str = urllib.parse.urlparse(url).netloc
 
     try:
-        shop_info = shops_info[enabled_shops[hostname]]
+        shop_info = enabled_shops[hostname]
     except KeyError as exception:
         raise WebsiteNotImplementedException(url) from exception
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-    crawler/simonlevelt.py
+    crawler/shop/simonlevelt.py
 
     Crawler for simonlevelt.nl
 
@@ -31,12 +31,14 @@ from bs4 import BeautifulSoup
 from argostime.exceptions import CrawlerException
 from argostime.exceptions import PageNotFoundException
 
-from argostime.crawler.crawl_utils import CrawlResult
+from argostime.crawler.crawl_utils import CrawlResult, register_crawler
 
+
+@register_crawler("Simon Lévelt", "simonlevelt.nl")
 def crawl_simonlevelt(url: str) -> CrawlResult:
     """Crawler for simonlevelt.nl"""
 
-    response: requests.Response = requests.get(url)
+    response: requests.Response = requests.get(url, timeout=10)
 
     if response.status_code != 200:
         logging.debug("Got status code %d while getting url %s", response.status_code, url)

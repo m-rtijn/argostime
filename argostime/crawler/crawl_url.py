@@ -6,6 +6,7 @@
     information from a given URL.
 
     Copyright (c) 2022 Martijn <martijn [at] mrtijn.nl>
+    Copyright (c) 2022 Kevin <kevin [at] 2sk.nl>
 
     This file is part of Argostimè.
 
@@ -28,27 +29,15 @@ import urllib.parse
 
 from argostime.exceptions import WebsiteNotImplementedException
 
-from argostime.crawler.crawl_utils import CrawlResult
-from argostime.crawler.shop_info import shops_info, enabled_shops
+from argostime.crawler.crawl_utils import CrawlResult, enabled_shops
 
-from argostime.crawler.ah import crawl_ah
-from argostime.crawler.brandzaak import crawl_brandzaak
-from argostime.crawler.etos import crawl_etos
-from argostime.crawler.hema import crawl_hema
-from argostime.crawler.jumbo import crawl_jumbo
-from argostime.crawler.pipashop import crawl_pipashop
-from argostime.crawler.simonlevelt import crawl_simonlevelt
-from argostime.crawler.steam import crawl_steam
-from argostime.crawler.ikea import crawl_ikea
-from argostime.crawler.praxis import crawl_praxis
-from argostime.crawler.intergamma import crawl_intergamma
-from argostime.crawler.ekoplaza import crawl_ekoplaza
 
 def crawl_url(url: str) -> CrawlResult:
     """Crawl a product at the given URL
 
     Returns a CrawlResult object.
     May raise any of the following exceptions:
+        CrawlerException
         PageNotFoundException
         WebsiteNotImplementedException
     """
@@ -58,41 +47,10 @@ def crawl_url(url: str) -> CrawlResult:
     if hostname not in enabled_shops:
         raise WebsiteNotImplementedException(url)
 
-    result: CrawlResult
-    if shops_info["ah"]["hostname"] in hostname:
-        result = crawl_ah(url)
-    elif shops_info["jumbo"]["hostname"] in hostname:
-        result = crawl_jumbo(url)
-    elif shops_info["brandzaak"]["hostname"] in hostname:
-        result = crawl_brandzaak(url)
-    elif shops_info["etos"]["hostname"] in hostname:
-        result = crawl_etos(url)
-    elif shops_info["simonlevelt"]["hostname"] in hostname:
-        result = crawl_simonlevelt(url)
-    elif shops_info["hema"]["hostname"] in hostname:
-        result = crawl_hema(url)
-    elif shops_info["steam"]["hostname"] in hostname:
-        result = crawl_steam(url)
-    elif shops_info["pipashop"]["hostname"] in hostname:
-        result = crawl_pipashop(url)
-    elif shops_info["ikea"]["hostname"] in hostname:
-        result = crawl_ikea(url)
-    elif shops_info["praxis"]["hostname"] in hostname:
-        result = crawl_praxis(url)
-    elif shops_info["gamma"]["hostname"] in hostname:
-        result = crawl_intergamma(url)
-    elif shops_info["karwei"]["hostname"] in hostname:
-        result = crawl_intergamma(url)
-    elif shops_info["ekoplaza"]["hostname"] in hostname:
-        result = crawl_ekoplaza(url)
-    else:
-        raise WebsiteNotImplementedException(url)
-
-    if result.discount_price > 0:
-        result.on_sale = True
-    else:
-        result.on_sale = False
+    # Note: This is a function call! The called function is the corresponding crawler
+    # registered using the "@register_crawler" decorator in the "shop" directory.
+    result: CrawlResult = enabled_shops[hostname]["crawler"](url)
+    result.check()
 
     logging.debug("Crawl resulted in %s", result)
-
     return result

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-    crawler/steam.py
+    crawler/shop/steam.py
 
     Crawler for store.steampowered.com
 
@@ -30,14 +30,16 @@ from bs4 import BeautifulSoup
 from argostime.exceptions import CrawlerException
 from argostime.exceptions import PageNotFoundException
 
-from argostime.crawler.crawl_utils import CrawlResult
+from argostime.crawler.crawl_utils import CrawlResult, register_crawler
 
+
+@register_crawler("Steam", "store.steampowered.com", False)
 def crawl_steam(url: str) -> CrawlResult:
     """Crawler for store.steampowered.com"""
 
     result: CrawlResult = CrawlResult(url=url)
 
-    response: requests.Response = requests.get(url)
+    response: requests.Response = requests.get(url, timeout=10)
 
     if response.status_code != 200:
         logging.error("Got status code %d while getting url %s", response.status_code, url)
@@ -93,6 +95,7 @@ def crawl_steam(url: str) -> CrawlResult:
                 "discount_block",
                 "game_purchase_discount"
                 ).get("data-price-final")) / 100.0
+        result.on_sale = True
         # There is info in the page about the normal price when there is a discount,
         # it's just more of a hassle to find that information
     except Exception as exception:
