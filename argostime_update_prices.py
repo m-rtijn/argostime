@@ -33,10 +33,6 @@ from argostime import create_app
 app = create_app()
 app.app_context().push()
 
-initial_sleep_time: float = random.uniform(0, 600)
-logging.debug("Sleeping for %f seconds", initial_sleep_time)
-#time.sleep(initial_sleep_time)
-
 def update_shop_offers(shop_id: int) -> None:
     """Crawl all the offers of one shop"""
 
@@ -53,12 +49,12 @@ def update_shop_offers(shop_id: int) -> None:
         logging.debug("Sleeping for %f seconds", next_sleep_time)
         time.sleep(next_sleep_time)
 
-for shop in Webshop.query.all():
-    #update_shop_offers(shop.id)
-    shop_process: Process = Process(
-        target=update_shop_offers,
-        args=[shop.id],
-        name=f"ShopProcess({shop.id})")
+if __name__ == "__main__":
+    for shop in Webshop.query.all():
+        shop_process: Process = Process(
+            target=update_shop_offers,
+            args=[shop.id],
+            name=f"ShopProcess({shop.id})")
 
-    logging.info("Starting process %s", shop_process)
-    shop_process.start()
+        logging.info("Starting process %s", shop_process)
+        shop_process.start()
