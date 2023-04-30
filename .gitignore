@@ -142,6 +142,7 @@ argostime/test.db
 *.db
 *.sql
 argostime.conf
+*.zst
 
 *.vscode/
 *.idea/
