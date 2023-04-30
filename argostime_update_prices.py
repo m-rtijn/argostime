@@ -4,7 +4,7 @@
 
     Standalone script to update prices in the database.
 
-    Copyright (c) 2022 Martijn <martijn [at] mrtijn.nl>
+    Copyright (c) 2022, 2023 Martijn <martijn [at] mrtijn.nl>
 
     This file is part of Argostimè.
 
@@ -24,27 +24,37 @@
 
 import random
 import logging
+from multiprocessing import Process
 import time
 
-from argostime.models import ProductOffer
+from argostime.models import ProductOffer, Webshop
 from argostime import create_app
 
 app = create_app()
 app.app_context().push()
 
-initial_sleep_time: float = random.uniform(0, 600)
-logging.debug("Sleeping for %f seconds", initial_sleep_time)
-time.sleep(initial_sleep_time)
+def update_shop_offers(shop_id: int) -> None:
+    """Crawl all the offers of one shop"""
 
-offer: ProductOffer
-for offer in ProductOffer.query.all():
-    logging.info("Crawling %s", str(offer))
+    offer: ProductOffer
+    for offer in ProductOffer.query.filter_by(shop_id=shop_id).all():
+        logging.info("Crawling %s", str(offer))
 
-    try:
-        offer.crawl_new_price()
-    except Exception as exception:
-        logging.error("Received %s while updating price of %s, continuing...", exception, offer)
+        try:
+            offer.crawl_new_price()
+        except Exception as exception:
+            logging.error("Received %s while updating price of %s, continuing...", exception, offer)
 
-    next_sleep_time: float = random.uniform(1, 180)
-    logging.debug("Sleeping for %f seconds", next_sleep_time)
-    time.sleep(next_sleep_time)
+        next_sleep_time: float = random.uniform(1, 180)
+        logging.debug("Sleeping for %f seconds", next_sleep_time)
+        time.sleep(next_sleep_time)
+
+if __name__ == "__main__":
+    for shop in Webshop.query.all():
+        shop_process: Process = Process(
+            target=update_shop_offers,
+            args=[shop.id],
+            name=f"ShopProcess({shop.id})")
+
+        logging.info("Starting process %s", shop_process)
+        shop_process.start()

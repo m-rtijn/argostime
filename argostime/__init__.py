@@ -25,7 +25,7 @@ import logging
 logging.basicConfig(
     filename="argostime.log",
     level=logging.DEBUG,
-    format="%(asctime)s - %(levelname)s - %(module)s - %(funcName)s - %(message)s"
+    format="%(asctime)s - %(processName)s - %(levelname)s - %(module)s - %(funcName)s - %(message)s"
 )
 
 import os.path

@@ -48,6 +48,9 @@ class Webshop(db.Model):  # type: ignore
                                 backref="webshop",
                                 lazy=True, cascade="all, delete", passive_deletes=True)
 
+    def __str__(self) -> str:
+        return f"Webshop(id={self.id}, name={self.name}, hostname={self.hostname})"
+
 
 class Product(db.Model):  # type: ignore
     """A product, which may be sold by multiple webshops."""
@@ -61,6 +64,10 @@ class Product(db.Model):  # type: ignore
                                         backref="product", lazy=True,
                                         cascade="all, delete", passive_deletes=True)
 
+    def __str__(self) -> str:
+        return (f"Product(id={self.id}, name={self.name}, description={self.description},"
+                f"ean={self.ean}, product_code={self.product_code}, product_offers={self.product_offers})")
+
 
 class Price(db.Model):  # type: ignore
     """Pricing information of a specific ProductOffer at some point in time."""
@@ -73,6 +80,11 @@ class Price(db.Model):  # type: ignore
     product_offer_id = db.Column(db.Integer,
                                     db.ForeignKey("ProductOffer.id", ondelete="CASCADE"),
                                     nullable=False)
+
+    def __str__(self) -> str:
+        return (f"Price(id={self.id}, normal_price={self.normal_price},"
+                f"discount_price={self.discount_price}, on_sale={self.on_sale}"
+                f"datetime={self.datetime}, product_offer_id={self.product_offer_id})")
 
     def get_effective_price(self) -> float:
         """Return the discounted price if on sale, else the normal price."""
@@ -99,8 +111,8 @@ class ProductOffer(db.Model):  # type: ignore
                                 cascade="all, delete", passive_deletes=True)
 
     def __str__(self):
-        return f"ProductOffer(id={self.id}, product_id={self.product_id},"\
-            f"shop_id={self.shop_id}, url={self.url}, time_added={self.time_added})"
+        return (f"ProductOffer(id={self.id}, product_id={self.product_id},"
+                f"shop_id={self.shop_id}, url={self.url}, time_added={self.time_added})")
 
     def get_current_price(self) -> Price:
         """Get the latest Price object related to this offer."""
