@@ -40,7 +40,23 @@ from argostime.crawler.crawl_utils import parse_promotional_message
 def crawl_etos(url: str) -> CrawlResult:
     """Crawler for etos.nl"""
 
-    response = requests.get(url, timeout=10)
+    headers = {
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+        "Accept-Encoding": "gzip, deflate, br",
+        "Accept-Language": "nl,en-US;q=0.7,en;q=0.3",
+        "Cache-Control": "no-cache",
+        "Connection": "keep-alive",
+        "DNT": "1",
+        "Pragma": "no-cache",
+        "Sec-Fetch-Dest": "document",
+        "Sec-Fetch-Mode": "navigate",
+        "Sec-Fetch-Site": "none",
+        "Sec-Fetch-User": "?1",
+        "Upgrade-Insecure-Requests": "1",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:96.0) Gecko/20100101 Firefox/96.0"
+    }
+
+    response = requests.get(url, timeout=10, headers=headers)
 
     if response.status_code != 200:
         logging.error("Got status code %d while getting url %s", response.status_code, url)
