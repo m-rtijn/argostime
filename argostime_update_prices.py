@@ -24,6 +24,7 @@
 
 import random
 import logging
+from multiprocessing import Process
 import time
 
 from argostime.models import ProductOffer, Webshop
@@ -39,6 +40,7 @@ logging.debug("Sleeping for %f seconds", initial_sleep_time)
 def update_shop_offers(shop_id: int) -> None:
     """Crawl all the offers of one shop"""
 
+    offer: ProductOffer
     for offer in ProductOffer.query.filter_by(shop_id=shop_id).all():
         logging.info("Crawling %s", str(offer))
 
@@ -52,5 +54,11 @@ def update_shop_offers(shop_id: int) -> None:
         time.sleep(next_sleep_time)
 
 for shop in Webshop.query.all():
-    logging.info(f"Starting crawler for {shop}")
-    update_shop_offers(shop.id)
+    #update_shop_offers(shop.id)
+    shop_process: Process = Process(
+        target=update_shop_offers,
+        args=[shop.id],
+        name=f"ShopProcess({shop.id})")
+
+    logging.info("Starting process %s", shop_process)
+    shop_process.start()
