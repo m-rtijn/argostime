@@ -104,6 +104,8 @@ class ProductOffer(db.Model):  # type: ignore
                             db.ForeignKey("Webshop.id", ondelete="CASCADE"), nullable=False)
     url = db.Column(db.Unicode(1024), unique=True, nullable=False)
     time_added = db.Column(db.DateTime)
+    average_price = db.Column(db.Float)
+
     prices = db.relationship("Price", backref="product_offer", lazy=True,
                                 cascade="all, delete", passive_deletes=True)
 
@@ -115,8 +117,8 @@ class ProductOffer(db.Model):  # type: ignore
         """Get the latest Price object related to this offer."""
         return Price.query.filter_by(product_offer_id=self.id).order_by(Price.datetime.desc()).first()
 
-    def get_average_price(self) -> float:
-        """Calculate the average price of this offer."""
+    def update_average_price(self) -> float:
+        """Calculate the average price of this offer and update ProductOffer.average_price."""
         effective_price_values: List[float] = []
         for price in Price.query.filter_by(product_offer_id=self.id).all():
             try:
@@ -125,10 +127,17 @@ class ProductOffer(db.Model):  # type: ignore
                 # Ignore price entries without a valid price in calculating the price.
                 pass
         try:
-            return statistics.mean(effective_price_values)
+            avg: float = statistics.mean(effective_price_values)
+            self.average_price = avg
+            db.session.commit()
+            return avg
         except statistics.StatisticsError:
             logging.debug("Called get_average_price for %s but no prices were found...", str(self))
             return -1
+
+    def get_average_price(self) -> float:
+        """Stub for new .average_price attribute"""
+        return self.average_price
 
     def get_lowest_price_since(self, since_time: datetime) -> float:
         """Return the lowest effective price of this offer since a specific time."""
@@ -231,3 +240,5 @@ class ProductOffer(db.Model):  # type: ignore
         )
         db.session.add(price)
         db.session.commit()
+
+        self.update_average_price()
