@@ -28,7 +28,7 @@ from multiprocessing import Process
 import time
 
 from argostime.models import ProductOffer, Webshop
-from argostime import create_app
+from argostime import create_app, db
 
 app = create_app()
 app.app_context().push()
@@ -36,8 +36,10 @@ app.app_context().push()
 def update_shop_offers(shop_id: int) -> None:
     """Crawl all the offers of one shop"""
 
+    offers_query = db.session.scalars(db.select(ProductOffer).where(ProductOffer.shop_id == shop_id))
+
     offer: ProductOffer
-    for offer in ProductOffer.query.filter_by(shop_id=shop_id).all():
+    for offer in offers_query.all():
         logging.info("Crawling %s", str(offer))
 
         try:
@@ -50,7 +52,10 @@ def update_shop_offers(shop_id: int) -> None:
         time.sleep(next_sleep_time)
 
 if __name__ == "__main__":
-    for shop in Webshop.query.all():
+
+    shop_query = db.session.scalars(db.select(Webshop).order_by(Webshop.id)).all()
+
+    for shop in shop_query.all():
         shop_process: Process = Process(
             target=update_shop_offers,
             args=[shop.id],

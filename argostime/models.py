@@ -28,15 +28,12 @@ import statistics
 from sys import maxsize
 from typing import List
 
-from flask_sqlalchemy import SQLAlchemy
-
 from argostime.crawler import crawl_url, CrawlResult
 from argostime.exceptions import CrawlerException, WebsiteNotImplementedException
 from argostime.exceptions import PageNotFoundException
 from argostime.exceptions import NoEffectivePriceAvailableException
 
-db: SQLAlchemy = SQLAlchemy()
-
+from argostime import db
 
 class Webshop(db.Model):  # type: ignore
     """A webshop, which may offer products."""
