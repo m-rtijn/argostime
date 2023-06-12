@@ -36,10 +36,13 @@ app.app_context().push()
 def update_shop_offers(shop_id: int) -> None:
     """Crawl all the offers of one shop"""
 
-    offers_query = db.session.scalars(db.select(ProductOffer).where(ProductOffer.shop_id == shop_id))
+    offers: list[ProductOffer] = db.session.scalars(
+        db.select(ProductOffer)
+            .where(ProductOffer.shop_id == shop_id)
+    ).all()
 
     offer: ProductOffer
-    for offer in offers_query.all():
+    for offer in offers:
         logging.info("Crawling %s", str(offer))
 
         try:
@@ -53,9 +56,12 @@ def update_shop_offers(shop_id: int) -> None:
 
 if __name__ == "__main__":
 
-    shop_query = db.session.scalars(db.select(Webshop).order_by(Webshop.id)).all()
+    shops: list[Webshop] = db.session.scalars(
+        db.select(Webshop)
+            .order_by(Webshop.id)
+    ).all()
 
-    for shop in shop_query.all():
+    for shop in shops:
         shop_process: Process = Process(
             target=update_shop_offers,
             args=[shop.id],

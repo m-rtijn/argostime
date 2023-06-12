@@ -1,4 +1,26 @@
 #!/usr/bin/env python
+"""
+    argostime_update_prices.py
+
+    Standalone script to add new columns added in the sqlalchemy-v2 branch.
+
+    Copyright (c) 2023 Martijn <martijn [at] mrtijn.nl>
+
+    This file is part of Argostimè.
+
+    Argostimè is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Argostimè is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with Argostimè. If not, see <https://www.gnu.org/licenses/>.
+"""
 
 import logging
 

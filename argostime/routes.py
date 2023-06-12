@@ -80,6 +80,7 @@ def index():
                 db.select(Product).order_by(Product.id.desc()).limit(5)
             ).all()
 
+        # TODO: Maybe join on productoffer & product?
         discounts = db.session.scalars(
                 db.select(Price).where(
                     Price.datetime >= datetime.now().date(),

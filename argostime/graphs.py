@@ -27,6 +27,7 @@ from typing import List, Tuple
 from datetime import datetime, timedelta
 import json
 
+from argostime import db
 from argostime.exceptions import NoEffectivePriceAvailableException
 from argostime.models import ProductOffer, Price
 
@@ -36,8 +37,11 @@ def generate_price_graph_data(offer: ProductOffer) -> str:
         time of a specific ProductOffer
     """
 
-    prices: List[Price] = Price.query.filter_by(
-        product_offer_id=offer.id).order_by(Price.datetime).all()
+    prices: List[Price] = db.session.scalars(
+        db.select(Price)
+            .where(Price.product_offer_id == offer.id)
+            .order_by(Price.datetime)
+    ).all()
 
     dates: List[datetime] = []
     effective_prices: List[float] = []
