@@ -40,6 +40,16 @@ try:
 except OperationalError:
     logging.info("Column already seems to exist, fine")
 
+try:
+    db.session.execute(text('ALTER TABLE ProductOffer ADD COLUMN minimum_price float'))
+except OperationalError:
+    logging.info("Column already seems to exist, fine")
+
+try:
+    db.session.execute(text('ALTER TABLE ProductOffer ADD COLUMN maximum_price float'))
+except OperationalError:
+    logging.info("Column already seems to exist, fine")
+
 logging.info("Calculate average prices")
 
 offers = db.session.scalars(
@@ -48,6 +58,7 @@ offers = db.session.scalars(
         .order_by(Product.name)
 ).all()
 
+offer: ProductOffer
 for offer in offers:
-    logging.info("Calculating initial average price for %s", offer)
-    offer.update_average_price()
+    logging.info("Calculating initial memoization values for %s", offer)
+    offer.update_memoized_values()

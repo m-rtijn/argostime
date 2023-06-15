@@ -105,6 +105,8 @@ class ProductOffer(db.Model):  # type: ignore
     url = db.Column(db.Unicode(1024), unique=True, nullable=False)
     time_added = db.Column(db.DateTime)
     average_price = db.Column(db.Float)
+    minimum_price = db.Column(db.Float)
+    maximum_price = db.Column(db.Float)
 
     prices = db.relationship("Price", backref="product_offer", lazy=True,
                                 cascade="all, delete", passive_deletes=True)
@@ -120,6 +122,7 @@ class ProductOffer(db.Model):  # type: ignore
             db.select(Price)
                 .where(Price.product_offer_id == self.id)
                 .order_by(Price.datetime.desc())
+                .limit(1)
         )
 
         return price
@@ -150,19 +153,23 @@ class ProductOffer(db.Model):  # type: ignore
             return -1
 
     def get_average_price(self) -> float:
-        """Stub for new .average_price attribute"""
+        """Stub for new .average_price attribute
+
+        DEPRECATED: Use ProductOffer.average_price instead.
+        """
         return self.average_price
 
     def get_prices_since(self, since_time: datetime) -> list[Price]:
+        """Get all prices since given date"""
         prices_since = db.session.scalars(
             db.select(Price)
                 .where(Price.product_offer_id == self.id)
                 .where(Price.datetime >= since_time)
         ).all()
 
-        prices_since_list: list[Price]
-        for p in prices_since:
-            prices_since_list.append(p)
+        prices_since_list: list[Price] = []
+        for price in prices_since:
+            prices_since_list.append(price)
 
         return prices_since_list
 
@@ -184,9 +191,19 @@ class ProductOffer(db.Model):  # type: ignore
 
         return min_price
 
+    def update_minimum_price(self) -> None:
+        """Update the minimum price ever in the minimum column"""
+
+        min_price: float = self.get_lowest_price_since(self.time_added)
+        self.minimum_price = min_price
+        db.session.commit()
+
     def get_lowest_price(self) -> float:
-        """Return the lowest effective price of this offer."""
-        return self.get_lowest_price_since(self.time_added)
+        """Return the lowest effective price of this offer.
+
+        DEPRECATED: Use ProductOffer.minimum_price instead
+        """
+        return self.minimum_price
 
     def get_highest_price_since(self, since_time: datetime) -> float:
         """Return the highest effective price of this offer since a specific time."""
@@ -205,9 +222,19 @@ class ProductOffer(db.Model):  # type: ignore
 
         return max_price
 
+    def update_maximum_price(self) -> None:
+        """Update the maximum price ever in the maximum_price column"""
+
+        max_price: float = self.get_highest_price_since(self.time_added)
+        self.maximum_price = max_price
+        db.session.commit()
+
     def get_highest_price(self) -> float:
-        """Return the highest effective price of this offer."""
-        return self.get_highest_price_since(self.time_added)
+        """Return the highest effective price of this offer.
+
+        DEPRECATED: Use ProductOffer.maximum_price instead.
+        """
+        return self.maximum_price
 
     def get_price_standard_deviation_since(self, since_time: datetime) -> float:
         """Return the standard deviation of the effective price of this offer since a given date."""
@@ -230,6 +257,13 @@ class ProductOffer(db.Model):  # type: ignore
     def get_price_standard_deviation(self) -> float:
         """Return the standard deviation of the effective price of this offer."""
         return self.get_price_standard_deviation_since(self.time_added)
+
+    def update_memoized_values(self) -> None:
+        """Update all memoized columns"""
+
+        self.update_average_price()
+        self.update_minimum_price()
+        self.update_maximum_price()
 
     def crawl_new_price(self) -> None:
         """Crawl the current price if we haven't already checked today."""
@@ -271,4 +305,4 @@ class ProductOffer(db.Model):  # type: ignore
         db.session.add(price)
         db.session.commit()
 
-        self.update_average_price()
+        self.update_memoized_values()

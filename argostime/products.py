@@ -109,6 +109,6 @@ def add_product_offer_from_url(url: str) -> Tuple[ProductOfferAddResult, Product
     )
     db.session.add(price)
     db.session.commit()
-    offer.update_average_price()
+    offer.update_memoized_values()
 
     return (ProductOfferAddResult.ADDED, offer)

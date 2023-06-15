@@ -23,9 +23,9 @@
 {% else %}
     <td>{{ "€%.2f" | format(offer.get_current_price().normal_price) }} ({{ offer.get_current_price().datetime.strftime("%Y-%m-%d") }})</td>
 {% endif %}
-    <td>{{ "€%.2f" | format(offer.get_average_price()) }}</td>
-    <td>{{ "€%.2f" | format(offer.get_lowest_price()) }}</td>
-    <td>{{ "€%.2f" | format(offer.get_highest_price()) }}</td>
+    <td>{{ "€%.2f" | format(offer.average_price) }}</td>
+    <td>{{ "€%.2f" | format(offer.minimum_price) }}</td>
+    <td>{{ "€%.2f" | format(offer.maximum_price) }}</td>
     <td>{{ "%.2f" | format(offer.get_price_standard_deviation()) }}</td>
     <td>{{ offer.time_added.strftime("%Y-%m-%d") }}</td>
 </tr>
