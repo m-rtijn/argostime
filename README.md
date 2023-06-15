@@ -5,8 +5,8 @@
 Argostimè is a web-app to keep an eye on prices in webshops. The name is derived from
 Argos, the mythical giant with a hundred eyes, and "timè", Greek for price.
 
-Argostimè is based on Flask and SQLAlchemy and has a modular structure so new shops can
-be added easily.
+Argostimè is requires Python 3.10 (or later) and is based on Flask and SQLAlchemy.
+Argostimè has a modular structure so new shops can be added easily.
 
 The "official" version of Argostimè is available at [argostime.mrtijn.nl](https://argostime.mrtijn.nl/).
 
