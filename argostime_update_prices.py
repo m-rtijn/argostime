@@ -24,48 +24,31 @@
 
 import random
 import logging
-from multiprocessing import Process
 import time
 
-from argostime.models import ProductOffer, Webshop
+from argostime.models import ProductOffer
 from argostime import create_app, db
 
 app = create_app()
 app.app_context().push()
 
-def update_shop_offers(shop_id: int) -> None:
-    """Crawl all the offers of one shop"""
+initial_sleep_time: float = random.uniform(0, 600)
+logging.debug("Sleeping for %f seconds", initial_sleep_time)
+time.sleep(initial_sleep_time)
 
-    offers: list[ProductOffer] = db.session.scalars(
-        db.select(ProductOffer)
-            .where(ProductOffer.shop_id == shop_id)
-    ).all()
+offers = db.session.scalars(
+    db.select(ProductOffer)
+).all()
 
-    offer: ProductOffer
-    for offer in offers:
-        logging.info("Crawling %s", str(offer))
+offer: ProductOffer
+for offer in offers:
+    logging.info("Crawling %s", str(offer))
 
-        try:
-            offer.crawl_new_price()
-        except Exception as exception:
-            logging.error("Received %s while updating price of %s, continuing...", exception, offer)
+    try:
+        offer.crawl_new_price()
+    except Exception as exception:
+        logging.error("Received %s while updating price of %s, continuing...", exception, offer)
 
-        next_sleep_time: float = random.uniform(1, 180)
-        logging.debug("Sleeping for %f seconds", next_sleep_time)
-        time.sleep(next_sleep_time)
-
-if __name__ == "__main__":
-
-    shops: list[Webshop] = db.session.scalars(
-        db.select(Webshop)
-            .order_by(Webshop.id)
-    ).all()
-
-    for shop in shops:
-        shop_process: Process = Process(
-            target=update_shop_offers,
-            args=[shop.id],
-            name=f"ShopProcess({shop.id})")
-
-        logging.info("Starting process %s", shop_process)
-        shop_process.start()
+    next_sleep_time: float = random.uniform(1, 180)
+    logging.debug("Sleeping for %f seconds", next_sleep_time)
+    time.sleep(next_sleep_time)
