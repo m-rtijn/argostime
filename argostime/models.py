@@ -154,13 +154,17 @@ class ProductOffer(db.Model):  # type: ignore
         return self.average_price
 
     def get_prices_since(self, since_time: datetime) -> list[Price]:
-        prices_since: list[Price] = db.session.scalars(
+        prices_since = db.session.scalars(
             db.select(Price)
                 .where(Price.product_offer_id == self.id)
                 .where(Price.datetime >= since_time)
         ).all()
 
-        return prices_since
+        prices_since_list: list[Price]
+        for p in prices_since:
+            prices_since_list.append(p)
+
+        return prices_since_list
 
     def get_lowest_price_since(self, since_time: datetime) -> float:
         """Return the lowest effective price of this offer since a specific time."""

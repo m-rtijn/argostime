@@ -23,7 +23,6 @@
     along with Argostimè. If not, see <https://www.gnu.org/licenses/>.
 """
 
-from typing import List, Tuple
 from datetime import datetime, timedelta
 import json
 
@@ -37,16 +36,16 @@ def generate_price_graph_data(offer: ProductOffer) -> str:
         time of a specific ProductOffer
     """
 
-    prices: List[Price] = db.session.scalars(
+    prices = db.session.scalars(
         db.select(Price)
             .where(Price.product_offer_id == offer.id)
             .order_by(Price.datetime)
     ).all()
 
-    dates: List[datetime] = []
-    effective_prices: List[float] = []
-    sales_index: List[Tuple[int, int]] = []
-    sales_dates: List[Tuple[datetime, datetime]] = []
+    dates: list[datetime] = []
+    effective_prices: list[float] = []
+    sales_index: list[tuple[int, int]] = []
+    sales_dates: list[tuple[datetime, datetime]] = []
 
     index = 0
     for price in prices:
