@@ -3,4 +3,6 @@ requires = [
     "requests >= 2.27.1",
     "beautifulsoup4 >= 4.10.0",
     "Flask-SQLAlchemy >= 2.5.1",
+    "SQLAlchemy >= 2",
+    "gunicorn"
 ]
