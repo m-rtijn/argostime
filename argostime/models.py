@@ -107,6 +107,7 @@ class ProductOffer(db.Model):  # type: ignore
     average_price = db.Column(db.Float)
     minimum_price = db.Column(db.Float)
     maximum_price = db.Column(db.Float)
+    # TODO: Memoize current price with reference to the most recent Price entry
 
     prices = db.relationship("Price", backref="product_offer", lazy=True,
                                 cascade="all, delete", passive_deletes=True)

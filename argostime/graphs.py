@@ -58,11 +58,11 @@ def generate_price_graph_data(offer: ProductOffer) -> str:
                     sales_index.append((index, index))
                 else:
                     sales_index[-1] = (sales_index[-1][0], index)
-            
+
             index += 1
         except NoEffectivePriceAvailableException:
             pass
-    
+
     for sale in sales_index:
         start: datetime
         end: datetime
@@ -71,7 +71,7 @@ def generate_price_graph_data(offer: ProductOffer) -> str:
             start = dates[sale[0]] - timedelta(hours=12)
         else:
             start = dates[sale[0]] - (dates[sale[0]] - dates[sale[0]-1]) / 2
-        
+
         if sale[1] == len(dates)-1:
             end = dates[sale[1]] + timedelta(hours=12)
         else:

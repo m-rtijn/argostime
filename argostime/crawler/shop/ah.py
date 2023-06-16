@@ -113,7 +113,7 @@ def crawl_ah(url: str) -> CrawlResult:
                 "p",
                 attrs={ "class" :lambda x: x and x.startswith("promo-sticker-text") }
                 )
-            
+
             if len(promo_text_matches) == 0:
                 promo_text_matches = soup.find_all(
                     "div",

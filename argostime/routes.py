@@ -40,6 +40,7 @@ from argostime.models import Webshop, Product, ProductOffer, Price
 from argostime.products import ProductOfferAddResult, add_product_offer_from_url
 
 def add_product_url(url):
+    """Helper function for adding a product"""
     try:
         res, offer = add_product_offer_from_url(url)
     except WebsiteNotImplementedException:
@@ -144,7 +145,7 @@ def all_offers():
     """Generate an overview of all available offers"""
 
     show_variance: bool = False
-    if request.args.get("variance") != None:
+    if request.args.get("variance") is not None:
         show_variance = True
 
     offers: List[ProductOffer] = db.session.scalars(
@@ -176,7 +177,7 @@ def webshop_page(shop_id):
         abort(404)
 
     show_variance: bool = False
-    if request.args.get("variance") != None:
+    if request.args.get("variance") is not None:
         show_variance = True
 
     offers: List[ProductOffer] = db.session.scalars(
