@@ -28,8 +28,9 @@ from datetime import datetime
 from typing import Tuple
 import urllib.parse
 
+from argostime import db
 from argostime.exceptions import WebsiteNotImplementedException
-from argostime.models import Webshop, Price, Product, ProductOffer, db
+from argostime.models import Webshop, Price, Product, ProductOffer
 from argostime.crawler import crawl_url, CrawlResult, enabled_shops
 
 class ProductOfferAddResult(Enum):
@@ -51,7 +52,10 @@ def add_product_offer_from_url(url: str) -> Tuple[ProductOfferAddResult, Product
     except KeyError as exception:
         raise WebsiteNotImplementedException(url) from exception
 
-    shop: Webshop = Webshop.query.filter(Webshop.hostname.contains(shop_info["hostname"])).first()
+    shop: Webshop = db.session.scalar(
+        db.select(Webshop)
+            .where(Webshop.hostname.contains(shop_info["hostname"]))
+    )
 
     # Add Webshop if it can't be found in the database
     if shop is None:
@@ -60,14 +64,20 @@ def add_product_offer_from_url(url: str) -> Tuple[ProductOfferAddResult, Product
         db.session.commit()
 
     # Check if this ProductOffer already exists
-    product_offer: ProductOffer = ProductOffer.query.filter_by(url=url).first()
+    product_offer: ProductOffer = db.session.scalar(
+        db.select(ProductOffer)
+            .where(ProductOffer.url == url)
+    )
     if product_offer is not None:
         return (ProductOfferAddResult.ALREADY_EXISTS, product_offer)
 
     parse_results: CrawlResult = crawl_url(url)
 
     # Check if this Product already exists, otherwise add it to the database
-    product: Product = Product.query.filter_by(product_code=parse_results.product_code).first()
+    product: Product = db.session.scalar(
+        db.select(Product)
+            .where(Product.product_code == parse_results.product_code)
+    )
     if product is None:
         product = Product(
             name=parse_results.product_name,
@@ -99,5 +109,6 @@ def add_product_offer_from_url(url: str) -> Tuple[ProductOfferAddResult, Product
     )
     db.session.add(price)
     db.session.commit()
+    offer.update_memoized_values()
 
     return (ProductOfferAddResult.ADDED, offer)

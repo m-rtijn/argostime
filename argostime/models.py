@@ -28,15 +28,12 @@ import statistics
 from sys import maxsize
 from typing import List
 
-from flask_sqlalchemy import SQLAlchemy
-
 from argostime.crawler import crawl_url, CrawlResult
 from argostime.exceptions import CrawlerException, WebsiteNotImplementedException
 from argostime.exceptions import PageNotFoundException
 from argostime.exceptions import NoEffectivePriceAvailableException
 
-db: SQLAlchemy = SQLAlchemy()
-
+from argostime import db
 
 class Webshop(db.Model):  # type: ignore
     """A webshop, which may offer products."""
@@ -107,6 +104,11 @@ class ProductOffer(db.Model):  # type: ignore
                             db.ForeignKey("Webshop.id", ondelete="CASCADE"), nullable=False)
     url = db.Column(db.Unicode(1024), unique=True, nullable=False)
     time_added = db.Column(db.DateTime)
+    average_price = db.Column(db.Float)
+    minimum_price = db.Column(db.Float)
+    maximum_price = db.Column(db.Float)
+    # TODO: Memoize current price with reference to the most recent Price entry
+
     prices = db.relationship("Price", backref="product_offer", lazy=True,
                                 cascade="all, delete", passive_deletes=True)
 
@@ -116,30 +118,71 @@ class ProductOffer(db.Model):  # type: ignore
 
     def get_current_price(self) -> Price:
         """Get the latest Price object related to this offer."""
-        return Price.query.filter_by(product_offer_id=self.id).order_by(Price.datetime.desc()).first()
 
-    def get_average_price(self) -> float:
-        """Calculate the average price of this offer."""
+        price = db.session.scalar(
+            db.select(Price)
+                .where(Price.product_offer_id == self.id)
+                .order_by(Price.datetime.desc())
+                .limit(1)
+        )
+
+        return price
+
+    def update_average_price(self) -> float:
+        """Calculate the average price of this offer and update ProductOffer.average_price."""
+        logging.debug("Updating average price for %s", self)
         effective_price_values: List[float] = []
-        for price in Price.query.filter_by(product_offer_id=self.id).all():
+
+        prices = db.session.scalars(
+            db.select(Price)
+                .where(Price.product_offer_id == self.id)
+        ).all()
+
+        for price in prices:
             try:
                 effective_price_values.append(price.get_effective_price())
             except NoEffectivePriceAvailableException:
                 # Ignore price entries without a valid price in calculating the price.
                 pass
         try:
-            return statistics.mean(effective_price_values)
+            avg: float = statistics.mean(effective_price_values)
+            self.average_price = avg
+            db.session.commit()
+            return avg
         except statistics.StatisticsError:
             logging.debug("Called get_average_price for %s but no prices were found...", str(self))
             return -1
 
+    def get_average_price(self) -> float:
+        """Stub for new .average_price attribute
+
+        DEPRECATED: Use ProductOffer.average_price instead.
+        """
+        return self.average_price
+
+    def get_prices_since(self, since_time: datetime) -> list[Price]:
+        """Get all prices since given date"""
+        prices_since = db.session.scalars(
+            db.select(Price)
+                .where(Price.product_offer_id == self.id)
+                .where(Price.datetime >= since_time)
+        ).all()
+
+        prices_since_list: list[Price] = []
+        for price in prices_since:
+            prices_since_list.append(price)
+
+        return prices_since_list
+
     def get_lowest_price_since(self, since_time: datetime) -> float:
         """Return the lowest effective price of this offer since a specific time."""
+        logging.debug("Calculating lowest price since %s for %s", since_time, self)
         min_price: float = maxsize
         price: Price
-        for price in Price.query.filter(
-                Price.product_offer_id == self.id,
-                Price.datetime >= since_time).all():
+
+        prices_since = self.get_prices_since(since_time)
+
+        for price in prices_since:
             try:
                 if price.get_effective_price() < min_price:
                     min_price = price.get_effective_price()
@@ -149,17 +192,29 @@ class ProductOffer(db.Model):  # type: ignore
 
         return min_price
 
+    def update_minimum_price(self) -> None:
+        """Update the minimum price ever in the minimum column"""
+
+        min_price: float = self.get_lowest_price_since(self.time_added)
+        self.minimum_price = min_price
+        db.session.commit()
+
     def get_lowest_price(self) -> float:
-        """Return the lowest effective price of this offer."""
-        return self.get_lowest_price_since(self.time_added)
+        """Return the lowest effective price of this offer.
+
+        DEPRECATED: Use ProductOffer.minimum_price instead
+        """
+        return self.minimum_price
 
     def get_highest_price_since(self, since_time: datetime) -> float:
         """Return the highest effective price of this offer since a specific time."""
+        logging.debug("Calculating highest price since %s for %s", since_time, self)
         max_price: float = -1
         price: Price
-        for price in Price.query.filter(
-                Price.product_offer_id == self.id,
-                Price.datetime >= since_time).all():
+
+        prices_since = self.get_prices_since(since_time)
+
+        for price in prices_since:
             try:
                 if price.get_effective_price() > max_price:
                     max_price = price.get_effective_price()
@@ -168,19 +223,28 @@ class ProductOffer(db.Model):  # type: ignore
 
         return max_price
 
+    def update_maximum_price(self) -> None:
+        """Update the maximum price ever in the maximum_price column"""
+
+        max_price: float = self.get_highest_price_since(self.time_added)
+        self.maximum_price = max_price
+        db.session.commit()
+
     def get_highest_price(self) -> float:
-        """Return the highest effective price of this offer."""
-        return self.get_highest_price_since(self.time_added)
+        """Return the highest effective price of this offer.
+
+        DEPRECATED: Use ProductOffer.maximum_price instead.
+        """
+        return self.maximum_price
 
     def get_price_standard_deviation_since(self, since_time: datetime) -> float:
         """Return the standard deviation of the effective price of this offer since a given date."""
         effective_prices: List[float] = []
         price: Price
 
-        for price in Price.query.filter(
-            Price.product_offer_id == self.id,
-            Price.datetime >= since_time).all():
+        prices_since = self.get_prices_since(since_time)
 
+        for price in prices_since:
             try:
                 effective_prices.append(price.get_effective_price())
             except NoEffectivePriceAvailableException:
@@ -194,6 +258,13 @@ class ProductOffer(db.Model):  # type: ignore
     def get_price_standard_deviation(self) -> float:
         """Return the standard deviation of the effective price of this offer."""
         return self.get_price_standard_deviation_since(self.time_added)
+
+    def update_memoized_values(self) -> None:
+        """Update all memoized columns"""
+
+        self.update_average_price()
+        self.update_minimum_price()
+        self.update_maximum_price()
 
     def crawl_new_price(self) -> None:
         """Crawl the current price if we haven't already checked today."""
@@ -234,3 +305,5 @@ class ProductOffer(db.Model):  # type: ignore
         )
         db.session.add(price)
         db.session.commit()
+
+        self.update_memoized_values()

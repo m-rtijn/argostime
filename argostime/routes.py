@@ -31,6 +31,7 @@ from flask import current_app as app
 from flask import render_template, abort, request, redirect
 from flask import Response
 
+from argostime import db
 from argostime.exceptions import CrawlerException
 from argostime.exceptions import PageNotFoundException
 from argostime.exceptions import WebsiteNotImplementedException
@@ -39,6 +40,7 @@ from argostime.models import Webshop, Product, ProductOffer, Price
 from argostime.products import ProductOfferAddResult, add_product_offer_from_url
 
 def add_product_url(url):
+    """Helper function for adding a product"""
     try:
         res, offer = add_product_offer_from_url(url)
     except WebsiteNotImplementedException:
@@ -75,31 +77,49 @@ def index():
     if request.method == "POST":
         return add_product_url(request.form["url"])
     else:
-        products = Product.query.order_by(Product.id.desc()).limit(5).all()
-        discounts = Price.query.filter(
-            Price.datetime >= datetime.now().date(),
-            Price.on_sale == True # pylint: disable=C0121
+        recently_added_products = db.session.scalars(
+                db.select(Product).order_by(Product.id.desc()).limit(5)
+            ).all()
+
+        # TODO: Maybe join on productoffer & product?
+        discounts = db.session.scalars(
+                db.select(Price).where(
+                    Price.datetime >= datetime.now().date(),
+                    Price.on_sale == True # pylint: disable=C0121
+                )
             ).all()
 
         discounts.sort(key=lambda x: x.product_offer.product.name)
-        shops = Webshop.query.order_by(Webshop.name).all()
+        shops = db.session.scalars(
+            db.select(Webshop)
+                .order_by(Webshop.name)
+        ).all()
 
         return render_template(
             "index.html.jinja",
-            products=products,
+            products=recently_added_products,
             discounts=discounts,
             shops=shops)
 
 @app.route("/product/<product_code>")
 def product_page(product_code):
     """Show the page for a specific product, with all known product offers"""
-    product: Product = Product.query.filter_by(product_code=product_code).first()
+
+    product: Product = db.session.scalars(
+        db.select(Product)
+            .where(Product.product_code == product_code)
+    ).first()
+
+    logging.debug("Rendering product page for %s based on product code %s", product, product_code)
 
     if product is None:
         abort(404)
 
-    offers: List[ProductOffer] = ProductOffer.query.filter_by(
-        product_id=product.id).join(Webshop).order_by(Webshop.name).all()
+    offers: List[ProductOffer] = db.session.scalars(
+        db.select(ProductOffer)
+            .where(ProductOffer.product_id == product.id)
+            .join(Webshop).order_by(Webshop.name)
+    ).all()
 
     return render_template(
         "product.html.jinja",
@@ -109,7 +129,10 @@ def product_page(product_code):
 @app.route("/productoffer/<offer_id>/price_step_graph_data.json")
 def offer_price_json(offer_id):
     """Generate the price step graph data of a specific offer"""
-    offer: ProductOffer = ProductOffer.query.get(offer_id)
+    offer: ProductOffer = db.session.execute(
+        db.select(ProductOffer)
+            .where(ProductOffer.id == offer_id)
+    ).scalar_one()
 
     if offer is None:
         abort(404)
@@ -122,11 +145,14 @@ def all_offers():
     """Generate an overview of all available offers"""
 
     show_variance: bool = False
-    if request.args.get("variance") != None:
+    if request.args.get("variance") is not None:
         show_variance = True
 
-    offers: List[ProductOffer] = ProductOffer.query.join(
-        Product).order_by(Product.name).all()
+    offers: List[ProductOffer] = db.session.scalars(
+        db.select(ProductOffer)
+            .join(Product)
+            .order_by(Product.name)
+    ).all()
 
     current_prices: Dict[ProductOffer, Price] = {}
     for offer in offers:
@@ -142,17 +168,24 @@ def all_offers():
 @app.route("/shop/<shop_id>")
 def webshop_page(shop_id):
     """Show a page with all the product offers of a specific webshop"""
-    shop: Webshop = Webshop.query.get(shop_id)
+    shop: Webshop = db.session.scalar(
+        db.select(Webshop)
+            .where(Webshop.id == shop_id)
+    )
 
     if shop is None:
         abort(404)
 
     show_variance: bool = False
-    if request.args.get("variance") != None:
+    if request.args.get("variance") is not None:
         show_variance = True
 
-    offers: List[ProductOffer] = ProductOffer.query.filter_by(
-        shop_id=shop_id).join(Product).order_by(Product.name).all()
+    offers: List[ProductOffer] = db.session.scalars(
+        db.select(ProductOffer)
+            .where(ProductOffer.shop_id == shop_id)
+            .join(Product)
+            .order_by(Product.name)
+    ).all()
 
     current_prices: Dict[ProductOffer, Price] = {}
     for offer in offers:

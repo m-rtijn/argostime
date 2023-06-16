@@ -1,6 +1,24 @@
+[project]
+name = "Argostimè"
+description = "Keep an eye on prices"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {file = "LICENSE"}
+classifiers = [
+    "Framework :: Flask",
+    "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
+    "Natural Language :: Dutch",
+    "Operating System :: POSIX :: Linux",
+]
+
+[project.urls]
+Homepage = "https://github.com/m-rtijn/argostime"
+
 [build-system]
 requires = [
     "requests >= 2.27.1",
     "beautifulsoup4 >= 4.10.0",
     "Flask-SQLAlchemy >= 2.5.1",
+    "SQLAlchemy >= 2",
+    "gunicorn"
 ]

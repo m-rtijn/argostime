@@ -24,37 +24,31 @@
 
 import random
 import logging
-from multiprocessing import Process
 import time
 
-from argostime.models import ProductOffer, Webshop
-from argostime import create_app
+from argostime.models import ProductOffer
+from argostime import create_app, db
 
 app = create_app()
 app.app_context().push()
 
-def update_shop_offers(shop_id: int) -> None:
-    """Crawl all the offers of one shop"""
+initial_sleep_time: float = random.uniform(0, 600)
+logging.debug("Sleeping for %f seconds", initial_sleep_time)
+time.sleep(initial_sleep_time)
 
-    offer: ProductOffer
-    for offer in ProductOffer.query.filter_by(shop_id=shop_id).all():
-        logging.info("Crawling %s", str(offer))
+offers = db.session.scalars(
+    db.select(ProductOffer)
+).all()
 
-        try:
-            offer.crawl_new_price()
-        except Exception as exception:
-            logging.error("Received %s while updating price of %s, continuing...", exception, offer)
+offer: ProductOffer
+for offer in offers:
+    logging.info("Crawling %s", str(offer))
 
-        next_sleep_time: float = random.uniform(1, 180)
-        logging.debug("Sleeping for %f seconds", next_sleep_time)
-        time.sleep(next_sleep_time)
+    try:
+        offer.crawl_new_price()
+    except Exception as exception:
+        logging.error("Received %s while updating price of %s, continuing...", exception, offer)
 
-if __name__ == "__main__":
-    for shop in Webshop.query.all():
-        shop_process: Process = Process(
-            target=update_shop_offers,
-            args=[shop.id],
-            name=f"ShopProcess({shop.id})")
-
-        logging.info("Starting process %s", shop_process)
-        shop_process.start()
+    next_sleep_time: float = random.uniform(1, 180)
+    logging.debug("Sleeping for %f seconds", next_sleep_time)
+    time.sleep(next_sleep_time)

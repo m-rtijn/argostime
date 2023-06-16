@@ -33,10 +33,9 @@ import os.path
 import configparser
 
 from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
 
-from argostime.products import *
-from argostime.exceptions import *
-from argostime.models import *
+db: SQLAlchemy = SQLAlchemy()
 
 def get_current_commit() -> str:
     """Return the hexadecimal hash of the current running commit."""
@@ -71,6 +70,7 @@ def create_app():
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
     app.config["GIT_CURRENT_COMMIT"] = get_current_commit()
+
     db.init_app(app)
 
     with app.app_context():

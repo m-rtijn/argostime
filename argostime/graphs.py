@@ -23,10 +23,10 @@
     along with Argostimè. If not, see <https://www.gnu.org/licenses/>.
 """
 
-from typing import List, Tuple
 from datetime import datetime, timedelta
 import json
 
+from argostime import db
 from argostime.exceptions import NoEffectivePriceAvailableException
 from argostime.models import ProductOffer, Price
 
@@ -36,13 +36,16 @@ def generate_price_graph_data(offer: ProductOffer) -> str:
         time of a specific ProductOffer
     """
 
-    prices: List[Price] = Price.query.filter_by(
-        product_offer_id=offer.id).order_by(Price.datetime).all()
+    prices = db.session.scalars(
+        db.select(Price)
+            .where(Price.product_offer_id == offer.id)
+            .order_by(Price.datetime)
+    ).all()
 
-    dates: List[datetime] = []
-    effective_prices: List[float] = []
-    sales_index: List[Tuple[int, int]] = []
-    sales_dates: List[Tuple[datetime, datetime]] = []
+    dates: list[datetime] = []
+    effective_prices: list[float] = []
+    sales_index: list[tuple[int, int]] = []
+    sales_dates: list[tuple[datetime, datetime]] = []
 
     index = 0
     for price in prices:
@@ -55,11 +58,11 @@ def generate_price_graph_data(offer: ProductOffer) -> str:
                     sales_index.append((index, index))
                 else:
                     sales_index[-1] = (sales_index[-1][0], index)
-            
+
             index += 1
         except NoEffectivePriceAvailableException:
             pass
-    
+
     for sale in sales_index:
         start: datetime
         end: datetime
@@ -68,7 +71,7 @@ def generate_price_graph_data(offer: ProductOffer) -> str:
             start = dates[sale[0]] - timedelta(hours=12)
         else:
             start = dates[sale[0]] - (dates[sale[0]] - dates[sale[0]-1]) / 2
-        
+
         if sale[1] == len(dates)-1:
             end = dates[sale[1]] + timedelta(hours=12)
         else:
