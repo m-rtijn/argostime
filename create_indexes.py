@@ -42,7 +42,6 @@ indexes = [
     db.Index("idx_ProductOffer_product_id", ProductOffer.product_id),
     db.Index("idx_Webshop_hostname", Webshop.hostname),
     db.Index("idx_Product_product_code", Product.product_code),
-    
 ]
 
 for index in indexes:
