@@ -199,6 +199,25 @@ def webshop_page(shop_id):
         show_variance=show_variance
         )
 
+@app.route("/stats")
+def statistics_page():
+
+    offers: List[ProductOffer] = ProductOffer.query.join(
+        Product).order_by(Product.name).all()
+
+    products: List[Product] = Product.query.all()
+
+    total_product: int = len(products)
+    total_offers: int = len(offers)
+    total_prices_count: int = len(Price.query.all())
+
+    return render_template(
+        "stats.html.jinja",
+        total_products=total_product,
+        total_offers=total_offers,
+        total_prices_count=total_prices_count
+    )
+
 @app.route("/add_url", methods=['GET'])
 def add_url():
     """GET request to allow users to add a URL using a booklet"""
