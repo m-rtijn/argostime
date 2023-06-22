@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
     crawler/__init__.py
 
