@@ -25,14 +25,14 @@ import json
 import logging
 from typing import Dict
 
-import requests
-from bs4 import BeautifulSoup
-
+from argostime.crawler.crawl_utils import CrawlResult, register_crawler
+from argostime.crawler.crawl_utils import parse_promotional_message
 from argostime.exceptions import CrawlerException
 from argostime.exceptions import PageNotFoundException
 
-from argostime.crawler.crawl_utils import CrawlResult, register_crawler
-from argostime.crawler.crawl_utils import parse_promotional_message
+from bs4 import BeautifulSoup
+
+import requests
 
 
 @register_crawler("Etos", "etos.nl")
@@ -40,7 +40,8 @@ def crawl_etos(url: str) -> CrawlResult:
     """Crawler for etos.nl"""
 
     headers = {
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,"
+                  "image/avif,image/webp,*/*;q=0.8",
         "Accept-Encoding": "gzip, deflate, br",
         "Accept-Language": "nl,en-US;q=0.7,en;q=0.3",
         "Cache-Control": "no-cache",
@@ -52,13 +53,15 @@ def crawl_etos(url: str) -> CrawlResult:
         "Sec-Fetch-Site": "none",
         "Sec-Fetch-User": "?1",
         "Upgrade-Insecure-Requests": "1",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:96.0) Gecko/20100101 Firefox/96.0"
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:96.0) "
+                      "Gecko/20100101 Firefox/96.0"
     }
 
     response = requests.get(url, timeout=10, headers=headers)
 
     if response.status_code != 200:
-        logging.error("Got status code %d while getting url %s", response.status_code, url)
+        logging.error("Got status code %d while getting url %s",
+                      response.status_code, url)
         raise PageNotFoundException(url)
 
     soup = BeautifulSoup(response.text, "html.parser")
@@ -68,9 +71,7 @@ def crawl_etos(url: str) -> CrawlResult:
     try:
         raw_product_json = soup.find(
             "div",
-            attrs= {
-                "class": "js-product-detail",
-            }
+            attrs={"class": "js-product-detail"}
         ).get("data-gtm-event")
     except AttributeError as exception:
         logging.error("Could not find a product detail json")
@@ -79,7 +80,8 @@ def crawl_etos(url: str) -> CrawlResult:
     try:
         product_dict = json.loads(raw_product_json)
     except json.decoder.JSONDecodeError as exception:
-        logging.error("Could not decode JSON %s, raising CrawlerException", raw_product_json)
+        logging.error("Could not decode JSON %s, raising CrawlerException",
+                      raw_product_json)
         raise CrawlerException from exception
 
     logging.debug(product_dict)
@@ -89,7 +91,8 @@ def crawl_etos(url: str) -> CrawlResult:
     try:
         result.product_name = offer["name"]
     except KeyError as exception:
-        logging.error("No key name found in json %s parsed as %s", raw_product_json, product_dict)
+        logging.error("No key name found in json %s parsed as %s",
+                      raw_product_json, product_dict)
         raise CrawlerException from exception
 
     try:
@@ -110,9 +113,10 @@ def crawl_etos(url: str) -> CrawlResult:
             result.on_sale = True
         else:
             # Couldn't parse the promotion!
-            logging.info("Couldn't parse promotion %s, assuming no discount", promotion_message)
+            logging.info("Couldn't parse promotion %s, assuming no discount",
+                         promotion_message)
             result.normal_price = price
-    except KeyError as exception:
+    except KeyError:
         logging.debug("No promotion found, assuming no discount")
         try:
             result.normal_price = price

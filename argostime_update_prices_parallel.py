@@ -22,16 +22,17 @@
     along with Argostimè. If not, see <https://www.gnu.org/licenses/>.
 """
 
-import random
 import logging
-from multiprocessing import Process
+import random
 import time
+from multiprocessing import Process
 
-from argostime.models import ProductOffer, Webshop
 from argostime import create_app, db
+from argostime.models import ProductOffer, Webshop
 
 app = create_app()
 app.app_context().push()
+
 
 def update_shop_offers(shop_id: int) -> None:
     """Crawl all the offers of one shop"""
@@ -48,11 +49,13 @@ def update_shop_offers(shop_id: int) -> None:
         try:
             offer.crawl_new_price()
         except Exception as exception:
-            logging.error("Received %s while updating price of %s, continuing...", exception, offer)
+            logging.error("Received %s while updating price of %s, "
+                          "continuing...", exception, offer)
 
         next_sleep_time: float = random.uniform(1, 180)
         logging.debug("Sleeping for %f seconds", next_sleep_time)
         time.sleep(next_sleep_time)
+
 
 if __name__ == "__main__":
 

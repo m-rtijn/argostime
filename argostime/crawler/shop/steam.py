@@ -23,13 +23,13 @@
 
 import logging
 
-import requests
-from bs4 import BeautifulSoup
-
+from argostime.crawler.crawl_utils import CrawlResult, register_crawler
 from argostime.exceptions import CrawlerException
 from argostime.exceptions import PageNotFoundException
 
-from argostime.crawler.crawl_utils import CrawlResult, register_crawler
+from bs4 import BeautifulSoup
+
+import requests
 
 
 @register_crawler("Steam", "store.steampowered.com", False)
@@ -41,7 +41,8 @@ def crawl_steam(url: str) -> CrawlResult:
     response: requests.Response = requests.get(url, timeout=10)
 
     if response.status_code != 200:
-        logging.error("Got status code %d while getting url %s", response.status_code, url)
+        logging.error("Got status code %d while getting url %s",
+                      response.status_code, url)
         raise PageNotFoundException(url)
 
     soup = BeautifulSoup(response.text, "html.parser")
@@ -84,7 +85,8 @@ def crawl_steam(url: str) -> CrawlResult:
                 }
             ).get("value")
     except Exception as exception:
-        logging.error("Could not find a product code in %s %s", game_info, exception)
+        logging.error("Could not find a product code in %s %s",
+                      game_info, exception)
         raise CrawlerException from exception
 
     try:
@@ -95,10 +97,11 @@ def crawl_steam(url: str) -> CrawlResult:
                 "game_purchase_discount"
                 ).get("data-price-final")) / 100.0
         result.on_sale = True
-        # There is info in the page about the normal price when there is a discount,
-        # it's just more of a hassle to find that information
+        # There is info in the page about the normal price when there is a
+        # discount, it's just more of a hassle to find that information
     except Exception as exception:
-        logging.info("No discount found, looking for normal price %s", exception)
+        logging.info("No discount found, looking for normal price %s",
+                     exception)
         try:
             result.normal_price = float(
                 game_info.find(
@@ -106,7 +109,8 @@ def crawl_steam(url: str) -> CrawlResult:
                     "game_purchase_price"
                     ).get("data-price-final")) / 100.0
         except Exception as inner_exception:
-            logging.error("No normal price found in %s %s", game_info, inner_exception)
+            logging.error("No normal price found in %s %s",
+                          game_info, inner_exception)
             raise CrawlerException from inner_exception
 
     return result

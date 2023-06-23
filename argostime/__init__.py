@@ -24,27 +24,31 @@ import logging
 logging.basicConfig(
     filename="argostime.log",
     level=logging.DEBUG,
-    format="%(asctime)s - %(processName)s - %(levelname)s - %(module)s - %(funcName)s - %(message)s"
+    format="%(asctime)s - %(processName)s - %(levelname)s - %(module)s - "
+           "%(funcName)s - %(message)s"
 )
 
-import os.path
+import configparser  # noqa: I100, I202, E402
+import os.path  # noqa: E402
 
-import configparser
+from flask import Flask  # noqa: E402
 
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy  # noqa: E402
 
 db: SQLAlchemy = SQLAlchemy()
 
+
 def get_current_commit() -> str:
     """Return the hexadecimal hash of the current running commit."""
-    git_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.git"))
-    with open(os.path.join(git_path, "HEAD"), "r", encoding="utf-8") as file_head:
+    gp = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.git"))
+    with open(os.path.join(gp, "HEAD"), "r", encoding="utf-8") as file_head:
         hexsha = file_head.read().strip()
         while hexsha.startswith("ref: "):
-            with open(os.path.join(git_path, hexsha[5:]), "r", encoding="utf-8") as file_ref:
+            with open(os.path.join(gp, hexsha[5:]),
+                      "r", encoding="utf-8") as file_ref:
                 hexsha = file_ref.read().strip()
     return hexsha
+
 
 def create_app():
     """Return a flask object for argostime, initialize logger and db."""
@@ -57,7 +61,9 @@ def create_app():
     logging.debug("Found sections %s in config", config.sections())
 
     if "mariadb" in config:
-        app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://{user}:{password}@{server}/{database}?charset=utf8mb4".format(
+        app.config["SQLALCHEMY_DATABASE_URI"] = \
+            "mysql+pymysql://{user}:{password}@{server}/{database}" \
+            "?charset=utf8mb4".format(
             user=config["mariadb"]["user"],
             password=config["mariadb"]["password"],
             server=config["mariadb"]["server"],

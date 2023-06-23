@@ -1,8 +1,8 @@
 """
     products.py
 
-    Abstraction layer between the crawler & database on one hand, and the actual web interface
-    on the other.
+    Abstraction layer between the crawler & database on one hand, and the
+    actual web interface on the other.
 
     Copyright (c) 2022 Martijn <martijn [at] mrtijn.nl>
 
@@ -22,15 +22,16 @@
     along with Argostimè. If not, see <https://www.gnu.org/licenses/>.
 """
 
-from enum import Enum
-from datetime import datetime
-from typing import Tuple
 import urllib.parse
+from datetime import datetime
+from enum import Enum
+from typing import Tuple
 
 from argostime import db
+from argostime.crawler import CrawlResult, crawl_url, enabled_shops
 from argostime.exceptions import WebsiteNotImplementedException
-from argostime.models import Webshop, Price, Product, ProductOffer
-from argostime.crawler import crawl_url, CrawlResult, enabled_shops
+from argostime.models import Price, Product, ProductOffer, Webshop
+
 
 class ProductOfferAddResult(Enum):
     """Enum to indicate the result of add_product_offer"""
@@ -39,8 +40,12 @@ class ProductOfferAddResult(Enum):
     ALREADY_EXISTS = 2
     FAILED_404_NOT_FOUND = 3
 
-def add_product_offer_from_url(url: str) -> Tuple[ProductOfferAddResult, ProductOffer]:
-    """Try to add a product offer to the database, add product and webshop if required.
+
+def add_product_offer_from_url(url: str) -> \
+        Tuple[ProductOfferAddResult, ProductOffer]:
+    """
+    Try to add a product offer to the database, add product and webshop if
+    required.
 
     Returns a ProductOfferAddResult enum
     """

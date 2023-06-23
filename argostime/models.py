@@ -21,18 +21,19 @@
     along with Argostimè. If not, see <https://www.gnu.org/licenses/>.
 """
 
-from datetime import datetime
 import logging
 import statistics
+from datetime import datetime
 from sys import maxsize
 from typing import List
 
-from argostime.crawler import crawl_url, CrawlResult
-from argostime.exceptions import CrawlerException, WebsiteNotImplementedException
-from argostime.exceptions import PageNotFoundException
-from argostime.exceptions import NoEffectivePriceAvailableException
-
 from argostime import db
+from argostime.crawler import CrawlResult, crawl_url
+from argostime.exceptions import \
+    CrawlerException, WebsiteNotImplementedException
+from argostime.exceptions import NoEffectivePriceAvailableException
+from argostime.exceptions import PageNotFoundException
+
 
 class Webshop(db.Model):  # type: ignore
     """A webshop, which may offer products."""
@@ -40,12 +41,12 @@ class Webshop(db.Model):  # type: ignore
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Unicode(512), unique=True, nullable=False)
     hostname = db.Column(db.Unicode(512), unique=True, nullable=False)
-    products = db.relationship("ProductOffer",
-                                backref="webshop",
-                                lazy=True, cascade="all, delete", passive_deletes=True)
+    products = db.relationship("ProductOffer", backref="webshop", lazy=True,
+                               cascade="all, delete", passive_deletes=True)
 
     def __str__(self) -> str:
-        return f"Webshop(id={self.id}, name={self.name}, hostname={self.hostname})"
+        return f"Webshop(id={self.id}, name={self.name}, " \
+               f"hostname={self.hostname})"
 
 
 class Product(db.Model):  # type: ignore
@@ -56,13 +57,15 @@ class Product(db.Model):  # type: ignore
     description = db.Column(db.Unicode(1024))
     ean = db.Column(db.Integer)
     product_code = db.Column(db.Unicode(512), unique=True)
-    product_offers = db.relationship("ProductOffer",
-                                        backref="product", lazy=True,
-                                        cascade="all, delete", passive_deletes=True)
+    product_offers = db.relationship("ProductOffer", backref="product",
+                                     lazy=True, cascade="all, delete",
+                                     passive_deletes=True)
 
     def __str__(self) -> str:
-        return (f"Product(id={self.id}, name={self.name}, description={self.description},"
-                f"ean={self.ean}, product_code={self.product_code}, product_offers={self.product_offers})")
+        return (f"Product(id={self.id}, name={self.name}, "
+                f"description={self.description}, ean={self.ean}, "
+                f"product_code={self.product_code}, "
+                f"product_offers={self.product_offers})")
 
 
 class Price(db.Model):  # type: ignore
@@ -73,14 +76,17 @@ class Price(db.Model):  # type: ignore
     discount_price = db.Column(db.Float)
     on_sale = db.Column(db.Boolean)
     datetime = db.Column(db.DateTime)
-    product_offer_id = db.Column(db.Integer,
-                                    db.ForeignKey("ProductOffer.id", ondelete="CASCADE"),
-                                    nullable=False)
+    product_offer_id = db.Column(
+        db.Integer,
+        db.ForeignKey("ProductOffer.id", ondelete="CASCADE"),
+        nullable=False
+    )
 
     def __str__(self) -> str:
         return (f"Price(id={self.id}, normal_price={self.normal_price},"
                 f"discount_price={self.discount_price}, on_sale={self.on_sale}"
-                f"datetime={self.datetime}, product_offer_id={self.product_offer_id})")
+                f"datetime={self.datetime}, "
+                f"product_offer_id={self.product_offer_id})")
 
     def get_effective_price(self) -> float:
         """Return the discounted price if on sale, else the normal price."""
@@ -98,9 +104,11 @@ class ProductOffer(db.Model):  # type: ignore
     __tablename__ = "ProductOffer"
     id = db.Column(db.Integer, primary_key=True)
     product_id = db.Column(db.Integer,
-                            db.ForeignKey("Product.id", ondelete="CASCADE"), nullable=False)
+                           db.ForeignKey("Product.id", ondelete="CASCADE"),
+                           nullable=False)
     shop_id = db.Column(db.Integer,
-                            db.ForeignKey("Webshop.id", ondelete="CASCADE"), nullable=False)
+                        db.ForeignKey("Webshop.id", ondelete="CASCADE"),
+                        nullable=False)
     url = db.Column(db.Unicode(1024), unique=True, nullable=False)
     time_added = db.Column(db.DateTime)
     average_price = db.Column(db.Float)
@@ -109,11 +117,12 @@ class ProductOffer(db.Model):  # type: ignore
     # TODO: Memoize current price with reference to the most recent Price entry
 
     prices = db.relationship("Price", backref="product_offer", lazy=True,
-                                cascade="all, delete", passive_deletes=True)
+                             cascade="all, delete", passive_deletes=True)
 
     def __str__(self):
-        return (f"ProductOffer(id={self.id}, product_id={self.product_id},"
-                f"shop_id={self.shop_id}, url={self.url}, time_added={self.time_added})")
+        return (f"ProductOffer(id={self.id}, product_id={self.product_id}, "
+                f"shop_id={self.shop_id}, url={self.url}, "
+                f"time_added={self.time_added})")
 
     def get_current_price(self) -> Price:
         """Get the latest Price object related to this offer."""
@@ -128,7 +137,10 @@ class ProductOffer(db.Model):  # type: ignore
         return price
 
     def update_average_price(self) -> float:
-        """Calculate the average price of this offer and update ProductOffer.average_price."""
+        """
+        Calculate the average price of this offer and update
+        ProductOffer.average_price.
+        """
         logging.debug("Updating average price for %s", self)
         effective_price_values: List[float] = []
 
@@ -141,7 +153,7 @@ class ProductOffer(db.Model):  # type: ignore
             try:
                 effective_price_values.append(price.get_effective_price())
             except NoEffectivePriceAvailableException:
-                # Ignore price entries without a valid price in calculating the price.
+                # Ignore price entries without a valid price.
                 pass
         try:
             avg: float = statistics.mean(effective_price_values)
@@ -149,7 +161,8 @@ class ProductOffer(db.Model):  # type: ignore
             db.session.commit()
             return avg
         except statistics.StatisticsError:
-            logging.debug("Called get_average_price for %s but no prices were found...", str(self))
+            logging.debug("Called get_average_price for %s but no prices were "
+                          "found...", str(self))
             return -1
 
     def get_average_price(self) -> float:
@@ -174,8 +187,11 @@ class ProductOffer(db.Model):  # type: ignore
         return prices_since_list
 
     def get_lowest_price_since(self, since_time: datetime) -> float:
-        """Return the lowest effective price of this offer since a specific time."""
-        logging.debug("Calculating lowest price since %s for %s", since_time, self)
+        """
+        Return the lowest effective price of this offer since a specific time.
+        """
+        logging.debug("Calculating lowest price since %s for %s",
+                      since_time, self)
         min_price: float = maxsize
         price: Price
 
@@ -206,8 +222,11 @@ class ProductOffer(db.Model):  # type: ignore
         return self.minimum_price
 
     def get_highest_price_since(self, since_time: datetime) -> float:
-        """Return the highest effective price of this offer since a specific time."""
-        logging.debug("Calculating highest price since %s for %s", since_time, self)
+        """
+        Return the highest effective price of this offer since a specific time.
+        """
+        logging.debug("Calculating highest price since %s for %s",
+                      since_time, self)
         max_price: float = -1
         price: Price
 
@@ -236,8 +255,12 @@ class ProductOffer(db.Model):  # type: ignore
         """
         return self.maximum_price
 
-    def get_price_standard_deviation_since(self, since_time: datetime) -> float:
-        """Return the standard deviation of the effective price of this offer since a given date."""
+    def get_price_standard_deviation_since(self, since_time: datetime) \
+            -> float:
+        """
+        Return the standard deviation of the effective price of this offer
+        since a given date.
+        """
         effective_prices: List[float] = []
         price: Price
 
@@ -255,7 +278,9 @@ class ProductOffer(db.Model):  # type: ignore
             return 0.0
 
     def get_price_standard_deviation(self) -> float:
-        """Return the standard deviation of the effective price of this offer."""
+        """
+        Return the standard deviation of the effective price of this offer.
+        """
         return self.get_price_standard_deviation_since(self.time_added)
 
     def update_memoized_values(self) -> None:

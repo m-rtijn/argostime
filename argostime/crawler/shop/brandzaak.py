@@ -22,16 +22,15 @@
     along with Argostimè. If not, see <https://www.gnu.org/licenses/>.
 """
 
-
 import logging
 
-import requests
-from bs4 import BeautifulSoup
-
+from argostime.crawler.crawl_utils import CrawlResult, register_crawler
 from argostime.exceptions import CrawlerException
 from argostime.exceptions import PageNotFoundException
 
-from argostime.crawler.crawl_utils import CrawlResult, register_crawler
+from bs4 import BeautifulSoup
+
+import requests
 
 
 @register_crawler("Brandzaak", "brandzaak.nl")
@@ -41,15 +40,17 @@ def crawl_brandzaak(url: str) -> CrawlResult:
     response = requests.get(url, timeout=10)
 
     if response.status_code != 200:
-        logging.error("Got status code %d while getting url %s", response.status_code, url)
+        logging.error("Got status code %d while getting url %s",
+                      response.status_code, url)
         raise PageNotFoundException(url)
 
     soup = BeautifulSoup(response.text, "html.parser")
 
     result: CrawlResult = CrawlResult(url=url)
 
-    product_title = soup.find("meta", attrs={ "name": "title"})
-    product_price = soup.find("meta", attrs={ "property": "product:price:amount"})
+    product_title = soup.find("meta", attrs={"name": "title"})
+    product_price = soup.find("meta",
+                              attrs={"property": "product:price:amount"})
 
     try:
         result.product_name = product_title['content']

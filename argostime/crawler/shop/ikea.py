@@ -24,13 +24,13 @@
 import logging
 import re
 
-import requests
-from bs4 import BeautifulSoup
-
+from argostime.crawler.crawl_utils import CrawlResult, register_crawler
 from argostime.exceptions import CrawlerException
 from argostime.exceptions import PageNotFoundException
 
-from argostime.crawler.crawl_utils import CrawlResult, register_crawler
+from bs4 import BeautifulSoup
+
+import requests
 
 
 @register_crawler("IKEA", "ikea.com")
@@ -42,14 +42,15 @@ def crawl_ikea(url: str) -> CrawlResult:  # pylint: disable=R0915
     response: requests.Response = requests.get(url, timeout=10)
 
     if response.status_code != 200:
-        logging.error("Got status code %d while getting url %s", response.status_code, url)
+        logging.error("Got status code %d while getting url %s",
+                      response.status_code, url)
         raise PageNotFoundException(url)
 
     soup = BeautifulSoup(response.text, "html.parser")
 
     info_wrapper = soup.find(
         "div",
-        id= re.compile("buy-module-content")
+        id=re.compile("buy-module-content")
         )
 
     try:
@@ -60,35 +61,36 @@ def crawl_ikea(url: str) -> CrawlResult:  # pylint: disable=R0915
     try:
         result.product_name = info_wrapper.find(
             ["span", "div"],
-            class_= re.compile("header-section__title--big")
+            class_=re.compile("header-section__title--big")
             ).text
     except Exception as exception:
-        logging.error("Could not find a name in %s %s", info_wrapper, exception)
+        logging.error("Could not find a name in %s %s",
+                      info_wrapper, exception)
         raise CrawlerException from exception
 
     try:
         result.product_description = info_wrapper.find(
             "span",
-            class_= re.compile("header-section__description-text")
+            class_=re.compile("header-section__description-text")
             ).text
-    except Exception as exception:
+    except:
         logging.error("Could not find a description in %s", info_wrapper)
-
 
     try:
         result.product_code = soup.find(
             "span",
-            class_= re.compile("product-identifier__value")
+            class_=re.compile("product-identifier__value")
             ).text
     except Exception as exception:
-        logging.error("Could not find a product code in %s %s", info_wrapper, exception)
+        logging.error("Could not find a product code in %s %s",
+                      info_wrapper, exception)
         raise CrawlerException from exception
 
     try:
         # Todo: Verify if this is needed with discounted product page...
         price_tag_prev = info_wrapper.find(
             "div",
-            class_= re.compile("price-package__previous-price-hasStrikeThrough")
+            class_=re.compile("price-package__previous-price-hasStrikeThrough")
             )
 
         if not price_tag_prev:
@@ -109,7 +111,7 @@ def crawl_ikea(url: str) -> CrawlResult:  # pylint: disable=R0915
             decimals = float(
                 price_tag_prev.find(
                     "span",
-                    class_= re.compile("price__decimal")
+                    class_=re.compile("price__decimal")
                     ).text)
         except Exception as exception:
             logging.debug("No decimals found, assuming 0 %s", exception)
@@ -122,7 +124,7 @@ def crawl_ikea(url: str) -> CrawlResult:  # pylint: disable=R0915
     try:
         price_tag_curr = info_wrapper.find(
             # "div",
-            class_= re.compile("price-module__current-price")
+            class_=re.compile("price-module__current-price")
             )
 
         integers = float(
@@ -130,14 +132,14 @@ def crawl_ikea(url: str) -> CrawlResult:  # pylint: disable=R0915
                 ".-", "",
                 price_tag_curr.find(
                     "span",
-                    class_= re.compile("price__integer")
+                    class_=re.compile("price__integer")
                     ).text))
 
         try:
             decimals = float(
                 price_tag_curr.find(
                     "span",
-                    class_= re.compile("price__decimal")
+                    class_=re.compile("price__decimal")
                     ).text)
         except Exception as exception:
             logging.debug("No decimals found, assuming 0 %s", exception)
@@ -149,7 +151,8 @@ def crawl_ikea(url: str) -> CrawlResult:  # pylint: disable=R0915
         else:
             result.normal_price = integers + decimals
     except Exception as exception:
-        logging.error("No current price found in %s %s", info_wrapper, exception)
+        logging.error("No current price found in %s %s",
+                      info_wrapper, exception)
         raise CrawlerException from exception
 
     return result

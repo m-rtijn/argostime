@@ -23,13 +23,13 @@
 
 import logging
 
-import requests
-from bs4 import BeautifulSoup
-
+from argostime.crawler.crawl_utils import CrawlResult, register_crawler
 from argostime.exceptions import CrawlerException
 from argostime.exceptions import PageNotFoundException
 
-from argostime.crawler.crawl_utils import CrawlResult, register_crawler
+from bs4 import BeautifulSoup
+
+import requests
 
 
 def crawl_intergamma(url: str) -> CrawlResult:
@@ -37,7 +37,8 @@ def crawl_intergamma(url: str) -> CrawlResult:
 
     response: requests.Response = requests.get(url, timeout=10)
     if response.status_code != 200:
-        logging.error("Got status code %s while getting url %s", response.status_code, url)
+        logging.error("Got status code %s while getting url %s",
+                      response.status_code, url)
         raise PageNotFoundException(url)
 
     # Use UTF-8 encoding instead of ISO-8859-1
@@ -73,7 +74,8 @@ def crawl_intergamma(url: str) -> CrawlResult:
             itemtype="http://schema.org/Product"
         )["data-product-code"]
     except Exception as exception:
-        logging.error("Could not find a product code, raising CrawlerException")
+        logging.error("Could not find a product code, "
+                      "raising CrawlerException")
         logging.debug("Got exception: %s", exception)
         raise CrawlerException from exception
 

@@ -21,6 +21,6 @@
     along with Argostimè. If not, see <https://www.gnu.org/licenses/>.
 """
 
-from argostime.crawler.crawl_utils import CrawlResult, enabled_shops
 from argostime.crawler.crawl_url import crawl_url
+from argostime.crawler.crawl_utils import CrawlResult, enabled_shops
 from argostime.crawler.shop import *

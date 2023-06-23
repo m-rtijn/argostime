@@ -1,8 +1,8 @@
 """
     crawler/crawl_url.py
 
-    Crawler function exposed to the rest of the system to get pricing and product
-    information from a given URL.
+    Crawler function exposed to the rest of the system to get pricing and
+    product information from a given URL.
 
     Copyright (c) 2022 Martijn <martijn [at] mrtijn.nl>
     Copyright (c) 2022 Kevin <kevin [at] 2sk.nl>
@@ -26,9 +26,8 @@
 import logging
 import urllib.parse
 
-from argostime.exceptions import WebsiteNotImplementedException
-
 from argostime.crawler.crawl_utils import CrawlResult, enabled_shops
+from argostime.exceptions import WebsiteNotImplementedException
 
 
 def crawl_url(url: str) -> CrawlResult:
@@ -46,8 +45,9 @@ def crawl_url(url: str) -> CrawlResult:
     if hostname not in enabled_shops:
         raise WebsiteNotImplementedException(url)
 
-    # Note: This is a function call! The called function is the corresponding crawler
-    # registered using the "@register_crawler" decorator in the "shop" directory.
+    # Note: This is a function call! The called function is the corresponding
+    # crawler registered using the "@register_crawler" decorator in the "shop"
+    # directory.
     result: CrawlResult = enabled_shops[hostname]["crawler"](url)
     result.check()
 

@@ -22,12 +22,13 @@
     along with Argostimè. If not, see <https://www.gnu.org/licenses/>.
 """
 
-from datetime import datetime, timedelta
 import json
+from datetime import datetime, timedelta
 
 from argostime import db
 from argostime.exceptions import NoEffectivePriceAvailableException
-from argostime.models import ProductOffer, Price
+from argostime.models import Price, ProductOffer
+
 
 def generate_price_graph_data(offer: ProductOffer) -> str:
     """
@@ -50,7 +51,8 @@ def generate_price_graph_data(offer: ProductOffer) -> str:
     for price in prices:
         try:
             effective_prices.append(price.get_effective_price())
-            dates.append(price.datetime.replace(hour=12, minute=0, second=0, microsecond=0))
+            dates.append(price.datetime.replace(
+                hour=12, minute=0, second=0, microsecond=0))
 
             if price.on_sale:
                 if len(sales_index) == 0 or sales_index[-1][1] != (index - 1):
@@ -89,7 +91,8 @@ def generate_price_graph_data(offer: ProductOffer) -> str:
 
     data = {
         "title": {
-            "text": f"Prijsontwikkeling van {offer.product.name} bij {offer.webshop.name}",
+            "text": f"Prijsontwikkeling van {offer.product.name} "
+                    f"bij {offer.webshop.name}",
             "left": "center",
             "textStyle": {
                 "color": "#000",

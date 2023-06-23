@@ -24,3 +24,9 @@ repos:
           - Flask-SQLAlchemy
           - requests
           - beautifulsoup4
+- repo: https://github.com/PyCQA/flake8
+  rev: 6.0.0
+  hooks:
+    -   id: flake8
+        additional_dependencies:
+          - flake8-import-order

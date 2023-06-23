@@ -35,7 +35,9 @@ __voor_regex = re.compile("voor")
 
 
 class CrawlResult:
-    """Data structure for returning the results of a crawler in a uniform way."""
+    """
+    Data structure for returning the results of a crawler in a uniform way.
+    """
 
     url: Optional[str]
     product_name: Optional[str]
@@ -49,15 +51,15 @@ class CrawlResult:
 
     def __init__(
         self,
-        url: Optional[str]=None,
-        product_name: Optional[str]=None,
-        product_description: Optional[str]=None,
-        product_code: Optional[str]=None,
-        normal_price: float=-1.0,
-        discount_price: float=-1.0,
-        on_sale: bool=False,
-        ean: Optional[int]=None,
-        ):
+        url: Optional[str] = None,
+        product_name: Optional[str] = None,
+        product_description: Optional[str] = None,
+        product_code: Optional[str] = None,
+        normal_price: float = -1.0,
+        discount_price: float = -1.0,
+        on_sale: bool = False,
+        ean: Optional[int] = None,
+    ):
         self.url = url
         self.product_name = product_name
         self.product_description = product_description
@@ -71,7 +73,8 @@ class CrawlResult:
         string = f"CrawlResult(product_name={self.product_name},"\
             f"product_description={self.product_description},"\
             f"product_code={self.product_code},price={self.normal_price},"\
-            f"discount={self.discount_price},sale={self.on_sale},ean={self.ean}"
+            f"discount={self.discount_price},sale={self.on_sale}," \
+            f"ean={self.ean}"
 
         return string
 
@@ -99,24 +102,28 @@ class CrawlResult:
         if self.discount_price < 0 and self.on_sale:
             raise CrawlerException("No discount price given for item on sale!")
         if self.normal_price < 0 and not self.on_sale:
-            raise CrawlerException("No normal price given for item not on sale!")
+            raise CrawlerException(
+                "No normal price given for item not on sale!")
 
 
 CrawlerFunc = Callable[[str], CrawlResult]
-ShopDict = TypedDict("ShopDict", {"name": str, "hostname": str, "crawler": CrawlerFunc})
+ShopDict = TypedDict("ShopDict", {"name": str, "hostname": str,
+                                  "crawler": CrawlerFunc})
 enabled_shops: Dict[str, ShopDict] = {}
 
 
-def register_crawler(name: str, host: str, use_www: bool = True) -> Callable[[CrawlerFunc], None]:
+def register_crawler(name: str, host: str, use_www: bool = True) \
+        -> Callable[[CrawlerFunc], None]:
     """Decorator to register a new crawler function."""
 
     def decorate(func: Callable[[str], CrawlResult]) -> None:
         """
-        This function will be called when you put the "@register_crawler" decorator above
-        a function defined in a file in the "shop" directory! The argument will be the
-        function above which you put the decorator.
+        This function will be called when you put the "@register_crawler"
+        decorator above a function defined in a file in the "shop" directory!
+        The argument will be the function above which you put the decorator.
         """
-        if "argostime" in __config and "disabled_shops" in __config["argostime"]:
+        if "argostime" in __config and \
+                "disabled_shops" in __config["argostime"]:
             if host in __config["argostime"]["disabled_shops"]:
                 logging.debug("Shop %s is disabled", host)
                 return
@@ -136,7 +143,9 @@ def register_crawler(name: str, host: str, use_www: bool = True) -> Callable[[Cr
 
 
 def parse_promotional_message(message: str, price: float) -> float:
-    """Parse a given promotional message, and returns the calculated effective price.
+    """
+    Parse a given promotional message, and returns the calculated effective
+    price.
 
     For example "1+1 GRATIS" will be parsed to meaning a 50% discount.
     "2+1 GRATIS" will be parsed to mean a 33% discount, and will return 2/3.
@@ -151,7 +160,8 @@ def parse_promotional_message(message: str, price: float) -> float:
 
     message_no_whitespace = message_no_whitespace.lower()
 
-    logging.debug("Promotion yielded sanitized input %s", message_no_whitespace)
+    logging.debug("Promotion yielded sanitized input %s",
+                  message_no_whitespace)
 
     if message_no_whitespace == "1+1gratis":
         return 1/2 * price
@@ -186,7 +196,8 @@ def parse_promotional_message(message: str, price: float) -> float:
                 return float(msg_split[1])
             return float(msg_split[1]) / float(msg_split[0])
         except ArithmeticError as exception:
-            logging.error("Calculation error parsing %s %s", message_no_whitespace, exception)
+            logging.error("Calculation error parsing %s %s",
+                          message_no_whitespace, exception)
         except IndexError:
             logging.error("IndexError in message %s", message_no_whitespace)
 
