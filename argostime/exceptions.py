@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
     exceptions.py
 
@@ -22,6 +21,7 @@
 
 import logging
 
+
 class PageNotFoundException(Exception):
     """Exception to throw when a request gets a 404 returned."""
     def __init__(self, url: str):
@@ -30,6 +30,7 @@ class PageNotFoundException(Exception):
         logging.debug("PageNotFoundException for %s", url)
 
         super().__init__()
+
 
 class WebsiteNotImplementedException(Exception):
     """Exception to throw if a certain website has no implemented scraper."""
@@ -41,8 +42,10 @@ class WebsiteNotImplementedException(Exception):
 
         super().__init__()
 
+
 class NoEffectivePriceAvailableException(Exception):
     """Exception to throw if a Price object has no valid price."""
+
 
 class CrawlerException(Exception):
     """Exception to throw if something goes wrong in the crawler."""

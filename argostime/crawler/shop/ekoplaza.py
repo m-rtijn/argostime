@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
     crawler/shop/ekoplaza.py
 
@@ -24,12 +23,11 @@
 
 import logging
 
-import requests
-
+from argostime.crawler.crawl_utils import CrawlResult, register_crawler
 from argostime.exceptions import CrawlerException
 from argostime.exceptions import PageNotFoundException
 
-from argostime.crawler.crawl_utils import CrawlResult, register_crawler
+import requests
 
 
 @register_crawler("Ekoplaza", "ekoplaza.nl")

@@ -22,12 +22,12 @@
     along with Argostimè. If not, see <https://www.gnu.org/licenses/>.
 """
 
-import random
 import logging
+import random
 import time
 
-from argostime.models import ProductOffer
 from argostime import create_app, db
+from argostime.models import ProductOffer
 
 app = create_app()
 app.app_context().push()
@@ -47,7 +47,8 @@ for offer in offers:
     try:
         offer.crawl_new_price()
     except Exception as exception:
-        logging.error("Received %s while updating price of %s, continuing...", exception, offer)
+        logging.error("Received %s while updating price of %s, continuing...",
+                      exception, offer)
 
     next_sleep_time: float = random.uniform(1, 180)
     logging.debug("Sleeping for %f seconds", next_sleep_time)

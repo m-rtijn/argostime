@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
     crawler/shop/praxis.py
 
@@ -26,13 +25,13 @@ import json
 import logging
 import re
 
-import requests
-from bs4 import BeautifulSoup
-
+from argostime.crawler.crawl_utils import CrawlResult, register_crawler
 from argostime.exceptions import CrawlerException
 from argostime.exceptions import PageNotFoundException
 
-from argostime.crawler.crawl_utils import CrawlResult, register_crawler
+from bs4 import BeautifulSoup
+
+import requests
 
 
 def __fix_bad_json(bad_json: str) -> str:
@@ -45,7 +44,8 @@ def crawl_praxis(url: str) -> CrawlResult:
 
     response: requests.Response = requests.get(url, timeout=10)
     if response.status_code != 200:
-        logging.error("Got status code %s while getting url %s", response.status_code, url)
+        logging.error("Got status code %s while getting url %s",
+                      response.status_code, url)
         raise PageNotFoundException(url)
 
     soup: BeautifulSoup = BeautifulSoup(response.text, "html.parser")
@@ -54,17 +54,20 @@ def crawl_praxis(url: str) -> CrawlResult:
     try:
         raw_product_json = soup.find(
             "script",
-            text=lambda value: value and value.startswith("window.__PRELOADED_STATE_productDetailsFragmentInfo__")
+            text=lambda value: value and value.startswith(
+                "window.__PRELOADED_STATE_productDetailsFragmentInfo__")
         ).text.split("=", maxsplit=1)[1].strip()
     except Exception as exception:
-        logging.error("Could not find a product detail JSON, raising CrawlerException")
+        logging.error("Could not find a product detail JSON, "
+                      "raising CrawlerException")
         raise CrawlerException from exception
 
     try:
         json_data = json.loads(__fix_bad_json(raw_product_json))
         product = json_data["productDetails"]
     except json.decoder.JSONDecodeError as exception:
-        logging.error("Could not decode JSON %s, raising CrawlerException", raw_product_json)
+        logging.error("Could not decode JSON %s, raising CrawlerException",
+                      raw_product_json)
         raise CrawlerException from exception
     except KeyError as exception:
         logging.error("No key productDetails found in JSON data")
@@ -90,13 +93,14 @@ def crawl_praxis(url: str) -> CrawlResult:
 
     try:
         result.ean = int(product["ean"])
-    except KeyError as exception:
+    except KeyError:
         # Don't raise an exception since EAN is not strictly necessary!
         logging.error("No key ean found in JSON")
 
     try:
         if "discount" in product.keys() and \
-        ("discountClass" not in product.keys() or product["discountClass"] != "excludedproducts"):
+                ("discountClass" not in product.keys() or
+                 product["discountClass"] != "excludedproducts"):
             result.discount_price = float(product["discount"]["value"])
             result.on_sale = True
         else:

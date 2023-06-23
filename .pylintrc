@@ -1,8 +1,8 @@
 [GENERAL]
-fail-under=9.0
+fail-under=10.0
 
 [MESSAGES CONTROL]
-disable=R0903
+disable=C,R,W0511,W0702,W0718
 
 [TYPECHECK]
 generated-members=flask_sqlalchemy.SQLAlchemy.DateTime,

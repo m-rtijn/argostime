@@ -23,11 +23,10 @@
 """
 import logging
 
-from sqlalchemy import text
-from sqlalchemy.exc import OperationalError
-
 from argostime import create_app, db
-from argostime.models import ProductOffer, Product, Price, Webshop
+from argostime.models import Price, Product, ProductOffer, Webshop
+
+from sqlalchemy.exc import OperationalError
 
 app = create_app()
 app.app_context().push()
@@ -37,12 +36,12 @@ logging.info("Adding indexes")
 indexes = [
     db.Index("idx_Price_datetime", Price.datetime),
     db.Index("idx_Price_product_offer", Price.product_offer_id),
-    db.Index("idx_Price_product_offer_id_datetime", Price.product_offer_id, Price.datetime),
+    db.Index("idx_Price_product_offer_id_datetime",
+             Price.product_offer_id, Price.datetime),
     db.Index("idx_ProductOffer_shop_id", ProductOffer.shop_id),
     db.Index("idx_ProductOffer_product_id", ProductOffer.product_id),
     db.Index("idx_Webshop_hostname", Webshop.hostname),
     db.Index("idx_Product_product_code", Product.product_code),
-    
 ]
 
 for index in indexes:

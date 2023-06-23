@@ -26,7 +26,6 @@ import sys
 import traceback
 
 from argostime.crawler.crawl_url import crawl_url
-
 from argostime.crawler.crawl_utils import CrawlResult
 
 # Print help message if needed...
@@ -37,7 +36,7 @@ if len(sys.argv) < 2 or len(sys.argv) > 2 or "help" in sys.argv[1]:
 # Just call the crawler with the url given by the user
 try:
     result: CrawlResult = crawl_url(sys.argv[1])
-except Exception as exception:
+except:
     print("Exception thrown during crawling:", file=sys.stderr)
     traceback.print_exc()
     exit()

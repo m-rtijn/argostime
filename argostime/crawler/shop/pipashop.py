@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
     crawler/shop/pipashop.py
 
@@ -25,13 +24,13 @@
 import logging
 import re
 
-import requests
-from bs4 import BeautifulSoup
-
+from argostime.crawler.crawl_utils import CrawlResult, register_crawler
 from argostime.exceptions import CrawlerException
 from argostime.exceptions import PageNotFoundException
 
-from argostime.crawler.crawl_utils import CrawlResult, register_crawler
+from bs4 import BeautifulSoup
+
+import requests
 
 
 @register_crawler("Pipa Shop", "pipa-shop.nl")
@@ -46,7 +45,8 @@ def crawl_pipashop(url: str) -> CrawlResult:
     soup = BeautifulSoup(request.text, "html.parser")
 
     try:
-        price = re.sub(r"[^0-9.]", "", soup.select_one("div.product-price").text)
+        price = re.sub(r"[^0-9.]", "",
+                       soup.select_one("div.product-price").text)
         result.product_name = soup.select_one("div.product-title a").text
         result.product_code = url.split("/product/").pop().split("/")[0]
         result.normal_price = float(price)

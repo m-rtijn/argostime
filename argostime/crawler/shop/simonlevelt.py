@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
     crawler/shop/simonlevelt.py
 
@@ -25,13 +24,13 @@
 import locale
 import logging
 
-import requests
-from bs4 import BeautifulSoup
-
+from argostime.crawler.crawl_utils import CrawlResult, register_crawler
 from argostime.exceptions import CrawlerException
 from argostime.exceptions import PageNotFoundException
 
-from argostime.crawler.crawl_utils import CrawlResult, register_crawler
+from bs4 import BeautifulSoup
+
+import requests
 
 
 @register_crawler("Simon Lévelt", "simonlevelt.nl")
@@ -41,7 +40,8 @@ def crawl_simonlevelt(url: str) -> CrawlResult:
     response: requests.Response = requests.get(url, timeout=10)
 
     if response.status_code != 200:
-        logging.debug("Got status code %d while getting url %s", response.status_code, url)
+        logging.debug("Got status code %d while getting url %s",
+                      response.status_code, url)
         raise PageNotFoundException(url)
 
     soup = BeautifulSoup(response.text, "html.parser")
@@ -49,9 +49,11 @@ def crawl_simonlevelt(url: str) -> CrawlResult:
     result = CrawlResult()
 
     try:
-        result.url = soup.find("meta", property="product:product_link").get("content")
+        result.url = soup.find("meta",
+                               property="product:product_link").get("content")
     except Exception as exception:
-        logging.info("Couldn't find url in soup, using given instead %s", exception)
+        logging.info("Couldn't find url in soup, using given instead %s",
+                     exception)
         result.url = url
 
     try:

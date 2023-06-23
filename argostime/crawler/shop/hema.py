@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
     crawler/shop/hema.py
 
@@ -28,13 +27,13 @@ import logging
 import re
 from typing import Optional
 
-import requests
-from bs4 import BeautifulSoup
-
+from argostime.crawler.crawl_utils import CrawlResult, register_crawler
 from argostime.exceptions import CrawlerException
 from argostime.exceptions import PageNotFoundException
 
-from argostime.crawler.crawl_utils import CrawlResult, register_crawler
+from bs4 import BeautifulSoup
+
+import requests
 
 
 @register_crawler("HEMA", "hema.nl")
@@ -44,7 +43,8 @@ def crawl_hema(url: str) -> CrawlResult:
     response: requests.Response = requests.get(url, timeout=10)
 
     if response.status_code != 200:
-        logging.error("Got status code %d while getting url %s", response.status_code, url)
+        logging.error("Got status code %d while getting url %s",
+                      response.status_code, url)
         raise PageNotFoundException(url)
 
     soup = BeautifulSoup(response.text, "html.parser")
@@ -70,27 +70,34 @@ def crawl_hema(url: str) -> CrawlResult:
     try:
         product_dict = json.loads(raw_json)
     except json.decoder.JSONDecodeError as exception:
-        logging.error("Could not decode JSON %s, raising CrawlerException", raw_json)
+        logging.error("Could not decode JSON %s, raising CrawlerException",
+                      raw_json)
         raise CrawlerException from exception
 
     logging.debug(product_dict)
 
     try:
-        result.product_name = product_dict["ecommerce"]["detail"]["products"][0]["name"]
+        result.product_name = \
+            product_dict["ecommerce"]["detail"]["products"][0]["name"]
     except KeyError as exception:
-        logging.error("Could not find product name in %s via %s", raw_json, url)
+        logging.error("Could not find product name in %s via %s",
+                      raw_json, url)
         raise CrawlerException from exception
 
     try:
-        result.product_code = product_dict["ecommerce"]["detail"]["products"][0]["id"]
+        result.product_code = \
+            product_dict["ecommerce"]["detail"]["products"][0]["id"]
     except KeyError as exception:
-        logging.error("Could not find product code in %s via %s", raw_json, url)
+        logging.error("Could not find product code in %s via %s",
+                      raw_json, url)
         raise CrawlerException from exception
 
     try:
-        result.normal_price = float(product_dict["ecommerce"]["detail"]["products"][0]["price"])
-    except KeyError as exception:
-        logging.error("Could not find a valid price in %s via %s", raw_json, url)
+        result.normal_price = \
+            float(product_dict["ecommerce"]["detail"]["products"][0]["price"])
+    except KeyError:
+        logging.error("Could not find a valid price in %s via %s",
+                      raw_json, url)
         result.normal_price = -1
 
     return result

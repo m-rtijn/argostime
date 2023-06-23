@@ -2,7 +2,8 @@
 """
     manual_update.py
 
-    Standalone script to manually update the price of a product offer by product_offer_id.
+    Standalone script to manually update the price of a product offer by
+    product_offer_id.
 
     Copyright (c) 2022 Kevin
 
@@ -22,11 +23,12 @@
     along with Argostimè. If not, see <https://www.gnu.org/licenses/>.
 """
 
-import sys
 import logging
+import sys
 
 from argostime import create_app, db
 from argostime.models import ProductOffer
+
 
 app = create_app()
 app.app_context().push()
@@ -37,7 +39,10 @@ except:
     print("No number given")
     sys.exit(-1)
 
-offer: ProductOffer = db.session.execute(db.select(ProductOffer).where(ProductOffer.id == product_offer_id)).scalar_one()
+offer: ProductOffer = \
+    db.session.execute(
+        db.select(ProductOffer).where(ProductOffer.id == product_offer_id)
+    ).scalar_one()
 
 logging.debug("Found offer %s", product_offer_id)
 logging.debug("Manually updating ProductOffer %s", offer)
@@ -45,4 +50,5 @@ logging.debug("Manually updating ProductOffer %s", offer)
 try:
     offer.crawl_new_price()
 except Exception as exception:
-    logging.error("Received %s while updating price of %s, continuing...", exception, offer)
+    logging.error("Received %s while updating price of %s, continuing...",
+                  exception, offer)

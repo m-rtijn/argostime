@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
     crawler/shop/__init__.py
 
@@ -22,10 +21,11 @@
     along with Argostimè. If not, see <https://www.gnu.org/licenses/>.
 """
 
-from os.path import dirname, basename, isfile, join
 import glob
+from os.path import basename, dirname, isfile, join
 
-# Load all modules in the current directory, based on the answer from Anurag Uniyal:
-# https://stackoverflow.com/questions/1057431/how-to-load-all-modules-in-a-folder
+# Load all modules in the current directory, based on the answer from
+# Anurag Uniyal: https://stackoverflow.com/q/1057431
 modules = glob.glob(join(dirname(__file__), "*.py"))
-__all__ = [basename(f)[:-3] for f in modules if isfile(f) and not f.endswith('__init__.py')]
+__all__ = [basename(f)[:-3] for f in modules if isfile(f) and
+           not f.endswith('__init__.py')]

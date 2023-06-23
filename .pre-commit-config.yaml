@@ -1,0 +1,32 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+repos:
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v4.4.0
+  hooks:
+    -   id: check-added-large-files
+    -   id: check-executables-have-shebangs
+    -   id: check-shebang-scripts-are-executable
+    -   id: end-of-file-fixer
+    -   id: trailing-whitespace
+- repo: https://github.com/pre-commit/mirrors-mypy
+  rev: v1.4.0
+  hooks:
+    -   id: mypy
+        additional_dependencies:
+          - types-requests
+- repo: https://github.com/pylint-dev/pylint
+  rev: v3.0.0a6
+  hooks:
+    -   id: pylint
+        additional_dependencies:
+          - flask
+          - Flask-SQLAlchemy
+          - requests
+          - beautifulsoup4
+- repo: https://github.com/PyCQA/flake8
+  rev: 6.0.0
+  hooks:
+    -   id: flake8
+        additional_dependencies:
+          - flake8-import-order

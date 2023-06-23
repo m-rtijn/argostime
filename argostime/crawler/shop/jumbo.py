@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
     crawler/shop/jumbo.py
 
@@ -25,13 +24,13 @@
 import json
 import logging
 
-import requests
-from bs4 import BeautifulSoup
-
+from argostime.crawler.crawl_utils import CrawlResult, register_crawler
 from argostime.exceptions import CrawlerException
 from argostime.exceptions import PageNotFoundException
 
-from argostime.crawler.crawl_utils import CrawlResult, register_crawler
+from bs4 import BeautifulSoup
+
+import requests
 
 
 @register_crawler("Jumbo", "jumbo.com")
@@ -42,7 +41,8 @@ def crawl_jumbo(url: str) -> CrawlResult:
     """
     headers = {
         "Referer": "https://www.jumbo.com",
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,"
+                  "image/avif,image/webp,*/*;q=0.8",
         "Accept-Encoding": "gzip, deflate, br",
         "Accept-Language": "nl,en-US;q=0.7,en;q=0.3",
         "Cache-Control": "no-cache",
@@ -54,17 +54,20 @@ def crawl_jumbo(url: str) -> CrawlResult:
         "Sec-Fetch-Site": "none",
         "Sec-Fetch-User": "?1",
         "Upgrade-Insecure-Requests": "1",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:96.0) Gecko/20100101 Firefox/96.0"
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:96.0) "
+                      "Gecko/20100101 Firefox/96.0"
     }
 
     response = requests.get(url, timeout=10, headers=headers)
 
     if response.status_code != 200:
-        logging.error("Got status code %d while getting url %s", response.status_code, url)
+        logging.error("Got status code %d while getting url %s",
+                      response.status_code, url)
         raise PageNotFoundException(url)
 
     soup = BeautifulSoup(response.text, "html.parser")
-    product_json = soup.find("script", attrs={"type": "application/ld+json", "data-n-head": "ssr"})
+    product_json = soup.find("script", attrs={"type": "application/ld+json",
+                                              "data-n-head": "ssr"})
     raw_json = product_json.string
 
     result: CrawlResult = CrawlResult(url=url)
@@ -72,13 +75,15 @@ def crawl_jumbo(url: str) -> CrawlResult:
     try:
         product = json.loads(raw_json)
     except json.decoder.JSONDecodeError as exception:
-        logging.error("Could not decode JSON %s, raising CrawlerException", raw_json)
+        logging.error("Could not decode JSON %s, raising CrawlerException",
+                      raw_json)
         raise CrawlerException from exception
 
     if product["offers"]["@type"] == "AggregateOffer":
         offer = product["offers"]
     else:
-        logging.error("No price info available in %s, raising CrawlerException", raw_json)
+        logging.error("No price info available in %s, "
+                      "raising CrawlerException", raw_json)
         raise CrawlerException()
 
     try:

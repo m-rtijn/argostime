@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
     crawler/shop/ah.py
 
@@ -22,33 +21,35 @@
     along with Argostimè. If not, see <https://www.gnu.org/licenses/>.
 """
 
-from datetime import date
 import json
 import logging
+from datetime import date
 
-import requests
-from bs4 import BeautifulSoup
-
+from argostime.crawler.crawl_utils import \
+    CrawlResult, parse_promotional_message, register_crawler
 from argostime.exceptions import CrawlerException
 from argostime.exceptions import PageNotFoundException
 
-from argostime.crawler.crawl_utils import CrawlResult, parse_promotional_message, register_crawler
+from bs4 import BeautifulSoup
+
+import requests
 
 
 @register_crawler("Albert Heijn", "ah.nl")
 def crawl_ah(url: str) -> CrawlResult:
     """Crawler for ah.nl"""
-    response: requests.Response = requests.get(url)
+    response: requests.Response = requests.get(url, timeout=10)
 
     if response.status_code != 200:
-        logging.error("Got status code %d while getting url %s", response.status_code, url)
+        logging.error("Got status code %d while getting url %s",
+                      response.status_code, url)
         raise PageNotFoundException(url)
 
     soup = BeautifulSoup(response.text, "html.parser")
 
     raw_json_match = soup.find(
         "script",
-        attrs={ "type": "application/ld+json", "data-react-helmet": "true"}
+        attrs={"type": "application/ld+json", "data-react-helmet": "true"}
         )
 
     result: CrawlResult = CrawlResult(url=url)
@@ -56,7 +57,8 @@ def crawl_ah(url: str) -> CrawlResult:
     try:
         product_dict = json.loads(raw_json_match.text)
     except json.decoder.JSONDecodeError as exception:
-        logging.error("Could not decode JSON %s, raising CrawlerException", raw_json_match)
+        logging.error("Could not decode JSON %s, raising CrawlerException",
+                      raw_json_match)
         raise CrawlerException from exception
     except Exception as exception:
         logging.error(
@@ -86,7 +88,8 @@ def crawl_ah(url: str) -> CrawlResult:
     try:
         offer = product_dict["offers"]
     except KeyError as exception:
-        logging.error("Could not find a valid offer in the json %s", product_dict)
+        logging.error("Could not find a valid offer in the json %s",
+                      product_dict)
         raise CrawlerException from exception
 
     if "validFrom" in offer.keys():
@@ -111,13 +114,15 @@ def crawl_ah(url: str) -> CrawlResult:
             # Try to find a promotional message
             promo_text_matches = soup.find_all(
                 "p",
-                attrs={ "class" :lambda x: x and x.startswith("promo-sticker-text") }
+                attrs={"class": lambda x:
+                       x and x.startswith("promo-sticker-text")}
                 )
 
             if len(promo_text_matches) == 0:
                 promo_text_matches = soup.find_all(
                     "div",
-                    attrs={ "class" :lambda x: x and x.startswith("promo-sticker_content") }
+                    attrs={"class": lambda x:
+                           x and x.startswith("promo-sticker_content")}
                     )
 
             promotion_message: str = ""
@@ -130,8 +135,8 @@ def crawl_ah(url: str) -> CrawlResult:
 
             price: float = float(offer["price"])
 
-            # If there is a mark with for example "25% Korting", this is already calculated into
-            # the price we got from the json.
+            # If there is a mark with for example "25% Korting", this is
+            # already calculated into the price we got from the json.
             if "korting" not in message_no_whitespace:
                 promotion = parse_promotional_message(promotion_message, price)
             else:
@@ -157,7 +162,8 @@ def crawl_ah(url: str) -> CrawlResult:
         try:
             result.normal_price = float(product_dict["offers"]["price"])
         except KeyError as inner_exception:
-            logging.error("Couldn't even find a normal price in %s", product_dict)
+            logging.error("Couldn't even find a normal price in %s",
+                          product_dict)
             raise CrawlerException from inner_exception
 
     return result

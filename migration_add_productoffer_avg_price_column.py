@@ -24,11 +24,12 @@
 
 import logging
 
+from argostime import create_app, db
+from argostime.models import Product, ProductOffer
+
 from sqlalchemy import text
 from sqlalchemy.exc import OperationalError
 
-from argostime import create_app, db
-from argostime.models import ProductOffer, Product
 
 app = create_app()
 app.app_context().push()
@@ -36,17 +37,20 @@ app.app_context().push()
 logging.info("Adding average_price column")
 
 try:
-    db.session.execute(text('ALTER TABLE ProductOffer ADD COLUMN average_price float'))
+    db.session.execute(
+        text('ALTER TABLE ProductOffer ADD COLUMN average_price float'))
 except OperationalError:
     logging.info("Column already seems to exist, fine")
 
 try:
-    db.session.execute(text('ALTER TABLE ProductOffer ADD COLUMN minimum_price float'))
+    db.session.execute(
+        text('ALTER TABLE ProductOffer ADD COLUMN minimum_price float'))
 except OperationalError:
     logging.info("Column already seems to exist, fine")
 
 try:
-    db.session.execute(text('ALTER TABLE ProductOffer ADD COLUMN maximum_price float'))
+    db.session.execute(
+        text('ALTER TABLE ProductOffer ADD COLUMN maximum_price float'))
 except OperationalError:
     logging.info("Column already seems to exist, fine")
 
