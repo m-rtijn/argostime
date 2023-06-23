@@ -39,10 +39,10 @@ db: SQLAlchemy = SQLAlchemy()
 def get_current_commit() -> str:
     """Return the hexadecimal hash of the current running commit."""
     git_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.git"))
-    with open(os.path.join(git_path, "HEAD"), "r") as file_head:
+    with open(os.path.join(git_path, "HEAD"), "r", encoding="utf-8") as file_head:
         hexsha = file_head.read().strip()
         while hexsha.startswith("ref: "):
-            with open(os.path.join(git_path, hexsha[5:])) as file_ref:
+            with open(os.path.join(git_path, hexsha[5:]), "r", encoding="utf-8") as file_ref:
                 hexsha = file_ref.read().strip()
     return hexsha
 
@@ -73,6 +73,6 @@ def create_app():
     db.init_app(app)
 
     with app.app_context():
-        from . import routes
+        from . import routes  # pylint: disable=W0611
         db.create_all()
         return app

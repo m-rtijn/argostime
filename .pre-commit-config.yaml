@@ -19,3 +19,8 @@ repos:
   rev: v3.0.0a6
   hooks:
     -   id: pylint
+        additional_dependencies:
+          - flask
+          - Flask-SQLAlchemy
+          - requests
+          - beautifulsoup4

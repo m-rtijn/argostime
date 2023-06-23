@@ -37,7 +37,7 @@ from argostime.crawler.crawl_utils import CrawlResult, parse_promotional_message
 @register_crawler("Albert Heijn", "ah.nl")
 def crawl_ah(url: str) -> CrawlResult:
     """Crawler for ah.nl"""
-    response: requests.Response = requests.get(url)
+    response: requests.Response = requests.get(url, timeout=10)
 
     if response.status_code != 200:
         logging.error("Got status code %d while getting url %s", response.status_code, url)
